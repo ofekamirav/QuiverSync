@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+
 }
 
 android {
@@ -42,5 +44,11 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.androidx.activity.compose)
+    //raam-costa navigation
+    implementation(libs.core)
+    ksp(libs.ksp)
+    implementation(libs.bottom.sheet)
+
     debugImplementation(libs.compose.ui.tooling)
+
 }

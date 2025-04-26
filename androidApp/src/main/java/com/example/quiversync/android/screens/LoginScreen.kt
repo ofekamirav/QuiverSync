@@ -17,8 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.quiversync.android.MyApplicationTheme
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -35,7 +33,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
-import com.example.quiversync.R
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -44,13 +41,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.quiversync.android.R
+import com.example.quiversync.android.navigation.RootNavGraph
+import com.ramcosta.composedestinations.annotation.Destination
 
+@RootNavGraph
+@Destination<RootNavGraph>
 @Composable
 fun LoginScreen() {
     Box(
@@ -67,7 +68,7 @@ fun LoginScreen() {
                 .padding(24.dp)
         ) {
             Icon(
-                imageVector = Icons.Filled.Lock,
+                painter = painterResource(id = R.drawable.quiversync_logo),
                 contentDescription = "Logo",
                 tint = Color(0xFF007BFF),
                 modifier = Modifier.size(48.dp)

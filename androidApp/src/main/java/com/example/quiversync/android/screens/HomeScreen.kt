@@ -1,28 +1,17 @@
 package com.example.quiversync.android.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import com.example.quiversync.android.MyApplicationTheme
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,10 +20,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.quiversync.android.MyApplicationTheme
 import com.example.quiversync.android.R
+import com.example.quiversync.android.navigation.RootNavGraph
+import com.ramcosta.composedestinations.annotation.Destination
 
+@RootNavGraph
+@Destination<RootNavGraph>
 @Composable
 fun HomeScreen() {
+    var expanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -42,8 +38,19 @@ fun HomeScreen() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("QuiverSync", color = Color(0xFF3366FF), style = MaterialTheme.typography.titleLarge)
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            "QuiverSync",
+            color = Color(0xFF3366FF),
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(vertical = 8.dp)
+        ) {
             Icon(
                 imageVector = Icons.Filled.LocationOn,
                 contentDescription = null,
@@ -51,28 +58,33 @@ fun HomeScreen() {
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
-            Text("Pipeline, North Shore", color = Color.Gray)
+            Text(
+                "Pipeline, North Shore",
+                color = Color.Gray,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                contentDescription = null,
+                tint = Color.Gray,
+                modifier = Modifier.size(24.dp)
+            )
         }
 
-        // Current Conditions Card
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF6FF)),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Current Conditions", style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    ConditionItem("Wave Height", "4-6ft", R.drawable.ic_waves)
-                    ConditionItem("Wind", "12mph", R.drawable.ic_air)
-                    ConditionItem("Tide", "Rising", R.drawable.ic_tide)
-                }
-            }
+        AnimatedVisibility(visible = expanded) {
+            CurrentConditions(
+                waveHeight = "3-4ft",
+                wind = "15mph",
+                tide = "Rising"
+            )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Board Recommendation Card
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .background( Color(0xFFFFFFFF), RoundedCornerShape(30.dp)),
             colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF))
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -98,6 +110,8 @@ fun HomeScreen() {
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Weekly Forecast
         Text("Weekly Forecast", style = MaterialTheme.typography.bodyMedium)
         ForecastItem("Mon", "Jan 15", "3-4ft", "15mph")
@@ -106,10 +120,32 @@ fun HomeScreen() {
 }
 
 @Composable
+fun CurrentConditions(waveHeight: String, wind: String, tide: String) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF6FF)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background( Color(0xFFEFF6FF), RoundedCornerShape(30.dp)),
+
+        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Current Conditions", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ConditionItem("Wave Height", waveHeight, R.drawable.ic_waves)
+                ConditionItem("Wind", wind, R.drawable.ic_air)
+                ConditionItem("Tide", tide, R.drawable.ic_tide)
+            }
+        }
+    }
+}
+
+@Composable
 fun ConditionItem(label: String, value: String, icon: Int) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
             painter = painterResource(id = icon),
             contentDescription = null,
@@ -118,7 +154,6 @@ fun ConditionItem(label: String, value: String, icon: Int) {
         )
         Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
         Text(value, fontWeight = FontWeight.Bold)
-
     }
 }
 
@@ -137,8 +172,10 @@ fun Chip(text: String, color: Color) {
 fun ForecastItem(day: String, date: String, waveHeight: String, wind: String) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
+        modifier = Modifier
+            .fillMaxWidth()
+            .background( Color(0xFFFFFFFF), RoundedCornerShape(30.dp))
+        ) {
         Row(
             modifier = Modifier
                 .padding(12.dp),
@@ -171,9 +208,8 @@ fun ForecastItem(day: String, date: String, waveHeight: String, wind: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewHomeScreen(){
+fun PreviewHomeScreen() {
     MyApplicationTheme {
         HomeScreen()
     }
-
 }
