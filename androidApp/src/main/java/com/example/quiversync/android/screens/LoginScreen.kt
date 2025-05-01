@@ -57,7 +57,7 @@ fun LoginScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF007BFF)),
+            .background(Color(0xFF397ff4)),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -70,10 +70,10 @@ fun LoginScreen() {
             Icon(
                 painter = painterResource(id = R.drawable.quiversync_logo),
                 contentDescription = "Logo",
-                tint = Color(0xFF007BFF),
+                tint = Color(0xFF397ff4),
                 modifier = Modifier.size(48.dp)
             )
-            Text("QuiverSync", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF007BFF))
+            Text("QuiverSync", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF397ff4))
             Text("Match your board to perfect waves", fontSize = 14.sp, color = Color.Gray)
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -112,7 +112,7 @@ fun LoginScreen() {
                 }
                 Text(
                     text = "Forgot Password?",
-                    color = Color(0xFF007BFF),
+                    color = Color(0xFF397ff4),
                     modifier = Modifier.clickable { },
                     fontSize = 12.sp
                 )
@@ -120,7 +120,7 @@ fun LoginScreen() {
 
             Button(
                 onClick = { },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007BFF)),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF397ff4)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
