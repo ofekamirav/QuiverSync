@@ -1,5 +1,6 @@
 package com.example.quiversync.android.screens
 
+import QuiverScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -73,7 +74,22 @@ fun MainScreen() {
                 0 -> HomeScreen()
                 1 -> SpotsScreen()
                 2 -> QuiverScreen()
-                3 -> ProfileScreen()
+                3 ->  ProfileScreen(
+                    user = UserProfile(
+                        name = "Mike Rodriguez",
+                        location = "San Diego, CA",
+                        imageUrl = "https://via.placeholder.com/150",
+                        boards = 8,
+                        reviews = 5,
+                        spots = 12,
+                        heightCm = 169,
+                        weightKg = 62,
+                        surfLevel = "Intermediate",
+                        email = "MikeRod@gmail.com",
+                        dateOfBirth = "01/01/2000"
+                    ),
+                    onLogout = { /* handle logout */ }
+                )
             }
         }
 
