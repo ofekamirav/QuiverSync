@@ -35,9 +35,9 @@ kotlin {
             //put your multiplatform dependencies here
             implementation(libs.jetbrains.compose.runtime)
             implementation(libs.jetbrains.compose.foundation)
-            implementation(libs.jetbrains.compose.material)
-            implementation(libs.compose.material3)
-            implementation(libs.androidx.material.icons.extended)
+//            implementation(libs.jetbrains.compose.material)
+//            implementation(libs.compose.material3)
+//            implementation(libs.androidx.material.icons.extended)
 
 
         }

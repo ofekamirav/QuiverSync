@@ -24,7 +24,7 @@ import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
 fun MainScreen() {
     val items = listOf(
         BottomNavItem("Home", painterResource(id = R.drawable.ic_home), HomeScreenDestination),
-        BottomNavItem("Spots", painterResource(id = R.drawable.ic_map), SpotsScreenDestination),
+        BottomNavItem("Forecast", painterResource(id = R.drawable.ic_map), ForecastScreenDestination),
         BottomNavItem(
             "Quiver",
             painterResource(id = R.drawable.ic_quiver),
@@ -35,6 +35,7 @@ fun MainScreen() {
             painterResource(id = R.drawable.ic_profile),
             ProfileScreenDestination
         ),
+
     )
     var selectedItem by remember { mutableStateOf(0) }
     Scaffold(
@@ -72,7 +73,7 @@ fun MainScreen() {
         ) {
             when (selectedItem) {
                 0 -> HomeScreen()
-                1 -> SpotsScreen()
+                1 -> ForecastScreen()
                 2 -> QuiverScreen()
                 3 ->  ProfileScreen(
                     user = UserProfile(
