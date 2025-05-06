@@ -8,6 +8,7 @@ androidx-activityCompose = "1.8.2"
 jetbrains-compose = "1.7.3"
 materialIconsExtended = "1.7.8"
 ksp = "2.1.10-1.0.31"
+playServicesMaps = "19.2.0"
 
 [libraries]
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -24,6 +25,7 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 jetbrains-compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "jetbrains-compose" }
 jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains-compose" }
 ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "core" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
