@@ -38,6 +38,8 @@ fun CustomTextField(
         .height(60.dp),
     trailingIcon: @Composable (() -> Unit)? = null,
     readOnly: Boolean = false,
+    isError: Boolean = false,
+    supportingText: @Composable (() -> Unit)? = null
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -93,5 +95,7 @@ fun CustomTextField(
             }
         ),
         readOnly = readOnly,
+        isError = isError,
+        supportingText = supportingText
     )
 }

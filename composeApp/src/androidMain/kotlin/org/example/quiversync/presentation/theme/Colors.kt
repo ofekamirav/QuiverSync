@@ -12,6 +12,7 @@ object OceanPalette {
     val SandOrange = Color(0xFFFFA726)
     val TextDark = Color(0xFF263238)
     val BorderGray = Color(0xFFE0E0E0)
+    val error = Color(0xFFD35C5C)
 
     val SurfGradient = listOf(SkyBlue, SurfBlue)
     val LoginGradientLight = listOf(SkyBlue, SurfBlue)

@@ -27,7 +27,8 @@ fun QuiverSyncTheme(
             background = OceanPalette.DarkBackground,
             surface = OceanPalette.DarkSurface,
             onSurface = OceanPalette.DarkText,
-            onSecondary = OceanPalette.DarkSky
+            onSecondary = OceanPalette.DarkSky,
+            error = OceanPalette.error
         )
     } else {
         lightColorScheme(
@@ -37,7 +38,8 @@ fun QuiverSyncTheme(
             background = OceanPalette.background,
             surface = OceanPalette.FoamWhite,
             onSurface = OceanPalette.TextDark,
-            onSecondary = OceanPalette.SurfBlue
+            onSecondary = OceanPalette.SurfBlue,
+            error = OceanPalette.error
         )
     }
 

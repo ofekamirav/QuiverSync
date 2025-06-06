@@ -18,6 +18,11 @@ compose-bom = "2024.02.00"
 junit = "4.13.2"
 kotlin = "2.0.0"
 kotlinxCoroutinesCore = "1.10.1"
+ktorClientContentNegotiation = "3.0.1"
+ktorClientCore = "3.0.1"
+ktorClientDarwin = "3.0.1"
+ktorClientOkhttp = "3.0.1"
+ktorSerializationKotlinxJson = "3.0.1"
 lifecycleViewmodelKtx = "2.8.7"
 navigationCompose = "2.7.7"
 playServicesMaps = "19.2.0"
@@ -63,6 +68,11 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 
 # Maps
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientDarwin" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientOkhttp" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 
