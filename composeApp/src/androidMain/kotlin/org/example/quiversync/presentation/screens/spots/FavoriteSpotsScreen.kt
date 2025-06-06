@@ -20,16 +20,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.quiversync.R
-import org.example.quiversync.model.FavoriteSpot
+import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.presentation.theme.OceanPalette
-import org.example.quiversync.presentation.theme.QuiverSyncTheme
 
 
 @Composable
-fun FavoriteSpotsScreen(spots: List<FavoriteSpot>) {
+fun FavoriteSpotsScreen(spots: List<FavoriteSpot> = emptyList()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,6 +58,7 @@ fun FavoriteSpotsScreen(spots: List<FavoriteSpot>) {
 fun ExpandableSpotCard(spot: FavoriteSpot) {
     var expanded by remember { mutableStateOf(false) }
     val isDark = isSystemInDarkTheme()
+    val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.White
 
     Card(
         modifier = Modifier
@@ -67,7 +66,7 @@ fun ExpandableSpotCard(spot: FavoriteSpot) {
             .clickable { expanded = !expanded },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isDark) OceanPalette.DarkFoamWhite else OceanPalette.FoamWhite
+            containerColor = cardColor
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -122,7 +121,7 @@ fun ExpandableSpotCard(spot: FavoriteSpot) {
                             )
                             Column {
                                 Text(
-                                    text = spot.recommendedBoard,
+                                    text = spot.recommendedBoardId,
                                     fontWeight = FontWeight.Bold,
                                     color = OceanPalette.DeepBlue
                                 )
@@ -177,15 +176,15 @@ fun ConfidenceProgress(percentage: Int) {
             .clip(RoundedCornerShape(8.dp))
     )
 }
-@Preview(showBackground = true)
-@Composable
-fun PreviewFavoriteSpotsScreen() {
-    val mockSpots = listOf(
-        FavoriteSpot("Pipeline", "North Shore, HI", "Shortboard", 94, "3-4"),
-        FavoriteSpot("Trestles", "California", "Fish", 87, "3-4"),
-        FavoriteSpot("Snapper Rocks", "Australia", "Funboard", 79, "3-4")
-    )
-    QuiverSyncTheme {
-        FavoriteSpotsScreen(spots = mockSpots)
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewFavoriteSpotsScreen() {
+//    val mockSpots = listOf(
+//        FavoriteSpot("Pipeline", "North Shore, HI", "Shortboard", 94, "3-4"),
+//        FavoriteSpot("Trestles", "California", "Fish", 87, "3-4"),
+//        FavoriteSpot("Snapper Rocks", "Australia", "Funboard", 79, "3-4")
+//    )
+//    QuiverSyncTheme {
+//        FavoriteSpotsScreen(spots = mockSpots)
+//    }
+//}

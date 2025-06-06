@@ -38,6 +38,8 @@ import org.example.quiversync.presentation.screens.home.HomeScreen
 import org.example.quiversync.presentation.screens.ProfileScreen
 import org.example.quiversync.presentation.screens.UserProfile
 import org.example.quiversync.presentation.screens.quiver.QuiverScreen
+import org.example.quiversync.presentation.screens.rentals.RentalsHubScreen
+import org.example.quiversync.presentation.screens.spots.FavoriteSpotsScreen
 import org.example.quiversync.presentation.theme.OceanPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +49,8 @@ fun MainScreen(
 ) {
     val items = listOf(
         BottomNavItem("Home", painterResource(id = R.drawable.ic_home), "home_screen", "QuiverSync"),
-        BottomNavItem("Forecast", painterResource(id = R.drawable.ic_map), "forecast_screen", "Search a Surf Spot"),
+        BottomNavItem("Spots", painterResource(id = R.drawable.ic_map), "spots_screen", "Surf Spots"),
+        BottomNavItem("Rentals", painterResource(id = R.drawable.ic_rentals), "rentals_screen", "Rentals"),
         BottomNavItem("Quiver", painterResource(id = R.drawable.ic_quiver), "quiver_screen", "My Quiver"),
         BottomNavItem("Profile", painterResource(id = R.drawable.ic_profile), "profile_screen", "Profile")
     )
@@ -119,8 +122,9 @@ fun MainScreen(
             when (selectedItem) {
                 0 -> HomeScreen()
                 1 -> ForecastScreen()
-                2 -> QuiverScreen(viewModel = quiverViewModel)
-                3 ->  ProfileScreen(
+                2 -> FavoriteSpotsScreen()
+                3 -> QuiverScreen(viewModel = quiverViewModel)
+                4 ->  ProfileScreen(
                     user = UserProfile(
                         name = "Mike Rodriguez",
                         location = "San Diego, CA",

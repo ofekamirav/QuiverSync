@@ -2,10 +2,14 @@ package org.example.quiversync.presentation.screens.quiver
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -16,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,10 +37,11 @@ import androidx.compose.ui.window.Dialog
 import org.example.quiversync.R
 import org.example.quiversync.features.quiver.QuiverState
 import org.example.quiversync.features.quiver.QuiverViewModel
-import org.example.quiversync.model.Surfboard
+import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.presentation.components.ErrorContent
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.theme.OceanPalette
+import org.example.quiversync.presentation.theme.QuiverSyncTheme
 
 @Composable
 fun QuiverScreen(
@@ -44,8 +50,8 @@ fun QuiverScreen(
     val uiState by viewModel.uiState.collectAsState()
     when (uiState) {
         is QuiverState.Error-> ErrorContent((uiState as QuiverState.Error).message)
-        is QuiverState.Loading -> LoadingAnimation(isLoading = true, animationFileName = "assets/loading_animation_quiversync.json")
-        is QuiverState.Success -> QuiverContent((uiState as QuiverState.Success).quiver.surfboards)
+        is QuiverState.Loading -> LoadingAnimation(isLoading = true, animationFileName = "assets/quiver_sync_loading_animation.json")
+        is QuiverState.Success -> QuiverContent((uiState as QuiverState.Success).quiver)
     }
     QuiverContent(
         boards = boards
@@ -55,6 +61,7 @@ fun QuiverScreen(
     val boards = listOf(
         Surfboard(
             id= "",
+            ownerId = "",
             model = "Holly Grail",
             company = "Hayden Shapes",
             type = "Shortboard",
@@ -62,10 +69,13 @@ fun QuiverScreen(
             height = "6'2\"",
             volume = "32L",
             width = "19\"",
-            addedDate = "2024-05-01"
+            addedDate = "2024-05-01",
+            isRentalPublished = false,
+            isRentalAvailable = false,
         ),
         Surfboard(
             id= "",
+            ownerId = "",
             model = "FRK+",
             company = "Slater Designs",
             type = "Funboard",
@@ -73,7 +83,10 @@ fun QuiverScreen(
             height = "5'8\"",
             volume = "28L",
             width = "20 1/4\"",
-            addedDate = "2024-04-15"
+            addedDate = "2024-04-15",
+            isRentalPublished = true,
+            isRentalAvailable = true,
+            pricePerDay = 10.0
         ),
     )
 
@@ -96,7 +109,8 @@ fun QuiverContent(boards: List<Surfboard>) {
             items(boards.size) { index ->
                 BoardCard(
                     board = boards[index],
-                    onLongClick = { selectedBoard = boards[index] }
+                    onClick = { selectedBoard = boards[index] },
+                    onPublishToggle = { /* Handle Publish Toggle */ }
                 )
             }
         }
@@ -125,33 +139,45 @@ fun QuiverContent(boards: List<Surfboard>) {
         SurfboardDetailDialog(
             board = it,
             visible = true,
-            onDismiss = { selectedBoard = null }
+            onDismiss = { selectedBoard = null },
+            onDelete = { /* Handle Delete */ }
         )
     }
 }
 
 
 @Composable
-fun BoardCard(board: Surfboard, onLongClick: () -> Unit) {
-    val backgroundColor = if (isSystemInDarkTheme()) {
-        OceanPalette.DeepBlue.copy(alpha = 0.1f)
-    } else {
-        OceanPalette.SkyBlue.copy(alpha = 0.1f)
-    }
+fun BoardCard(
+    board: Surfboard,
+    onClick: () -> Unit,
+    onPublishToggle: (Boolean) -> Unit
+) {
+    val isPublished = board.isRentalPublished
+    val baseBackgroundColor = if (isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.White
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = baseBackgroundColor,
+        animationSpec = tween(300)
+    )
 
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
+    val animatedBorderColor by animateColorAsState(
+        targetValue = if (isPublished) OceanPalette.SandOrange else Color.Transparent,
+        animationSpec = tween(300)
+    )
+
+    val animatedElevation by animateDpAsState(
+        targetValue = if (isPublished) 8.dp else 4.dp,
+        animationSpec = tween(300)
+    )
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f)
-            .pointerInput(Unit) {
-                detectTapGestures(onLongPress = { onLongClick() })
-            },
+            .aspectRatio(0.8f)
+            .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
+        elevation = CardDefaults.cardElevation(defaultElevation = animatedElevation),
+        colors = CardDefaults.cardColors(containerColor = animatedBackgroundColor),
+        border = BorderStroke(2.dp, animatedBorderColor)
     ) {
         Column(
             modifier = Modifier
@@ -173,96 +199,132 @@ fun BoardCard(board: Surfboard, onLongClick: () -> Unit) {
                 fontWeight = FontWeight.SemiBold,
                 color = OceanPalette.DeepBlue
             )
+            Spacer(Modifier.weight(1f))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "For Rent",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Switch(
+                    checked = board.isRentalPublished,
+                    onCheckedChange = onPublishToggle,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = OceanPalette.SandOrange,
+                        checkedTrackColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.6f),
+                        uncheckedThumbColor = OceanPalette.SandOrange.copy(alpha = 0.4f),
+                        uncheckedTrackColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.4f),
+                        uncheckedBorderColor = Color.Transparent,
+                    )
+                )
+            }
         }
     }
 }
 
 
 @Composable
-fun SurfboardDetailDialog(board: Surfboard, visible: Boolean, onDismiss: () -> Unit) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ){
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr){
+fun SurfboardDetailDialog(
+    board: Surfboard,
+    visible: Boolean,
+    onDismiss: () -> Unit,
+    onDelete: (Surfboard) -> Unit = {} // ← חדש
+) {
+    AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Dialog(onDismissRequest = onDismiss) {
                 Card(
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.padding(16.dp),
                     elevation = CardDefaults.cardElevation(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F4FF))
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(24.dp)
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = board.model,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF333333)
-                        )
-                        Image(
-                            painter = painterResource(id = board.imageRes),
-                            contentDescription = "Surfboard Image",
+                    Box {
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .padding(vertical = 8.dp)
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                                .padding(24.dp)
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("Company:", fontWeight = FontWeight.SemiBold)
-                            Text(board.company)
+                            Text(
+                                text = board.model,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Image(
+                                painter = painterResource(id = board.imageRes),
+                                contentDescription = "Surfboard Image",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .padding(vertical = 8.dp)
+                            )
+
+                            RowItem("Company:", board.company)
+                            RowItem("Height:", board.height)
+                            RowItem("Width:", board.width)
+                            RowItem("Volume:", board.volume)
+                            RowItem("Added:", board.addedDate)
+
+                            if (board.isRentalPublished) {
+                                RowItem("Price / Day:", "${board.pricePerDay} $")
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Button(
+                                onClick = {
+                                    onDelete(board)
+                                    onDismiss()
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Delete Surfboard", color = Color.White)
+                            }
                         }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(8.dp)
                         ) {
-                            Text("Height:", fontWeight = FontWeight.SemiBold)
-                            Text(board.height)
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("Width:", fontWeight = FontWeight.SemiBold)
-                            Text(board.width)
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("Volume:", fontWeight = FontWeight.SemiBold)
-                            Text(board.volume)
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("Added:", fontWeight = FontWeight.SemiBold)
-                            Text(board.addedDate)
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 }
             }
         }
-
     }
-
 }
 
+@Composable
+private fun RowItem(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+        Text(value, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Light)
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
 fun QuiverScreenPreview() {
-    QuiverScreen(
-        viewModel = QuiverViewModel()
-    )
+    QuiverSyncTheme{
+        QuiverScreen(viewModel = QuiverViewModel())
+    }
 }

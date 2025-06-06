@@ -30,6 +30,8 @@ fun ProfileScreen(
     onLogout: () -> Unit,
     onEdit: () -> Unit = {}
 ) {
+    val isDark = isSystemInDarkTheme()
+    val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.White
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -85,7 +87,7 @@ fun ProfileScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(vertical = 16.dp)
         ) {
-            StatItem("Reviews", user.reviews.toString())
+            StatItem("Rentals", user.reviews.toString())
             VerticalDivider()
             StatItem("Boards", user.boards.toString())
             VerticalDivider()
@@ -97,7 +99,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surface)
+                .background(cardColor)
                 .padding(vertical = 12.dp)
         ) {
             UserDetailItem(R.drawable.ic_mail, "Email", user.email)
