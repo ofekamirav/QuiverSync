@@ -36,6 +36,10 @@ fun AppNavigation(){
             LoginScreen(
                 onRegisterClick = {
                     navController.navigate(Screen.Register.route)
+                },
+                onSignInClick = {
+                    isLoggedIn = true
+                    navController.navigate(Screen.Main.route)
                 }
             )
         }

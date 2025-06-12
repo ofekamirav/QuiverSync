@@ -31,7 +31,8 @@ import org.example.quiversync.presentation.theme.OceanPalette
 
 @Composable
 fun LoginScreen(
-    onRegisterClick: () -> Unit = {}
+    onRegisterClick: () -> Unit = {},
+    onSignInClick: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -120,7 +121,8 @@ fun LoginScreen(
 
             GradientButton(
                 text = "Sign In",
-                onClick = { /* Handle login */ },
+                onClick = { onSignInClick() },
+//                modifier = Modifier.clickable { onSignInClick() },
                 shape = RoundedCornerShape(16.dp)
             )
 
