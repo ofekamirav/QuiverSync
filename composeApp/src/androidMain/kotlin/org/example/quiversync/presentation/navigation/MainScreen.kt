@@ -54,7 +54,6 @@ fun MainScreen(
         BottomNavItem("Quiver", painterResource(id = R.drawable.ic_quiver), "quiver_screen", "My Quiver"),
         BottomNavItem("Profile", painterResource(id = R.drawable.ic_profile), "profile_screen", "Profile")
     )
-    val quiverViewModel = QuiverViewModel()
     var selectedItem by remember { mutableStateOf(0) }
     val currentScreenTitle = items[selectedItem].title
     val canNavigateBack = false //if there is an inside page
@@ -123,7 +122,7 @@ fun MainScreen(
                 0 -> HomeScreen()
                 1 -> ForecastScreen()
                 2 -> FavoriteSpotsScreen()
-                3 -> QuiverScreen(viewModel = quiverViewModel)
+                3 -> QuiverScreen()
                 4 ->  ProfileScreen(
                     user = UserProfile(
                         name = "Mike Rodriguez",

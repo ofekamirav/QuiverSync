@@ -42,10 +42,11 @@ import org.example.quiversync.presentation.components.ErrorContent
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun QuiverScreen(
-    viewModel: QuiverViewModel
+    viewModel: QuiverViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     when (uiState) {
@@ -234,7 +235,7 @@ fun SurfboardDetailDialog(
     board: Surfboard,
     visible: Boolean,
     onDismiss: () -> Unit,
-    onDelete: (Surfboard) -> Unit = {} // ← חדש
+    onDelete: (Surfboard) -> Unit = {}
 ) {
     AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {

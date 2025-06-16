@@ -39,16 +39,30 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(libs.kotlinx.coroutines.core)
+            //ktor
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+            //Koin
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.test)
+
         }
         androidMain.dependencies {
             implementation(libs.androidx.lifecycle.viewmodel.ktx)
+            //ktor
             implementation(libs.ktor.client.okhttp)
+            //koin
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
+
         }
         iosMain.dependencies {
+            //Ktor
             implementation(libs.ktor.client.darwin)
+
         }
     }
 }
