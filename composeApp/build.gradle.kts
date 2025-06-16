@@ -23,6 +23,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.androidx.runtime)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -66,10 +68,8 @@ android {
 }
 
 dependencies {
-    val composeBom = platform(libs.compose.bom)
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
+    //ui
+    implementation(libs.androidx.ui.tooling.preview)
     debugImplementation(compose.uiTooling)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)
@@ -78,9 +78,12 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.accompanist.pager)
     implementation(libs.accompanist.pager.indicators)
-    //skeletone
+    //skeleton
     implementation(libs.accompanist.placeholder.material)
-
+    //koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
     //lottie-compose
     implementation(libs.lottie.compose)
     //Google Maps
