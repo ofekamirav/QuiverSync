@@ -45,7 +45,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun QuiverScreen(
-    viewModel: QuiverViewModel = koinViewModel()
+    viewModel: QuiverViewModel = QuiverViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsState().value
 

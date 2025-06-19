@@ -4,7 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.serialization.json.Json
-import org.example.quiversync.data.remote.datasource.RemoteQuiverRepository
+//import org.example.quiversync.data.remote.datasource.RemoteQuiverRepository
 import org.example.quiversync.domain.repository.QuiverRepository
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -17,6 +17,8 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import org.example.quiversync.features.quiver.QuiverViewModel
+import org.koin.core.module.dsl.factoryOf
 
 
 fun initKoin(config: KoinAppDeclaration? = null) {
@@ -36,11 +38,12 @@ expect val platformModule: Module
 
 val commonModule= module {
    singleOf(::createJson)
-   singleOf(::RemoteQuiverRepository).bind<QuiverRepository>()
+//   singleOf(::RemoteQuiverRepository).bind<QuiverRepository>()
    //add here all the repositories
 
    //add all the viewmodels
-   //viewModelOf(::QuiverViewModel)
+
+//   viewModel { QuiverViewModel() }
    single { createHttpClient(get(), get()) }
 }
 

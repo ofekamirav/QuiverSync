@@ -17,12 +17,14 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
-    
+
     sourceSets {
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.androidx.runtime)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -87,5 +89,7 @@ dependencies {
     //Google Maps
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
-}
 
+
+
+}
