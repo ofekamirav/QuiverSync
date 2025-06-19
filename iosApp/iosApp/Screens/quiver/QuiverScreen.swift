@@ -12,8 +12,22 @@ import SwiftUI
 import Shared
 
 public struct QuiverScreen: View {
+    
+    @ObservedObject private(set) var viewModel = QuiverViewModelWrapper()
+    
     public var body: some View {
-        Text("QuiverScreen")
+        VStack{
+            switch onEnum(of: viewModel.uiState){
+            case .loading:
+                Text("Loading...")
+            case .success:
+                Text("Success")
+            case .error:
+                Text("Failure")
+            
+                
+            }
+        }
     }
 }
 
@@ -26,7 +40,7 @@ extension QuiverScreen {
         let ViewModel: QuiverViewModel
         @Published var uiState: QuiverState
         
-        init(ViewModel: QuiverViewModel, uiState: QuiverState) {
+        init() {
             self.ViewModel = QuiverViewModel()
             self.uiState = ViewModel.uiState.value
         }
