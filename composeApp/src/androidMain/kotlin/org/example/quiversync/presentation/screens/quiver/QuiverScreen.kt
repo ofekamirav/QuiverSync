@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.screens.quiver
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -10,9 +11,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -26,7 +24,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +33,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import org.example.quiversync.R
+import org.example.quiversync.domain.model.Quiver
 import org.example.quiversync.features.quiver.QuiverState
 import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.domain.model.Surfboard
@@ -46,53 +45,54 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun QuiverScreen(
-    viewModel: QuiverViewModel = koinViewModel()
+    viewModel: QuiverViewModel = QuiverViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsState().value
+
     when (uiState) {
         is QuiverState.Error-> ErrorContent((uiState as QuiverState.Error).message)
         is QuiverState.Loading -> LoadingAnimation(isLoading = true, animationFileName = "assets/quiver_sync_loading_animation.json")
-        is QuiverState.Success -> QuiverContent((uiState as QuiverState.Success).quiver)
+        is QuiverState.Success -> QuiverContent(uiState.quiver)
     }
-    QuiverContent(
-        boards = boards
-    )
+//    QuiverContent(
+//        boards = boards
+//    )
 
 }
-    val boards = listOf(
-        Surfboard(
-            id= "",
-            ownerId = "",
-            model = "Holly Grail",
-            company = "Hayden Shapes",
-            type = "Shortboard",
-            imageRes = R.drawable.hs_shortboard,
-            height = "6'2\"",
-            volume = "32L",
-            width = "19\"",
-            addedDate = "2024-05-01",
-            isRentalPublished = false,
-            isRentalAvailable = false,
-        ),
-        Surfboard(
-            id= "",
-            ownerId = "",
-            model = "FRK+",
-            company = "Slater Designs",
-            type = "Funboard",
-            imageRes = R.drawable.hs_shortboard,
-            height = "5'8\"",
-            volume = "28L",
-            width = "20 1/4\"",
-            addedDate = "2024-04-15",
-            isRentalPublished = true,
-            isRentalAvailable = true,
-            pricePerDay = 10.0
-        ),
-    )
+//    val boards = listOf(
+//        Surfboard(
+//            id= "",
+//            ownerId = "",
+//            model = "Holly Grail",
+//            company = "Hayden Shapes",
+//            type = "Shortboard",
+//            imageRes = R.drawable.hs_shortboard,
+//            height = "6'2\"",
+//            volume = "32L",
+//            width = "19\"",
+//            addedDate = "2024-05-01",
+//            isRentalPublished = false,
+//            isRentalAvailable = false,
+//        ),
+//        Surfboard(
+//            id= "",
+//            ownerId = "",
+//            model = "FRK+",
+//            company = "Slater Designs",
+//            type = "Funboard",
+//            imageRes = R.drawable.hs_shortboard,
+//            height = "5'8\"",
+//            volume = "28L",
+//            width = "20 1/4\"",
+//            addedDate = "2024-04-15",
+//            isRentalPublished = true,
+//            isRentalAvailable = true,
+//            pricePerDay = 10.0
+//        ),
+//    )
 
 @Composable
-fun QuiverContent(boards: List<Surfboard>) {
+fun QuiverContent(boards: Quiver) {
     var selectedBoard by remember { mutableStateOf<Surfboard?>(null) }
 
     Column(
@@ -107,10 +107,10 @@ fun QuiverContent(boards: List<Surfboard>) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            items(boards.size) { index ->
+            items(boards.items.size) { index ->
                 BoardCard(
-                    board = boards[index],
-                    onClick = { selectedBoard = boards[index] },
+                    board = boards.items[index],
+                    onClick = { selectedBoard = boards.items[index] },
                     onPublishToggle = { /* Handle Publish Toggle */ }
                 )
             }
@@ -170,6 +170,11 @@ fun BoardCard(
         animationSpec = tween(300)
     )
 
+    val context = LocalContext.current
+    val imageResId = remember(board.imageRes) {
+        getDrawableIdByName(context, board.imageRes)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -188,7 +193,7 @@ fun BoardCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = board.imageRes),
+                painter = painterResource(id = imageResId),
                 contentDescription = "Surfboard Image",
                 modifier = Modifier
                     .size(80.dp)
@@ -229,6 +234,10 @@ fun BoardCard(
     }
 }
 
+fun getDrawableIdByName(context: Context, name: String): Int {
+    return context.resources.getIdentifier(name, "drawable", context.packageName)
+}
+
 
 @Composable
 fun SurfboardDetailDialog(
@@ -237,6 +246,10 @@ fun SurfboardDetailDialog(
     onDismiss: () -> Unit,
     onDelete: (Surfboard) -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val imageResId = remember(board.imageRes) {
+        getDrawableIdByName(context, board.imageRes)
+    }
     AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Dialog(onDismissRequest = onDismiss) {
@@ -260,8 +273,9 @@ fun SurfboardDetailDialog(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
+
                             Image(
-                                painter = painterResource(id = board.imageRes),
+                                painter = painterResource(id = imageResId),
                                 contentDescription = "Surfboard Image",
                                 modifier = Modifier
                                     .fillMaxWidth()
