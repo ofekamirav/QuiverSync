@@ -33,7 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.R
 import org.example.quiversync.features.quiver.QuiverViewModel
-import org.example.quiversync.presentation.screens.spots.ForecastScreen
+//import org.example.quiversync.presentation.screens.spots.ForecastScreen
 import org.example.quiversync.presentation.screens.home.HomeScreen
 import org.example.quiversync.presentation.screens.ProfileScreen
 import org.example.quiversync.presentation.screens.UserProfile
@@ -120,7 +120,7 @@ fun MainScreen(
         ) {
             when (selectedItem) {
                 0 -> HomeScreen()
-                1 -> ForecastScreen()
+                1 -> FavoriteSpotsScreen()
                 2 -> FavoriteSpotsScreen()
                 3 -> QuiverScreen()
                 4 ->  ProfileScreen(
