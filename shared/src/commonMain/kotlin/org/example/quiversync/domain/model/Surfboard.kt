@@ -9,7 +9,7 @@ data class Surfboard(
     val height: String,
     val width: String,
     val volume: String,
-    val imageRes: Int,
+    val imageRes: String,
     val addedDate: String,
     val isRentalPublished: Boolean,
     val isRentalAvailable: Boolean,
