@@ -52,44 +52,11 @@ fun QuiverScreen(
     when (uiState) {
         is QuiverState.Error-> ErrorContent((uiState as QuiverState.Error).message)
         is QuiverState.Loading -> LoadingAnimation(isLoading = true, animationFileName = "assets/quiver_sync_loading_animation.json")
-        is QuiverState.Success -> QuiverContent(uiState.quiver)
+        is QuiverState.Loaded -> QuiverContent(uiState.quiver)
     }
-//    QuiverContent(
-//        boards = boards
-//    )
 
 }
-//    val boards = listOf(
-//        Surfboard(
-//            id= "",
-//            ownerId = "",
-//            model = "Holly Grail",
-//            company = "Hayden Shapes",
-//            type = "Shortboard",
-//            imageRes = R.drawable.hs_shortboard,
-//            height = "6'2\"",
-//            volume = "32L",
-//            width = "19\"",
-//            addedDate = "2024-05-01",
-//            isRentalPublished = false,
-//            isRentalAvailable = false,
-//        ),
-//        Surfboard(
-//            id= "",
-//            ownerId = "",
-//            model = "FRK+",
-//            company = "Slater Designs",
-//            type = "Funboard",
-//            imageRes = R.drawable.hs_shortboard,
-//            height = "5'8\"",
-//            volume = "28L",
-//            width = "20 1/4\"",
-//            addedDate = "2024-04-15",
-//            isRentalPublished = true,
-//            isRentalAvailable = true,
-//            pricePerDay = 10.0
-//        ),
-//    )
+
 
 @Composable
 fun QuiverContent(boards: Quiver) {
