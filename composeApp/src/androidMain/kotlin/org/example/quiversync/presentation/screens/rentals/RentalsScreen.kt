@@ -27,6 +27,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import org.example.quiversync.presentation.widgets.rentals_screen.RentalBoardCard
+import org.example.quiversync.presentation.widgets.rentals_screen.RentalBoardList
+import org.example.quiversync.presentation.widgets.rentals_screen.RentalRequestCard
+import org.example.quiversync.presentation.widgets.rentals_screen.RentalRequestList
 
 
 data class UserProfile(
@@ -99,140 +103,6 @@ fun OwnerInfoChip(name: String, imageUrl: String) {
     }
 }
 
-@Composable
-fun RentalBoardCard(board: BoardForRent, modifier: Modifier = Modifier) {
-    val cardColor = if(isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.White
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(cardColor)
-    ) {
-        Column {
-            Image(
-                painter = painterResource(id = R.drawable.hs_shortboard),
-                contentDescription = board.boardName,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp),
-                contentScale = ContentScale.Fit
-            )
-
-            Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(
-                    text = board.boardName,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
-                )
-                Text(
-                    text = "${board.boardType} - ${board.size}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.hs_shortboard),
-                        contentDescription = board.owner.name,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clip(CircleShape)
-                            .background(Color.LightGray)
-                    )
-                    Text(
-                        text = board.owner.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Text(
-                    text = "$${String.format("%.0f", board.pricePerDay)}/day",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun RentalRequestCard(
-    request: RentalRequest,
-    isMyOffer: Boolean,
-    onApprove: (String) -> Unit,
-    onReject: (String) -> Unit
-) {
-    val cardColor = if(isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.White
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = "For: ${request.board.boardName}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    OwnerInfoChip(
-                        name = if(isMyOffer) "From: ${request.renter.name}" else "To: ${request.board.owner.name}",
-                        imageUrl = if(isMyOffer) request.renter.imageUrl else request.board.owner.imageUrl
-                    )
-                    Text(
-                        text = "Dates: ${formatDate(request.startDate)} - ${formatDate(request.endDate)}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                AssistChip(
-                    onClick = {},
-                    label = {
-                        Text(
-                            text = request.status.name,
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    colors = AssistChipDefaults.assistChipColors(
-                        containerColor = colorForStatus(request.status)
-                    )
-                )
-            }
-
-            if (isMyOffer && request.status == RentalStatus.PENDING) {
-                Divider()
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)
-                ) {
-                    OutlinedButton(onClick = { onReject(request.requestId) }) { Text("Reject") }
-                    Button(onClick = { onApprove(request.requestId) }) { Text("Approve") }
-                }
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -276,68 +146,6 @@ fun RentalsHubScreen(
         }
     }
 }
-
-@Composable
-fun RentalBoardList(boards: List<BoardForRent>) {
-    if (boards.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No boards available.", style = MaterialTheme.typography.bodyLarge, color = Color.Gray)
-        }
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(boards.chunked(2)) { boardPair ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    boardPair.forEach { board ->
-                        RentalBoardCard(
-                            board = board,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    if (boardPair.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun RentalRequestList(
-    requests: List<RentalRequest>,
-    isMyOffer: Boolean,
-    onApprove: (String) -> Unit = {},
-    onReject: (String) -> Unit = {}
-) {
-    if (requests.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No requests found.", style = MaterialTheme.typography.bodyLarge, color = Color.Gray)
-        }
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(requests) { request ->
-                RentalRequestCard(
-                    request = request,
-                    isMyOffer = isMyOffer,
-                    onApprove = onApprove,
-                    onReject = onReject
-                )
-            }
-        }
-    }
-}
-
 
 // --- שלב 5: תצוגה מקדימה עשירה ---
 

@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,8 +40,13 @@ import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.presentation.components.ErrorContent
 import org.example.quiversync.presentation.components.LoadingAnimation
+import org.example.quiversync.presentation.screens.skeletons.BoardCardSkeleton
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
+import org.example.quiversync.presentation.widgets.quiver_screen.BoardCard
+import org.example.quiversync.presentation.widgets.quiver_screen.SurfboardDetailDialog
+import org.example.quiversync.utils.LocalWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -48,49 +54,19 @@ fun QuiverScreen(
     viewModel: QuiverViewModel = QuiverViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsState().value
-
     when (uiState) {
-        is QuiverState.Error-> ErrorContent((uiState as QuiverState.Error).message)
-        is QuiverState.Loading -> LoadingAnimation(isLoading = true, animationFileName = "assets/quiver_sync_loading_animation.json")
+        is QuiverState.Error -> ErrorContent((uiState).message)
+        is QuiverState.Loading -> {
+            LazyColumn {
+                items(4) {
+                    BoardCardSkeleton()
+                }
+            }
+        }
+
         is QuiverState.Success -> QuiverContent(uiState.quiver)
     }
-//    QuiverContent(
-//        boards = boards
-//    )
-
 }
-//    val boards = listOf(
-//        Surfboard(
-//            id= "",
-//            ownerId = "",
-//            model = "Holly Grail",
-//            company = "Hayden Shapes",
-//            type = "Shortboard",
-//            imageRes = R.drawable.hs_shortboard,
-//            height = "6'2\"",
-//            volume = "32L",
-//            width = "19\"",
-//            addedDate = "2024-05-01",
-//            isRentalPublished = false,
-//            isRentalAvailable = false,
-//        ),
-//        Surfboard(
-//            id= "",
-//            ownerId = "",
-//            model = "FRK+",
-//            company = "Slater Designs",
-//            type = "Funboard",
-//            imageRes = R.drawable.hs_shortboard,
-//            height = "5'8\"",
-//            volume = "28L",
-//            width = "20 1/4\"",
-//            addedDate = "2024-04-15",
-//            isRentalPublished = true,
-//            isRentalAvailable = true,
-//            pricePerDay = 10.0
-//        ),
-//    )
-
 @Composable
 fun QuiverContent(boards: Quiver) {
     var selectedBoard by remember { mutableStateOf<Surfboard?>(null) }
@@ -101,8 +77,9 @@ fun QuiverContent(boards: Quiver) {
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
+
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Adaptive(minSize = 170.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = 100.dp)
@@ -115,6 +92,7 @@ fun QuiverContent(boards: Quiver) {
                 )
             }
         }
+
 
         Spacer(Modifier.weight(1f))
 
@@ -147,194 +125,11 @@ fun QuiverContent(boards: Quiver) {
 }
 
 
-@Composable
-fun BoardCard(
-    board: Surfboard,
-    onClick: () -> Unit,
-    onPublishToggle: (Boolean) -> Unit
-) {
-    val isPublished = board.isRentalPublished
-    val baseBackgroundColor = if (isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.White
-    val animatedBackgroundColor by animateColorAsState(
-        targetValue = baseBackgroundColor,
-        animationSpec = tween(300)
-    )
-
-    val animatedBorderColor by animateColorAsState(
-        targetValue = if (isPublished) OceanPalette.SandOrange else Color.Transparent,
-        animationSpec = tween(300)
-    )
-
-    val animatedElevation by animateDpAsState(
-        targetValue = if (isPublished) 8.dp else 4.dp,
-        animationSpec = tween(300)
-    )
-
-    val context = LocalContext.current
-    val imageResId = remember(board.imageRes) {
-        getDrawableIdByName(context, board.imageRes)
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(0.8f)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = animatedElevation),
-        colors = CardDefaults.cardColors(containerColor = animatedBackgroundColor),
-        border = BorderStroke(2.dp, animatedBorderColor)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = imageResId),
-                contentDescription = "Surfboard Image",
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(bottom = 12.dp)
-            )
-            Text(
-                board.model,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = OceanPalette.DeepBlue
-            )
-            Spacer(Modifier.weight(1f))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "For Rent",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Switch(
-                    checked = board.isRentalPublished,
-                    onCheckedChange = onPublishToggle,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = OceanPalette.SandOrange,
-                        checkedTrackColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.6f),
-                        uncheckedThumbColor = OceanPalette.SandOrange.copy(alpha = 0.4f),
-                        uncheckedTrackColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.4f),
-                        uncheckedBorderColor = Color.Transparent,
-                    )
-                )
-            }
-        }
-    }
-}
-
 fun getDrawableIdByName(context: Context, name: String): Int {
     return context.resources.getIdentifier(name, "drawable", context.packageName)
 }
 
 
-@Composable
-fun SurfboardDetailDialog(
-    board: Surfboard,
-    visible: Boolean,
-    onDismiss: () -> Unit,
-    onDelete: (Surfboard) -> Unit = {}
-) {
-    val context = LocalContext.current
-    val imageResId = remember(board.imageRes) {
-        getDrawableIdByName(context, board.imageRes)
-    }
-    AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-            Dialog(onDismissRequest = onDismiss) {
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.padding(16.dp),
-                    elevation = CardDefaults.cardElevation(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                ) {
-                    Box {
-                        Column(
-                            modifier = Modifier
-                                .padding(24.dp)
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = board.model,
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-
-                            Image(
-                                painter = painterResource(id = imageResId),
-                                contentDescription = "Surfboard Image",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .padding(vertical = 8.dp)
-                            )
-
-                            RowItem("Company:", board.company)
-                            RowItem("Height:", board.height)
-                            RowItem("Width:", board.width)
-                            RowItem("Volume:", board.volume)
-                            RowItem("Added:", board.addedDate)
-
-                            if (board.isRentalPublished) {
-                                RowItem("Price / Day:", "${board.pricePerDay} $")
-                            }
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            Button(
-                                onClick = {
-                                    onDelete(board)
-                                    onDismiss()
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Delete Surfboard", color = Color.White)
-                            }
-                        }
-                        IconButton(
-                            onClick = onDismiss,
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Close",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun RowItem(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(label, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-        Text(value, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Light)
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

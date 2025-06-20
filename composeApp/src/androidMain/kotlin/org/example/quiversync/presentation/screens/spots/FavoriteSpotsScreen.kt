@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import org.example.quiversync.R
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.presentation.theme.OceanPalette
+import org.example.quiversync.presentation.widgets.spots_screen.ExpandableSpotCard
 
 
 @Composable
@@ -54,128 +55,6 @@ fun FavoriteSpotsScreen(spots: List<FavoriteSpot> = emptyList()) {
     }
 }
 
-@Composable
-fun ExpandableSpotCard(spot: FavoriteSpot) {
-    var expanded by remember { mutableStateOf(false) }
-    val isDark = isSystemInDarkTheme()
-    val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.White
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = !expanded },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = cardColor
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column {
-                    Text(
-                        text = spot.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = spot.location,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
-                    )
-                }
-
-                Icon(
-                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Expand",
-                    tint = Color.Gray
-                )
-            }
-
-            AnimatedVisibility(visible = expanded) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp)
-                ) {
-                    Divider(color = OceanPalette.BorderGray, thickness = 1.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painter = painterResource(id = R.drawable.hs_shortboard),
-                                contentDescription = "Board",
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .padding(end = 12.dp)
-                            )
-                            Column {
-                                Text(
-                                    text = spot.recommendedBoardId,
-                                    fontWeight = FontWeight.Bold,
-                                    color = OceanPalette.DeepBlue
-                                )
-                                Text(
-                                    text = "${spot.confidence}% Match",
-                                    color = Color.Gray,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                        }
-
-                        // 🌊 Wave height with icon
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_waves),
-                                contentDescription = "Wave Height",
-                                tint = OceanPalette.SkyBlue,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "${spot.waveHeight} ft",
-                                color = OceanPalette.DeepBlue,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ConfidenceProgress(spot.confidence)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ConfidenceProgress(percentage: Int) {
-    val animatedProgress by animateFloatAsState(
-        targetValue = percentage / 100f,
-        animationSpec = tween(durationMillis = 800),
-        label = "ConfidenceAnim"
-    )
-
-    LinearProgressIndicator(
-        progress = animatedProgress,
-        color = OceanPalette.SurfBlue,
-        trackColor = OceanPalette.SkyBlue.copy(alpha = 0.3f),
-        modifier = Modifier
-            .width(100.dp)
-            .height(6.dp)
-            .clip(RoundedCornerShape(8.dp))
-    )
-}
 //@Preview(showBackground = true)
 //@Composable
 //fun PreviewFavoriteSpotsScreen() {
