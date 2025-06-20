@@ -34,6 +34,9 @@ struct MainTabView: View {
                 HomeScreen()
                     .tabItem { Label("Home", systemImage: "house") }
                     .tag(BottomTab.home)
+                QuiverScreen()
+                                .tabItem { Label("Quiver", systemImage: "surfboard.fill") }
+                                .tag(BottomTab.quiver)
                 
     //            ForecastScreen()
     //                .tabItem { Label("Spots", systemImage: "map") }

@@ -24,7 +24,7 @@ class QuiverViewModel: BaseViewModel() {
 
 
             _uiState.emit(
-                QuiverState.Success(quiver)
+                QuiverState.Loaded(quiver)
             )
         }
     }
@@ -34,7 +34,7 @@ class QuiverViewModel: BaseViewModel() {
 private fun createMockSurfBoards(): Quiver{
     val quiverList = listOf(
     Surfboard(
-        id= "",
+        id= "1",
         ownerId = "",
         model = "Holly Grail",
         company = "Hayden Shapes",
@@ -48,7 +48,7 @@ private fun createMockSurfBoards(): Quiver{
         isRentalAvailable = false,
     ),
     Surfboard(
-        id= "",
+        id= "2",
         ownerId = "",
         model = "FRK+",
         company = "Slater Designs",
