@@ -15,10 +15,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,7 +37,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
+import org.example.quiversync.presentation.widgets.spots_screen.ExpandableSpotCard
+import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.ShimmerBrush
+import org.example.quiversync.utils.WindowWidthSize
 
 @Composable
 fun ExpandableSpotCardSkeleton(brush: Brush) {
@@ -91,15 +98,36 @@ fun FavoriteSpotsScreenSkeleton() {
     }
 
     val brush = ShimmerBrush(baseColor = baseShimmerColor)
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        repeat(4) {
-            ExpandableSpotCardSkeleton(brush = brush)
+    val windowInfo = LocalWindowInfo.current
+
+    when (windowInfo.widthSize) {
+        WindowWidthSize.COMPACT -> {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(5) {
+                    ExpandableSpotCardSkeleton(brush = brush)
+                }
+            }
+        }
+        else -> { // MEDIUM or EXPANDED
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 300.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(8) {
+                    ExpandableSpotCardSkeleton(brush = brush)
+                }
+            }
         }
     }
 }

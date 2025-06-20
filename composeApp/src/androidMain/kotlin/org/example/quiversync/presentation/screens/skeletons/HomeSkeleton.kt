@@ -2,42 +2,24 @@ package org.example.quiversync.presentation.screens.skeletons
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.ShimmerBrush
+import org.example.quiversync.utils.LocalWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 
 @Composable
-fun HomeSkeleton() {
-    val baseShimmerColor = if (isSystemInDarkTheme()) {
-        OceanPalette.DarkText
-    } else {
-        OceanPalette.TextDark
-    }
-
-    val brush = ShimmerBrush(baseColor = baseShimmerColor)
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Location placeholder
+private fun MainContentSkeleton(brush: Brush) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -46,7 +28,6 @@ fun HomeSkeleton() {
                 .background(brush)
         )
 
-        // Current Conditions Card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -55,7 +36,6 @@ fun HomeSkeleton() {
                 .background(brush)
         )
 
-        // Board Recommendation Card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -63,8 +43,19 @@ fun HomeSkeleton() {
                 .clip(RoundedCornerShape(16.dp))
                 .background(brush)
         )
+    }
+}
 
-        // Forecast Items
+@Composable
+private fun ForecastPanelSkeleton(brush: Brush) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Box(
+            modifier = Modifier
+                .width(150.dp)
+                .height(20.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(brush)
+        )
         repeat(2) {
             Box(
                 modifier = Modifier
@@ -73,6 +64,46 @@ fun HomeSkeleton() {
                     .clip(RoundedCornerShape(16.dp))
                     .background(brush)
             )
+        }
+    }
+}
+
+
+@Composable
+fun HomeSkeleton() {
+    val baseShimmerColor = if (isSystemInDarkTheme()) OceanPalette.DarkText else OceanPalette.TextDark
+    val brush = ShimmerBrush(baseColor = baseShimmerColor)
+
+    val windowInfo = LocalWindowInfo.current
+
+    when (windowInfo.widthSize) {
+        WindowWidthSize.COMPACT -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                MainContentSkeleton(brush = brush)
+                ForecastPanelSkeleton(brush = brush)
+            }
+        }
+        else -> { // MEDIUM or EXPANDED
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(modifier = Modifier.weight(0.6f)) {
+                    MainContentSkeleton(brush = brush)
+                }
+                Column(modifier = Modifier.weight(0.4f)) {
+                    ForecastPanelSkeleton(brush = brush)
+                }
+            }
         }
     }
 }

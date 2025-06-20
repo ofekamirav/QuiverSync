@@ -78,7 +78,7 @@ fun QuiverScreenSkeleton() {
             .padding(16.dp)
     ) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Adaptive(minSize = 170.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
@@ -91,6 +91,14 @@ fun QuiverScreenSkeleton() {
 @Preview(showBackground = true)
 @Composable
 fun QuiverScreenSkeletonPreview() {
+    QuiverSyncTheme {
+        QuiverScreenSkeleton()
+    }
+}
+
+@Preview(showBackground = true, name = "Quiver Skeleton on Tablet", widthDp = 840, heightDp = 800)
+@Composable
+fun QuiverScreenSkeletonTabletPreview() {
     QuiverSyncTheme {
         QuiverScreenSkeleton()
     }

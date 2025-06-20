@@ -13,12 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,39 +31,126 @@ import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.ShimmerBrush
 
 
-@Composable
-fun BoardCardSkeleton(modifier: Modifier = Modifier) {
-    val shimmer = ShimmerBrush(baseColor = MaterialTheme.colorScheme.background)
 
+@Composable
+fun RentalRequestListSkeleton() {
+    val shimmer = ShimmerBrush(baseColor = MaterialTheme.colorScheme.background)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(5) {
+            RentalRequestSkeletonCard(brush = shimmer)
+        }
+    }
+}
+
+@Composable
+private fun RentalRequestSkeletonCard(brush: Brush) {
     Card(
-        modifier = modifier
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(130.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Placeholder for "For: Board Name"
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(20.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+            // Placeholder for Owner/Renter Chip
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.4f)
+                    .height(18.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+            // Placeholder for Dates
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(16.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+        }
+    }
+}
+
+@Composable
+fun ExploreTabSkeleton() {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 320.dp),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(6) {
+            BoardCardSkeleton()
+        }
+    }
+}
+
+@Composable
+private fun BoardCardSkeleton(brush: Brush) {
+    Card(
+        modifier = Modifier
             .fillMaxWidth()
             .height(230.dp),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(140.dp)
-                    .background(brush = shimmer)
+                    .background(brush = brush)
             )
-            Column(modifier = Modifier.padding(12.dp)) {
-                repeat(3) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.6f)
-                            .height(16.dp)
-                            .background(brush = shimmer, shape = RoundedCornerShape(4.dp))
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+            Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(18.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .height(16.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .height(16.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
             }
         }
     }
 }
-
 @Composable
 fun RentalRequestSkeletonCard(modifier: Modifier = Modifier) {
     val shimmer = ShimmerBrush(baseColor = MaterialTheme.colorScheme.background)
@@ -100,24 +191,3 @@ fun RentalRequestSkeletonCard(modifier: Modifier = Modifier) {
     }
 }
 
-
-@Composable
-fun RentalRequestSkeletonList() {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(5) {
-            RentalRequestSkeletonCard()
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BoardCardSkeletonPreview() {
-    QuiverSyncTheme {
-        RentalRequestSkeletonList()
-    }
-}

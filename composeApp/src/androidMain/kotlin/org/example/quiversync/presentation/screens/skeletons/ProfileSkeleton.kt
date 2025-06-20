@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,8 +28,84 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
+import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.ShimmerBrush
+import org.example.quiversync.utils.WindowWidthSize
 
+
+@Composable
+private fun ProfileHeaderSkeleton(brush: Brush, cardColor: Color, dividerColor: Color) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        // Avatar & Name Skeleton
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box {
+                Box(
+                    modifier = Modifier
+                        .size(110.dp)
+                        .clip(CircleShape)
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 4.dp, y = 4.dp)
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(brush)
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Box(
+                modifier = Modifier
+                    .height(24.dp)
+                    .width(200.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(brush)
+            )
+        }
+
+        // Stats Section Skeleton
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(cardColor)
+                .padding(vertical = 16.dp)
+        ) {
+            StatItemSkeleton(brush)
+            VerticalDivider(color = dividerColor)
+            StatItemSkeleton(brush)
+            VerticalDivider(color = dividerColor)
+            StatItemSkeleton(brush)
+        }
+    }
+}
+@Composable
+private fun ProfileDetailsSkeleton(brush: Brush, cardColor: Color, dividerColor: Color) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(cardColor)
+            .padding(vertical = 4.dp)
+    ) {
+        repeat(5) {
+            UserDetailItemSkeleton(brush)
+            if (it < 4) {
+                Divider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
+            }
+        }
+    }
+}
 @Composable
 private fun UserDetailItemSkeleton(brush: Brush) {
     Row(
@@ -101,86 +178,40 @@ fun ProfileSkeleton() {
     val cardColor = if (isDark) OceanPalette.DarkSurface else Color.White
     val dividerColor = if (isDark) OceanPalette.DarkBorder else OceanPalette.BorderGray
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        // Avatar & Name Skeleton
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Box {
-                // Profile picture placeholder
-                Box(
-                    modifier = Modifier
-                        .size(110.dp)
-                        .clip(CircleShape)
-                        .background(brush)
-                )
-                // Edit button placeholder
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .offset(x = 4.dp, y = 4.dp)
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(brush)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Name placeholder
-            Box(
+    val windowInfo = LocalWindowInfo.current
+    when (windowInfo.widthSize) {
+        WindowWidthSize.COMPACT -> {
+            Column(
                 modifier = Modifier
-                    .height(24.dp)
-                    .width(200.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(brush)
-            )
+                    .fillMaxSize()
+                    .background(backgroundColor)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                ProfileHeaderSkeleton(brush,cardColor = cardColor, dividerColor = dividerColor)
+                ProfileDetailsSkeleton(brush, cardColor, dividerColor)
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
 
-        // Stats Section Skeleton
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(cardColor)
-                .padding(vertical = 16.dp)
-        ) {
-            StatItemSkeleton(brush)
-            VerticalDivider(color = dividerColor) // Re-using your VerticalDivider with theme color
-            StatItemSkeleton(brush)
-            VerticalDivider(color = dividerColor)
-            StatItemSkeleton(brush)
-        }
-
-        // Details Section Skeleton
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(cardColor)
-                .padding(vertical = 4.dp)
-        ) {
-            repeat(5) {
-                UserDetailItemSkeleton(brush)
-                if (it < 4) {
-                    Divider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
+        else -> {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(backgroundColor)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(modifier = Modifier.weight(0.4f)) {
+                    ProfileHeaderSkeleton(brush,cardColor = cardColor, dividerColor = dividerColor)
+                }
+                Column(modifier = Modifier.weight(0.6f)) {
+                    ProfileDetailsSkeleton(brush, cardColor, dividerColor)
                 }
             }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
     }
 }
-
 @Composable
 fun VerticalDivider(color: Color = Color.LightGray) {
     Box(
@@ -197,6 +228,13 @@ fun VerticalDivider(color: Color = Color.LightGray) {
 )
 @Composable
 fun ProfileScreenSkeletonPreviewDark() {
+    QuiverSyncTheme(darkTheme = false) {
+        ProfileSkeleton()
+    }
+}
+@Preview(showBackground = true, name = "Profile Skeleton - Light Mode", widthDp = 840) // Preview לטאבלט
+@Composable
+fun ProfileScreenSkeletonPreviewTablet() {
     QuiverSyncTheme(darkTheme = false) {
         ProfileSkeleton()
     }

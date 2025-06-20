@@ -1,7 +1,9 @@
 package org.example.quiversync.presentation.navigation
 
+import androidx.annotation.NavigationRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,6 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -32,15 +37,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.R
-import org.example.quiversync.features.quiver.QuiverViewModel
-//import org.example.quiversync.presentation.screens.spots.ForecastScreen
 import org.example.quiversync.presentation.screens.home.HomeScreen
 import org.example.quiversync.presentation.screens.ProfileScreen
-import org.example.quiversync.presentation.screens.UserProfile
 import org.example.quiversync.presentation.screens.quiver.QuiverScreen
 import org.example.quiversync.presentation.screens.rentals.RentalsHubScreen
 import org.example.quiversync.presentation.screens.spots.FavoriteSpotsScreen
 import org.example.quiversync.presentation.theme.OceanPalette
+import org.example.quiversync.utils.LocalWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +62,34 @@ fun MainScreen(
     val currentScreenTitle = items[selectedItem].title
     val canNavigateBack = false //if there is an inside page
     val isDark = isSystemInDarkTheme()
+    val windowInfo = LocalWindowInfo.current
+    val showBottomBar = windowInfo.widthSize == WindowWidthSize.COMPACT
+
+    Row(modifier = Modifier.fillMaxSize()) {
+        if (!showBottomBar) {
+            NavigationRail {
+                items.forEachIndexed { index, item ->
+                    NavigationRailItem(
+                        icon = {
+                            Icon(
+                                item.icon,
+                                contentDescription = item.label,
+                                tint = if (selectedItem == index) OceanPalette.DeepBlue else OceanPalette.SkyBlue,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        },
+                        selected = selectedItem == index,
+                        onClick = { selectedItem = index },
+                        colors = NavigationRailItemDefaults.colors(
+                            indicatorColor = Color.Transparent,
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                        )
+                    )
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -121,23 +153,11 @@ fun MainScreen(
             when (selectedItem) {
                 0 -> HomeScreen()
                 1 -> FavoriteSpotsScreen()
-                2 -> FavoriteSpotsScreen()
+                2 -> RentalsHubScreen()
                 3 -> QuiverScreen()
                 4 ->  ProfileScreen(
-                    user = UserProfile(
-                        name = "Mike Rodriguez",
-                        location = "San Diego, CA",
-                        imageUrl = "https://via.placeholder.com/150",
-                        boards = 8,
-                        reviews = 5,
-                        spots = 12,
-                        heightCm = 169,
-                        weightKg = 62,
-                        surfLevel = "Intermediate",
-                        email = "MikeRod@gmail.com",
-                        dateOfBirth = "01/01/2000"
-                    ),
-                    onLogout = { /* handle logout */ }
+                    onLogout = { /* handle logout */ },
+                    onEdit = { /* handle edit profile */ }
                 )
             }
         }

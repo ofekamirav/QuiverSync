@@ -44,6 +44,10 @@ kotlin {
             api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.test)
+            implementation(libs.koin.compose.viewmodel)
+            //Date
+            implementation(libs.kotlinx.datetime)
+
 
         }
         androidMain.dependencies {
@@ -53,6 +57,8 @@ kotlin {
             //koin
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+            //UI
+            implementation(libs.androidx.material3.window.size)
 
         }
         iosMain.dependencies {

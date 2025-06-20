@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import org.example.quiversync.presentation.components.CustomTextField
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
+import org.example.quiversync.presentation.widgets.quiver_screen.SurfboardTypeDropdown
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,82 +146,12 @@ fun UploadImageBox(onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SurfboardTypeDropdown(
-    selectedType: String,
-    onTypeSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val boardTypes = listOf("Shortboard", "Longboard", "Fish", "Funboard")
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = modifier
-    ) {
-        OutlinedTextField(
-            value = selectedType,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Type") },
-            placeholder = { Text("Select surfboard type") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.onSecondary,
-                unfocusedBorderColor = Color.Gray,
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface
-            ),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-                .height(60.dp)
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            boardTypes.forEach { type ->
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(text = type, style = MaterialTheme.typography.bodyLarge)
-                            if (type == selectedType) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                    },
-                    onClick = {
-                        onTypeSelected(type)
-                        expanded = false
-                    },
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
-            }
-        }
-    }
-}
-
 @Preview(
     showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 fun AddBoardScreenPreview() {
-    QuiverSyncTheme(darkTheme = true) {
+    QuiverSyncTheme() {
         AddBoardScreen()
     }
-
 }
