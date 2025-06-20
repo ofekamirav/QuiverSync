@@ -7,6 +7,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -25,6 +28,8 @@ import org.example.quiversync.R
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.widgets.spots_screen.ExpandableSpotCard
+import org.example.quiversync.utils.LocalWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 
 
 @Composable
@@ -33,12 +38,37 @@ fun FavoriteSpotsScreen(spots: List<FavoriteSpot> = emptyList()) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        spots.forEach { spot ->
-            ExpandableSpotCard(spot)
+        val windowInfo = LocalWindowInfo.current
+
+        when (windowInfo.widthSize) {
+            WindowWidthSize.COMPACT -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(spots.size) { spot ->
+                        ExpandableSpotCard(spots[spot])
+                    }
+                }
+            }
+
+            else -> { // MEDIUM or EXPANDED
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 300.dp),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(spots.size) { spot ->
+                        ExpandableSpotCard(spots[spot])
+                    }
+                }
+            }
         }
+
         Spacer(modifier = Modifier.weight(1f))
         FloatingActionButton(
             onClick = { /* Handle floating action button click */ },
@@ -55,15 +85,5 @@ fun FavoriteSpotsScreen(spots: List<FavoriteSpot> = emptyList()) {
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewFavoriteSpotsScreen() {
-//    val mockSpots = listOf(
-//        FavoriteSpot("Pipeline", "North Shore, HI", "Shortboard", 94, "3-4"),
-//        FavoriteSpot("Trestles", "California", "Fish", 87, "3-4"),
-//        FavoriteSpot("Snapper Rocks", "Australia", "Funboard", 79, "3-4")
-//    )
-//    QuiverSyncTheme {
-//        FavoriteSpotsScreen(spots = mockSpots)
-//    }
-//}
+
+

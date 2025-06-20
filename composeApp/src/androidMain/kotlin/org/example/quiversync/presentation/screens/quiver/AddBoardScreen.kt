@@ -148,12 +148,10 @@ fun UploadImageBox(onClick: () -> Unit) {
 
 @Preview(
     showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 fun AddBoardScreenPreview() {
-    QuiverSyncTheme(darkTheme = true) {
+    QuiverSyncTheme() {
         AddBoardScreen()
     }
-
 }

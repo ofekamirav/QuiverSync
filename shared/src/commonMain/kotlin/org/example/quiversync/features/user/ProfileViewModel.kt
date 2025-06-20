@@ -22,7 +22,7 @@ class ProfileViewModel: BaseViewModel() {
 
 
             _uiState.emit(
-                UserState.Success(user)
+                UserState.Loaded(user)
             )
         }
     }
@@ -34,6 +34,7 @@ class ProfileViewModel: BaseViewModel() {
             locationName = "San Diego, CA",
             latitude = 32.7157,
             longitude = -117.1611,
+            password = "password",
             imageUrl = "",
             boards = 8,
             rentals = 5,

@@ -39,7 +39,7 @@ import org.example.quiversync.features.quiver.QuiverState
 import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.presentation.components.ErrorContent
-import org.example.quiversync.presentation.components.LoadingAnimation
+import org.example.quiversync.presentation.screens.skeletons.QuiverScreenSkeleton
 import org.example.quiversync.presentation.screens.skeletons.BoardCardSkeleton
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
@@ -56,15 +56,8 @@ fun QuiverScreen(
     val uiState = viewModel.uiState.collectAsState().value
     when (uiState) {
         is QuiverState.Error -> ErrorContent((uiState).message)
-        is QuiverState.Loading -> {
-            LazyColumn {
-                items(4) {
-                    BoardCardSkeleton()
-                }
-            }
-        }
-
-        is QuiverState.Success -> QuiverContent(uiState.quiver)
+        is QuiverState.Loading -> { QuiverScreenSkeleton() }
+        is QuiverState.Loaded -> QuiverContent(uiState.quiver)
     }
 }
 @Composable
@@ -77,7 +70,6 @@ fun QuiverContent(boards: Quiver) {
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
-
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 170.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),

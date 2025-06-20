@@ -45,6 +45,8 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.test)
             implementation(libs.koin.compose.viewmodel)
+            //Date
+            implementation(libs.kotlinx.datetime)
 
 
         }

@@ -40,6 +40,7 @@ import org.example.quiversync.R
 import org.example.quiversync.presentation.screens.home.HomeScreen
 import org.example.quiversync.presentation.screens.ProfileScreen
 import org.example.quiversync.presentation.screens.quiver.QuiverScreen
+import org.example.quiversync.presentation.screens.rentals.RentalsHubScreen
 import org.example.quiversync.presentation.screens.spots.FavoriteSpotsScreen
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.utils.LocalWindowInfo
@@ -152,7 +153,7 @@ fun MainScreen(
             when (selectedItem) {
                 0 -> HomeScreen()
                 1 -> FavoriteSpotsScreen()
-                2 -> FavoriteSpotsScreen()
+                2 -> RentalsHubScreen()
                 3 -> QuiverScreen()
                 4 ->  ProfileScreen(
                     onLogout = { /* handle logout */ },

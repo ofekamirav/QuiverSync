@@ -22,6 +22,8 @@ import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.presentation.widgets.profile_screen.ProfileHeader
 import org.example.quiversync.presentation.widgets.profile_screen.UserDetailsSection
+import org.example.quiversync.utils.LocalWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 
 @Composable
 fun ProfileScreen(
@@ -34,7 +36,7 @@ fun ProfileScreen(
         is UserState.Loading->{
             ProfileSkeleton()
         }
-        is UserState.Success -> {
+        is UserState.Loaded -> {
             ProfileScreenContent(
                 user = uiState.user,
                 onLogout = onLogout,
@@ -56,19 +58,43 @@ fun ProfileScreenContent(
     onLogout: () -> Unit,
     onEdit: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        ProfileHeader(user)
-        UserDetailsSection(user)
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        ProfileActionButtons(onLogout = onLogout, onEdit = onEdit)
+    val windowInfo = LocalWindowInfo.current
+    when (windowInfo.widthSize) {
+        WindowWidthSize.COMPACT -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                ProfileHeader(user)
+                UserDetailsSection(user)
+                Spacer(modifier = Modifier.weight(1f))
+                ProfileActionButtons(onLogout = onLogout, onEdit = onEdit)
+            }
+        }
+        else->{
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.weight(0.4f),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    ProfileHeader(user)
+                    Spacer(modifier = Modifier.weight(1f))
+                    ProfileActionButtons(onLogout = onLogout, onEdit = onEdit)
+                }
+                Column(modifier = Modifier.weight(0.6f)) {
+                    UserDetailsSection(user)
+                }
+            }
+        }
     }
 }
 

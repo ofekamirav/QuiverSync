@@ -8,6 +8,6 @@ data class Rental(
     val startDate: String,
     val endDate: String,
     val totalPrice: Double,
-    val status: String,
+    val status: RentalStatus,
     val addedDate: String
 )
