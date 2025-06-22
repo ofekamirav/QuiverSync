@@ -6,3 +6,14 @@
 //  Copyright © 2025 orgName. All rights reserved.
 //
 
+
+
+import SwiftUI
+
+public struct FavoriteSpotsScreen: View {
+    public var body: some View {
+        Text("FavoriteSpotsScreen")
+    }
+}
+
+

@@ -35,12 +35,20 @@ struct MainTabView: View {
                     .tabItem { Label("Home", systemImage: "house") }
                     .tag(BottomTab.home)
                 QuiverScreen()
-                                .tabItem { Label("Quiver", systemImage: "surfboard.fill") }
-                                .tag(BottomTab.quiver)
+                    .tabItem { Label("Quiver", systemImage: "surfboard.fill") }
+                    .tag(BottomTab.quiver)
+                ProfileScreen()
+                    .tabItem { Label("Profile", systemImage: "person.crop.circle") }
+                    .tag(BottomTab.profile)
+                    
                 
-    //            ForecastScreen()
-    //                .tabItem { Label("Spots", systemImage: "map") }
-    //                .tag(BottomTab.spots)
+                ForecastScreen()
+                    .tabItem { Label("Spots", systemImage: "map") }
+                    .tag(BottomTab.spots)
+                
+                ForecastResults()
+                    .tabItem { Label("Forecast", systemImage: "sun.min") }
+                    .tag(BottomTab.forecast)
     //
     //            RentalsHubScreen()
     //                .tabItem { Label("Rentals", systemImage: "car") }

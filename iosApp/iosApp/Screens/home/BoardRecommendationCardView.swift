@@ -17,7 +17,7 @@ struct BoardRecommendationCardView: View {
             HStack(spacing: 16) {
                 Image("OldFellow")
                     .resizable()
-                    .frame(width: 58, height: 68)
+                    .frame(width: 78, height: 88)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
 
                 VStack(alignment: .leading, spacing: 4) {
