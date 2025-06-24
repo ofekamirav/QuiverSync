@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -78,7 +80,7 @@ fun WelcomeBottomSheet(
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text("Get Started", color = Color.White)
                 }
@@ -99,14 +101,18 @@ fun DotItem(text: String) {
                 .background(MaterialTheme.colorScheme.primary)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text, fontSize = 14.sp, color = Color.DarkGray)
+        Text(text, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
-@Preview(showBackground = true)
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "Tablet", device = Devices.TABLET, showBackground = true)
 @Composable
-fun WelcomeBottomSheetPreview(){
+fun WelcomeBottomSheetComprehensivePreview(){
     QuiverSyncTheme {
-        WelcomeBottomSheet(show = true, onDismiss = {}, onGetStarted = {})
+        Box(modifier = Modifier.fillMaxSize()) {
+            WelcomeBottomSheet(show = true, onDismiss = {}, onGetStarted = {})
+        }
     }
 }

@@ -1,31 +1,30 @@
 package org.example.quiversync.presentation.screens.spots
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.example.quiversync.R
 import org.example.quiversync.domain.model.FavoriteSpot
+import org.example.quiversync.domain.model.FavoriteSpots
+import org.example.quiversync.features.quiver.QuiverState
+import org.example.quiversync.features.spots.FavSpotsState
+import org.example.quiversync.features.spots.FavSpotsViewModel
+import org.example.quiversync.presentation.components.ErrorContent
+import org.example.quiversync.presentation.screens.quiver.QuiverContent
+import org.example.quiversync.presentation.screens.skeletons.FavoriteSpotsScreenSkeleton
+import org.example.quiversync.presentation.screens.skeletons.QuiverScreenSkeleton
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.widgets.spots_screen.ExpandableSpotCard
 import org.example.quiversync.utils.LocalWindowInfo
@@ -33,11 +32,29 @@ import org.example.quiversync.utils.WindowWidthSize
 
 
 @Composable
-fun FavoriteSpotsScreen(spots: List<FavoriteSpot> = emptyList()) {
-    Column(
-        modifier = Modifier
+fun FavoriteSpotsScreen(
+    modifier: Modifier = Modifier,
+    onAddSpotClick: () -> Unit = {},
+    viewModel: FavSpotsViewModel = FavSpotsViewModel()
+) {
+    val uiState = viewModel.uiState.collectAsState().value
+
+    when (uiState) {
+        is FavSpotsState.Error -> ErrorContent(uiState.message)
+        is FavSpotsState.Loading -> {
+            FavoriteSpotsScreenSkeleton(modifier)
+        }
+        is FavSpotsState.Loaded -> FavoriteSpotsContent(modifier, uiState.spots, onAddSpotClick)
+    }
+}
+
+@Composable
+fun FavoriteSpotsContent(modifier: Modifier, spots: FavoriteSpots, onAddSpotClick: () -> Unit){
+    Box(
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)
     ) {
         val windowInfo = LocalWindowInfo.current
 
@@ -45,11 +62,10 @@ fun FavoriteSpotsScreen(spots: List<FavoriteSpot> = emptyList()) {
             WindowWidthSize.COMPACT -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(spots.size) { spot ->
-                        ExpandableSpotCard(spots[spot])
+                    items(spots.items.size) { spot ->
+                        ExpandableSpotCard(spots.items[spot])
                     }
                 }
             }
@@ -62,28 +78,27 @@ fun FavoriteSpotsScreen(spots: List<FavoriteSpot> = emptyList()) {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(spots.size) { spot ->
-                        ExpandableSpotCard(spots[spot])
+                    items(spots.items.size) { spot ->
+                        ExpandableSpotCard(spots.items[spot])
                     }
                 }
             }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
         FloatingActionButton(
-            onClick = { /* Handle floating action button click */ },
+            onClick = { onAddSpotClick() },
             containerColor = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.align(Alignment.End).size(56.dp)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .size(60.dp)
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "Add Spot",
                 tint = Color.White,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(32.dp)
             )
         }
     }
 }
-
 
 

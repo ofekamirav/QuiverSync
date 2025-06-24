@@ -51,30 +51,31 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun QuiverScreen(
-    viewModel: QuiverViewModel = QuiverViewModel()
+    modifier: Modifier = Modifier,
+    viewModel: QuiverViewModel = QuiverViewModel(),
+    onAddClick: () -> Unit = {}
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     when (uiState) {
         is QuiverState.Error -> ErrorContent((uiState).message)
-        is QuiverState.Loading -> { QuiverScreenSkeleton() }
-        is QuiverState.Loaded -> QuiverContent(uiState.quiver)
+        is QuiverState.Loading -> { QuiverScreenSkeleton(modifier) }
+        is QuiverState.Loaded -> QuiverContent(uiState.quiver, onAddClick, modifier)
     }
 }
 @Composable
-fun QuiverContent(boards: Quiver) {
+fun QuiverContent(boards: Quiver, onAddClick: () -> Unit = {}, modifier: Modifier) {
     var selectedBoard by remember { mutableStateOf<Surfboard?>(null) }
 
-    Column(
-        modifier = Modifier
+    Box(
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
     ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 170.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 100.dp)
+            contentPadding = PaddingValues(16.dp)
         ) {
             items(boards.items.size) { index ->
                 BoardCard(
@@ -85,16 +86,13 @@ fun QuiverContent(boards: Quiver) {
             }
         }
 
-
-        Spacer(Modifier.weight(1f))
-
         FloatingActionButton(
-            onClick = { /* Handle Add */ },
+            onClick = { onAddClick() },
             modifier = Modifier
                 .padding(16.dp)
                 .size(60.dp)
-                .align(Alignment.End),
-            containerColor = OceanPalette.SurfBlue,
+                .align(Alignment.BottomEnd),
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = Color.White
         ) {
             Icon(

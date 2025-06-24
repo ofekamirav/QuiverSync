@@ -10,27 +10,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
-import java.text.SimpleDateFormat
-import java.util.*
-import org.example.quiversync.domain.model.RentalRequest
 import org.example.quiversync.domain.model.RentalStatus
-import org.example.quiversync.domain.model.Surfboard
-import org.example.quiversync.domain.model.User
 import org.example.quiversync.features.rentals.explore.ExploreViewModel
 import org.example.quiversync.features.rentals.my_offers.MyOffersViewModel
 import org.example.quiversync.features.rentals.my_rentals.MyRentalsViewModel
-import org.example.quiversync.presentation.widgets.rentals_screen.RentalBoardList
-import org.example.quiversync.presentation.widgets.rentals_screen.RentalRequestList
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
-
-
 
 @Composable
 fun colorForStatus(status: RentalStatus): Color {
@@ -43,10 +32,10 @@ fun colorForStatus(status: RentalStatus): Color {
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RentalsHubScreen(
+    modifier: Modifier = Modifier,
     exploreViewModel: ExploreViewModel = ExploreViewModel(),
     myOffersViewModel: MyOffersViewModel = MyOffersViewModel(),
     myRentalsViewModel: MyRentalsViewModel = MyRentalsViewModel(),
@@ -55,13 +44,16 @@ fun RentalsHubScreen(
     val tabs = listOf("Explore", "My Rentals", "My Offers")
     val windowInfo = LocalWindowInfo.current
     val isExpanded = windowInfo.widthSize > WindowWidthSize.COMPACT
+
     if (isExpanded) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            NavigationRail {
+            NavigationRail(
+                containerColor = MaterialTheme.colorScheme.background,
+            ) {
                 tabs.forEachIndexed { index, title ->
                     NavigationRailItem(
                         selected = selectedTabIndex == index,
@@ -72,9 +64,22 @@ fun RentalsHubScreen(
                 }
             }
 
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                RentalsHubContent(
+                    selectedTabIndex = selectedTabIndex,
+                    exploreViewModel = exploreViewModel,
+                    myOffersViewModel = myOffersViewModel,
+                    myRentalsViewModel = myRentalsViewModel,
+                )
+            }
         }
+    } else {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
@@ -95,33 +100,7 @@ fun RentalsHubScreen(
                     )
                 }
             }
-            RentalsHubContent(
-                selectedTabIndex = selectedTabIndex,
-                exploreViewModel = exploreViewModel,
-                myOffersViewModel = myOffersViewModel,
-                myRentalsViewModel = myRentalsViewModel,
-            )
-        }
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            PrimaryTabRow(selectedTabIndex = selectedTabIndex) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
-                        text = {
-                            Text(
-                                text = title,
-                                fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal
-                            )
-                        }
-                    )
-                }
-            }
+
             RentalsHubContent(
                 selectedTabIndex = selectedTabIndex,
                 exploreViewModel = exploreViewModel,
@@ -130,7 +109,6 @@ fun RentalsHubScreen(
             )
         }
     }
-
 }
 
 @Composable
@@ -146,6 +124,7 @@ private fun RentalsHubContent(
         2 -> MyOffersTab(myOffersViewModel)
     }
 }
+
 @Preview(showBackground = true, name = "Rentals Hub - Light Mode")
 @Composable
 fun RentalsHubScreenPreview() {

@@ -15,3 +15,11 @@ data class Surfboard(
     val isRentalAvailable: Boolean,
     val pricePerDay: Double?= null
 )
+
+enum class SurfboardType(val serverName: String) {
+    SHORTBOARD("shortboard"),
+    LONGBOARD("longboard"),
+    SOFTBOARD("softboard"),
+    FISHBOARD("fishboard"),
+    FUNBOARD("funboard")
+}

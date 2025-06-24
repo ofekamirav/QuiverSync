@@ -70,7 +70,7 @@ private fun ForecastPanelSkeleton(brush: Brush) {
 
 
 @Composable
-fun HomeSkeleton() {
+fun HomeSkeleton(modifier: Modifier = Modifier) {
     val baseShimmerColor = if (isSystemInDarkTheme()) OceanPalette.DarkText else OceanPalette.TextDark
     val brush = ShimmerBrush(baseColor = baseShimmerColor)
 
@@ -79,7 +79,7 @@ fun HomeSkeleton() {
     when (windowInfo.widthSize) {
         WindowWidthSize.COMPACT -> {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(16.dp),
