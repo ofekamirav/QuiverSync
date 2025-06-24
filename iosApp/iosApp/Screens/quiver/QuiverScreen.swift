@@ -19,7 +19,7 @@ public struct QuiverScreen: View {
         VStack{
             switch onEnum(of: ViewModel.uiState){
             case .loading:
-                LoadingView()
+                LoadingView(colorName: "background")
             case .loaded(let loaded):
                 QuiverView(quiver: loaded.quiver, onBoardTap: {board in
                     selectedBoard = board
@@ -32,21 +32,6 @@ public struct QuiverScreen: View {
         }
     }
     
-}
-
-struct LoadingView: View {
-    var body: some View {
-        ProgressView()
-            .background(AppColors.background)
-    }
-}
-
-struct ErrorView: View {
-    var messege : String
-    var body: some View {
-        Text(messege)
-            .font(.title)
-    }
 }
 
 //using SKIE for async req , not using corutines

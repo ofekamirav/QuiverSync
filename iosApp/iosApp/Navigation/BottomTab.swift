@@ -16,4 +16,5 @@ enum BottomTab: String, Hashable {
     case rentals
     case quiver
     case profile
+    case forecast
 }
