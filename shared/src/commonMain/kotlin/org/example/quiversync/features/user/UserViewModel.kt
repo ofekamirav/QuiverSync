@@ -18,9 +18,11 @@ class UserViewModel: BaseViewModel() {
         fetchUser()
     }
 
-    private fun fetchUser(){
+    fun fetchUser() {
         scope.launch {
             val user = createMockUser()
+            delay(1500)
+
 
             _uiState.emit(
                 UserState.Loaded(user)
@@ -28,21 +30,24 @@ class UserViewModel: BaseViewModel() {
         }
     }
 
-}
-
-private fun createMockUser(): User {
-    return User(
-        id = "1",
-        name = "Mike Rodriguez",
-        email = "MikeRod@gmail.com",
-        locationName = "San Diego, CA",
-        latitude = 32.7157, // Coordinates for San Diego
-        longitude = -117.1611,
-        dateOfBirth = "2000-01-01", // Use ISO format if consistent
-        heightCm = 169,
-        weightKg = 62,
-        surfLevel = "Intermediate",
-        imageUrl = "hs_shortboard", // Or leave empty if no image
-        updatedAt = "2025-06-20T12:00:00Z" // Example timestamp
-    )
+    fun createMockUser(): User {
+        return User(
+            id = "1",
+            name = "Ofek",
+            locationName = "San Diego, CA",
+            latitude = 32.7157,
+            longitude = -117.1611,
+            password = "password",
+            imageUrl = "",
+            boards = 8,
+            rentals = 5,
+            spots = 12,
+            heightCm = 169,
+            weightKg = 62,
+            surfLevel = "Intermediate",
+            email = "MikeRod@gmail.com",
+            dateOfBirth = "01/01/2000",
+            updatedAt = "01/01/2000",
+        )
+    }
 }

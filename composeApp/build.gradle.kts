@@ -70,6 +70,7 @@ android {
 dependencies {
     //ui
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.google.android.material)
     implementation(libs.androidx.material3.window.size)
     debugImplementation(compose.uiTooling)
     implementation(libs.androidx.ui)
@@ -90,6 +91,7 @@ dependencies {
     //Google Maps
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
+    implementation(libs.places)
 
 
 

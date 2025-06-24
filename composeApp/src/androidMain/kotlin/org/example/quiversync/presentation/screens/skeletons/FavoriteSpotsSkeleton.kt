@@ -90,7 +90,7 @@ fun ExpandableSpotCardSkeleton(brush: Brush) {
 }
 
 @Composable
-fun FavoriteSpotsScreenSkeleton() {
+fun FavoriteSpotsScreenSkeleton(modifier: Modifier = Modifier) {
     val baseShimmerColor = if (isSystemInDarkTheme()) {
         OceanPalette.DarkText
     } else {
@@ -103,13 +103,13 @@ fun FavoriteSpotsScreenSkeleton() {
     when (windowInfo.widthSize) {
         WindowWidthSize.COMPACT -> {
             LazyColumn(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(5) {
+                items(6) {
                     ExpandableSpotCardSkeleton(brush = brush)
                 }
             }

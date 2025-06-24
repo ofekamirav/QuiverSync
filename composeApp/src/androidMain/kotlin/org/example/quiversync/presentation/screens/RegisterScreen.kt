@@ -26,12 +26,16 @@ import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.components.GradientButton
 import org.example.quiversync.R
 import org.example.quiversync.presentation.components.CustomTextField
+import org.example.quiversync.presentation.components.DropdownTextField
+import org.example.quiversync.utils.LocalWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 
 @Composable
 fun RegisterScreen(
@@ -39,6 +43,9 @@ fun RegisterScreen(
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var height by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+    var level by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val isDark = isSystemInDarkTheme()
@@ -48,7 +55,7 @@ fun RegisterScreen(
     val cardColor = if (isDark) OceanPalette.DarkCard else Color.White
     val textColor = MaterialTheme.colorScheme.onSurface
     val logoTint = if (isDark) OceanPalette.SkyBlue else OceanPalette.DeepBlue
-
+    val windowInfo = LocalWindowInfo.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -56,10 +63,14 @@ fun RegisterScreen(
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
+            modifier = if (windowInfo.widthSize == WindowWidthSize.COMPACT)
+                Modifier.fillMaxWidth(0.9f)
+                    .background(cardColor, RoundedCornerShape(16.dp))
+                    .padding(20.dp)
+            else
+                Modifier.widthIn(max = 500.dp)
                 .background(cardColor, RoundedCornerShape(16.dp))
-                .padding(24.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
@@ -77,7 +88,7 @@ fun RegisterScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 "Create Account",
@@ -86,7 +97,7 @@ fun RegisterScreen(
                 color = textColor
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             CustomTextField(
                 value = name,
@@ -96,7 +107,7 @@ fun RegisterScreen(
                 imeAction = ImeAction.Next
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             CustomTextField(
                 value = email,
@@ -106,8 +117,33 @@ fun RegisterScreen(
                 imeAction = ImeAction.Next
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                CustomTextField(
+                    modifier = Modifier.weight(1f),
+                    value = height ,
+                    onValueChange = { height=it },
+                    label = "Height",
+                    keyboardType = KeyboardType.Number
+                )
+                CustomTextField(
+                    modifier = Modifier.weight(1f),
+                    value = weight,
+                    onValueChange = { weight=it },
+                    label = "Weight",
+                    keyboardType = KeyboardType.Number
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            DropdownTextField(
+                label = "Surf Level",
+                options = listOf("Beginner", "Intermediate", "Advanced", "Pro"),
+                selectedOption = level,
+                onOptionSelected = { level = it },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
             CustomTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -117,7 +153,7 @@ fun RegisterScreen(
                 imeAction = ImeAction.Done
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Box {
                 Icon(
@@ -155,7 +191,7 @@ fun RegisterScreen(
                 color = Color.Gray
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             GradientButton(
                 text = "Sign Up",

@@ -3,6 +3,7 @@ package org.example.quiversync.data.remote.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SurfboardDto(
-    val id:String ?=null
+data class LoginRequestDto(
+    val email: String,
+    val password: String
 )

@@ -169,7 +169,7 @@ private fun StatItemSkeleton(brush: Brush) {
 }
 
 @Composable
-fun ProfileSkeleton() {
+fun ProfileSkeleton(modifier: Modifier = Modifier) {
     val isDark = isSystemInDarkTheme()
     val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
     val brush = ShimmerBrush(baseColor = baseShimmerColor)
@@ -182,7 +182,7 @@ fun ProfileSkeleton() {
     when (windowInfo.widthSize) {
         WindowWidthSize.COMPACT -> {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .background(backgroundColor)
                     .padding(16.dp),

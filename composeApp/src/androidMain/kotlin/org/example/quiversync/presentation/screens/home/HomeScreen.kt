@@ -16,7 +16,8 @@ import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(true) }
     val scrollState = rememberScrollState()
     val windowInfo = LocalWindowInfo.current
@@ -24,7 +25,7 @@ fun HomeScreen() {
     when (windowInfo.widthSize) {
         WindowWidthSize.COMPACT -> {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(16.dp)

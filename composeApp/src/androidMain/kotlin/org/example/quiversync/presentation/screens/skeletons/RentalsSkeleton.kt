@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -33,10 +35,10 @@ import org.example.quiversync.utils.ShimmerBrush
 
 
 @Composable
-fun RentalRequestListSkeleton() {
+fun RentalRequestListSkeleton(modifier: Modifier = Modifier) {
     val shimmer = ShimmerBrush(baseColor = MaterialTheme.colorScheme.background)
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -91,13 +93,13 @@ private fun RentalRequestSkeletonCard(brush: Brush) {
 }
 
 @Composable
-fun ExploreTabSkeleton() {
+fun ExploreTabSkeleton(modifier: Modifier = Modifier) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 320.dp),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         items(6) {
             BoardCardSkeleton()

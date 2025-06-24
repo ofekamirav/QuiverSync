@@ -80,7 +80,10 @@ fun CustomTextField(
             cursorColor = colors.primary,
             focusedLabelColor = colors.primary,
             unfocusedLabelColor = Color.Gray,
-            focusedContainerColor = colors.surfaceVariant,
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            errorContainerColor = Color.Transparent
         ),
         modifier = modifier,
         keyboardOptions = KeyboardOptions(
@@ -96,6 +99,6 @@ fun CustomTextField(
         ),
         readOnly = readOnly,
         isError = isError,
-        supportingText = supportingText
+        supportingText = supportingText,
     )
 }

@@ -2,7 +2,9 @@ package org.example.quiversync.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -14,8 +16,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.quiversync.R
 import org.example.quiversync.domain.model.User
-import org.example.quiversync.features.user.ProfileViewModel
 import org.example.quiversync.features.user.UserState
+import org.example.quiversync.features.user.UserViewModel
 import org.example.quiversync.presentation.components.ErrorContent
 import org.example.quiversync.presentation.screens.skeletons.ProfileSkeleton
 import org.example.quiversync.presentation.theme.OceanPalette
@@ -27,17 +29,19 @@ import org.example.quiversync.utils.WindowWidthSize
 
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = ProfileViewModel(),
+    modifier: Modifier = Modifier,
+    viewModel: UserViewModel = UserViewModel(),
     onLogout: () -> Unit,
     onEdit: () -> Unit = {}
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     when (uiState) {
         is UserState.Loading->{
-            ProfileSkeleton()
+            ProfileSkeleton(modifier)
         }
         is UserState.Loaded -> {
             ProfileScreenContent(
+                modifier = modifier,
                 user = uiState.user,
                 onLogout = onLogout,
                 onEdit = onEdit
@@ -54,6 +58,7 @@ fun ProfileScreen(
 
 @Composable
 fun ProfileScreenContent(
+    modifier: Modifier = Modifier,
     user: User,
     onLogout: () -> Unit,
     onEdit: () -> Unit
@@ -62,9 +67,10 @@ fun ProfileScreenContent(
     when (windowInfo.widthSize) {
         WindowWidthSize.COMPACT -> {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {

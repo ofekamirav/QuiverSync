@@ -28,6 +28,8 @@ import org.example.quiversync.presentation.components.CustomTextField
 import org.example.quiversync.presentation.components.GradientButton
 import org.example.quiversync.presentation.components.SocialLoginButton
 import org.example.quiversync.presentation.theme.OceanPalette
+import org.example.quiversync.utils.LocalWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 
 @Composable
 fun LoginScreen(
@@ -44,8 +46,7 @@ fun LoginScreen(
     )
     val cardColor = if (isDark) OceanPalette.DarkCard else Color.White
     val textColor = MaterialTheme.colorScheme.onSurface
-
-
+    val windowInfo = LocalWindowInfo.current
 
     Box(
         modifier = Modifier
@@ -54,10 +55,14 @@ fun LoginScreen(
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
+            modifier = if (windowInfo.widthSize == WindowWidthSize.COMPACT)
+                Modifier.fillMaxWidth(0.9f)
+                    .background(cardColor, RoundedCornerShape(16.dp))
+                    .padding(20.dp)
+            else
+                Modifier.widthIn(max = 400.dp)
                 .background(cardColor, RoundedCornerShape(16.dp))
-                .padding(24.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
@@ -122,7 +127,7 @@ fun LoginScreen(
             GradientButton(
                 text = "Sign In",
                 onClick = { onSignInClick() },
-//                modifier = Modifier.clickable { onSignInClick() },
+                modifier = Modifier.clickable { onSignInClick() },
                 shape = RoundedCornerShape(16.dp)
             )
 
@@ -144,8 +149,8 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                SocialLoginButton(text = "Google", logo = R.drawable.google_logo)
-                SocialLoginButton(text = "Apple", logo = R.drawable.apple_logo)
+                SocialLoginButton(windowInfo = windowInfo,text = "Google", logo = R.drawable.google_logo)
+                SocialLoginButton(windowInfo = windowInfo,text = "Apple", logo = R.drawable.apple_logo)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -172,10 +177,10 @@ fun LoginScreenDarkPreview() {
         LoginScreen()
     }
 }
-//@Preview(showBackground = true)
-//@Composable
-//fun LoginScreenPreview() {
-//    QuiverSyncTheme {
-//        LoginScreen()
-//    }
-//}
+@Preview(showBackground = true, widthDp = 900)
+@Composable
+fun LoginScreenPreviewTablet() {
+    QuiverSyncTheme() {
+        LoginScreen()
+    }
+}

@@ -18,13 +18,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import org.example.quiversync.presentation.theme.OceanPalette
+import org.example.quiversync.utils.AppWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 
 @Composable
 fun SocialLoginButton(
     text: String,
     logo: Int,
+    windowInfo: AppWindowInfo,
     onClick: () -> Unit = {}
 ) {
+    val buttonWidth = if (windowInfo.widthSize == WindowWidthSize.COMPACT) 140.dp else 200.dp
+    val buttonHeight = if (windowInfo.widthSize == WindowWidthSize.COMPACT) 48.dp else 56.dp
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
@@ -36,8 +41,8 @@ fun SocialLoginButton(
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
         modifier = Modifier
             .padding(horizontal = 4.dp)
-            .height(48.dp)
-            .width(140.dp)
+            .height(buttonHeight)
+            .width(buttonWidth)
     ) {
         Icon(
             painter = painterResource(id = logo),
