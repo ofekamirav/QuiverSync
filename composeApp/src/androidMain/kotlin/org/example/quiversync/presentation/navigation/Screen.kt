@@ -9,6 +9,7 @@ sealed class Screen(
 
     object Login : Screen("login_screen")
     object Register : Screen("register_screen")
+    object CompleteRegister: Screen("complete_register_screen")
 
     object Home : Screen("home_screen", "QuiverSync", true)
     object Spots : Screen("spots_screen", "Surf Spots", true)

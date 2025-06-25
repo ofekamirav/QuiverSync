@@ -15,6 +15,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.firebase.Firebase
+import com.google.firebase.initialize
 import org.example.quiversync.presentation.navigation.AppNavigation
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.AppWindowInfo
@@ -36,6 +38,8 @@ class MainActivity : ComponentActivity() {
                 else -> WindowWidthSize.COMPACT
             }
             val windowInfo = AppWindowInfo(widthSize = widthSize)
+            //Firebase
+            Firebase.initialize(this)
             ProvideWindowInfo(windowInfo = windowInfo) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     QuiverSyncTheme {

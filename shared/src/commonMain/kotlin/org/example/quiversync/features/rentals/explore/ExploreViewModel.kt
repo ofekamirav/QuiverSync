@@ -25,7 +25,7 @@ class ExploreViewModel : BaseViewModel(){
                 BoardForRent(
                     surfboardId = board.id,
                     ownerName = owner.name,
-                    ownerPic = owner.imageUrl,
+                    ownerPic = owner.profilePicture.toString(),
                     surfboardPic = board.imageRes,
                     model = board.model,
                     type = board.type,
@@ -77,22 +77,17 @@ class ExploreViewModel : BaseViewModel(){
 
     private fun getOwnerDetail(): User{
         return User(
-            id = "1",
+            uid = "1",
             name = "John Doe",
             email = "william.henry.harrison@example-pet-store.com",
-            imageUrl = "",
+            profilePicture = "",
             locationName = "Tel-Aviv, Israel",
             latitude = 32.0853,
             longitude = 34.7818,
-            spots = 0,
-            password = "",
-            boards = 0,
-            rentals = 0,
             dateOfBirth = "",
             heightCm = 0,
             weightKg = 0,
             surfLevel = "",
-            updatedAt = ""
         )
     }
 

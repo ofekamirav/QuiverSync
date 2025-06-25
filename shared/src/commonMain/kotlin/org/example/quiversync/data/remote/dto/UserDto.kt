@@ -1,9 +1,11 @@
-package org.example.quiversync.domain.model
+package org.example.quiversync.data.remote.dto
 
-data class User(
-    val uid: String,
-    val name: String,
-    val email: String,
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class UserDto(
+    val name: String? = null,
+    val email: String? = null,
     val locationName: String? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,

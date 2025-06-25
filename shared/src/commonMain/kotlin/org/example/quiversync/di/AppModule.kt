@@ -1,5 +1,10 @@
 package org.example.quiversync.di
 
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.FirebaseAuth
+import dev.gitlive.firebase.auth.auth
+import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.firestore
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -14,7 +19,14 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import org.example.quiversync.data.repository.AuthRepositoryImpl
+import org.example.quiversync.data.session.SessionManager
+import org.example.quiversync.domain.repository.AuthRepository
+import org.example.quiversync.domain.usecase.UpdateUserLocationUseCase
 import org.example.quiversync.features.quiver.QuiverViewModel
+import org.example.quiversync.features.register.OnboardingViewModel
+import org.example.quiversync.features.register.RegisterUseCases
+import org.example.quiversync.features.register.RegisterViewModel
 import org.koin.core.module.dsl.viewModelOf
 
 
@@ -34,13 +46,30 @@ fun appModules() = listOf(commonModule, platformModule)
 expect val platformModule: Module
 
 val commonModule= module {
-   val baseUrl = "https://your.api.base.url/"
+   // Core
    singleOf(::createJson)
-//   singleOf(::RemoteQuiverRepository).bind<QuiverRepository>()
-   //add here all the repositories
-
-   //add all the viewmodels
    single { createHttpClient(get(), get()) }
+   //Firebase
+   single<FirebaseAuth> { Firebase.auth }
+   single<FirebaseFirestore> { Firebase.firestore }
+
+   //Repositories
+   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
+
+   //UseCases
+   single {
+      RegisterUseCases(
+         registerUser = get(),
+         updateUserProfile = get()
+      )
+   }
+   single { UpdateUserLocationUseCase(get(), get()) }
+
+   // ViewModels
+   single { RegisterViewModel(get()) }
+   single { OnboardingViewModel(get()) }
+   //single { QuiverViewModel(get()) }
+
 }
 
 fun createJson(): Json = Json {

@@ -92,7 +92,6 @@ fun ExpandableSpotCard(spot: FavoriteSpot) {
                         .fillMaxWidth()
                         .padding(top = 12.dp)
                 ) {
-                    Divider(color = OceanPalette.BorderGray, thickness = 1.dp)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Row(

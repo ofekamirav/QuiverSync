@@ -30,10 +30,10 @@ class MyRentalsViewModel: BaseViewModel() {
                 MyRentRequest(
                     requestId = it.id,
                     boardModel = it.surfboardId,
-                    renterName = owner.id,
+                    renterName = owner.uid,
                     renterImageUrl = it.ownerId,
                     ownerName = owner.name,
-                    ownerImageUrl = owner.imageUrl,
+                    ownerImageUrl = owner.profilePicture.toString(),
                     startDate = it.startDate,
                     endDate = it.endDate,
                     status = it.status,
@@ -113,22 +113,17 @@ class MyRentalsViewModel: BaseViewModel() {
 
     private fun getOwner(ownerId: String): User {
         return User(
-            id = ownerId,
+            uid = ownerId,
             name = "Ofek",
             locationName = "San Diego, CA",
             latitude = 32.7157,
             longitude = -117.1611,
-            password = "password",
-            imageUrl = "",
-            boards = 8,
-            rentals = 5,
-            spots = 12,
+            profilePicture = "",
             heightCm = 169,
             weightKg = 62,
             surfLevel = "Intermediate",
             email = "MikeRod@gmail.com",
             dateOfBirth = "01/01/2000",
-            updatedAt  = "01/01/2000",
         )
     }
 

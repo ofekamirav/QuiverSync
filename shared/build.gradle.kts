@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -47,6 +48,13 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             //Date
             implementation(libs.kotlinx.datetime)
+            //firebase
+            implementation(libs.firebase.firestore)
+            implementation(libs.firebase.auth)
+            implementation(libs.firebase.common)
+            implementation(libs.firebase.storage)
+            //Date
+            implementation(libs.kotlinx.datetime)
 
 
         }
@@ -59,6 +67,8 @@ kotlin {
             implementation(libs.koin.androidx.compose)
             //UI
             implementation(libs.androidx.material3.window.size)
+            //DataStore
+            implementation(libs.androidx.datastore.preferences)
 
         }
         iosMain.dependencies {

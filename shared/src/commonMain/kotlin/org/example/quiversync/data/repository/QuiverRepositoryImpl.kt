@@ -4,7 +4,7 @@ import org.example.quiversync.data.remote.datasource.quiver.QuiverRemoteDataSour
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.repository.QuiverRepository
 
-class QuiverRepositoryImplementation(
+class QuiverRepositoryImpl(
     private val remoteDataSource: QuiverRemoteDataSource,
     //private val localDataSource: QuiverLocalDataSource
 ): QuiverRepository {

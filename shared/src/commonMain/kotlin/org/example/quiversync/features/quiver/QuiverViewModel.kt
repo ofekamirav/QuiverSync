@@ -10,7 +10,9 @@ import org.example.quiversync.features.BaseViewModel
 
 
 
-class QuiverViewModel: BaseViewModel() {
+class QuiverViewModel(
+    //private val quiverUseCases: QuiverUseCases
+): BaseViewModel() {
     private val _uiState = MutableStateFlow<QuiverState>(QuiverState.Loading)
     val uiState: StateFlow<QuiverState> get() = _uiState
 

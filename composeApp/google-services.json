@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "709464682274",
+    "project_id": "quiversync-213cf",
+    "storage_bucket": "quiversync-213cf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709464682274:android:d8aeb1ed8a4d773464bf7b",
+        "android_client_info": {
+          "package_name": "org.example.quiversync"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcdEw5mrGrdxgmTnUKxtyRuBfW6hh1YYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

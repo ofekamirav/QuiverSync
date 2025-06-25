@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
+
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -92,6 +94,9 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
     implementation(libs.places)
+    //firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.common.ktx)
 
 
 
