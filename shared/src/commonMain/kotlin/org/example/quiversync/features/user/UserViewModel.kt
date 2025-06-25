@@ -32,22 +32,17 @@ class UserViewModel: BaseViewModel() {
 
     fun createMockUser(): User {
         return User(
-            id = "1",
+            uid = "1234",
             name = "Ofek",
             locationName = "San Diego, CA",
             latitude = 32.7157,
             longitude = -117.1611,
-            password = "password",
-            imageUrl = "",
-            boards = 8,
-            rentals = 5,
-            spots = 12,
+            profilePicture = "",
             heightCm = 169,
             weightKg = 62,
             surfLevel = "Intermediate",
             email = "MikeRod@gmail.com",
             dateOfBirth = "01/01/2000",
-            updatedAt = "01/01/2000",
         )
     }
 }

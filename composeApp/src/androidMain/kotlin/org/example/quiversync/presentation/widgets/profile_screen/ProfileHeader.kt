@@ -84,11 +84,11 @@ fun ProfileHeader(user: User){
             .background(MaterialTheme.colorScheme.surface)
             .padding(vertical = 16.dp)
     ) {
-        StatItem("Rentals", user.rentals.toString())
+        StatItem("Rentals", "8")
         VerticalDivider()
-        StatItem("Boards", user.boards.toString())
+        StatItem("Boards", "9" )
         VerticalDivider()
-        StatItem("Spots", user.spots.toString())
+        StatItem("Spots", "10")
     }
 }
 

@@ -1,6 +1,6 @@
 package org.example.quiversync.features.forecast
 
-import org.example.quiversync.domain.model.Forecast.WeeklyForecast
+import org.example.quiversync.domain.model.forecast.WeeklyForecast
 
 sealed class ForecastState {
     object Loading : ForecastState()

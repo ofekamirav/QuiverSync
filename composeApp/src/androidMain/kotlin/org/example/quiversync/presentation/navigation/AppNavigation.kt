@@ -2,19 +2,15 @@ package org.example.quiversync.presentation.navigation
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -24,25 +20,44 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.example.quiversync.R
-import org.example.quiversync.presentation.components.WelcomeBottomSheet
+import org.example.quiversync.data.session.SessionManager
+import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.screens.LoginScreen
 import org.example.quiversync.presentation.screens.ProfileScreen
-import org.example.quiversync.presentation.screens.RegisterScreen
+import org.example.quiversync.presentation.screens.register.RegisterScreen
 import org.example.quiversync.presentation.screens.home.HomeScreen
 import org.example.quiversync.presentation.screens.quiver.QuiverScreen
 import org.example.quiversync.presentation.screens.quiver.add_board.AddSurfboardFlowScreen
+import org.example.quiversync.presentation.screens.register.CompleteRegisterScreen
 import org.example.quiversync.presentation.screens.rentals.RentalsHubScreen
-import org.example.quiversync.presentation.screens.spots.AddSpotScreen
 import org.example.quiversync.presentation.screens.spots.FavoriteSpotsScreen
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavigation() {
+fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     val navController = rememberNavController()
-    var isLoggedIn by remember { mutableStateOf(false) }
+    var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
+
+    LaunchedEffect(Unit) {
+        val uid = sessionManager.getUid()
+        isLoggedIn = uid != null
+    }
+
+    if (isLoggedIn == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+        ){
+            LoadingAnimation(
+                isLoading = true,
+                animationFileName = "quiver_sync_loading_animation.json"
+            )
+            return
+        }
+    }
 
     val items = listOf(
         BottomNavItem(
@@ -76,10 +91,10 @@ fun AppNavigation() {
             "Profile"
         )
     )
-
+    val startDestination = if (isLoggedIn == true) Screen.Home.route else Screen.Login.route
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val hideTopBarRoutes = listOf(Screen.Login.route, Screen.Register.route)
+    val hideTopBarRoutes = listOf(Screen.Login.route, Screen.Register.route, Screen.CompleteRegister.route)
     val showTopBar = currentRoute !in hideTopBarRoutes
     val currentScreen = Screen::class.sealedSubclasses
         .mapNotNull { it.objectInstance }
@@ -148,7 +163,7 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = if (isLoggedIn) Screen.Home.route else Screen.Login.route,
+            startDestination = startDestination,
             modifier = Modifier.fillMaxSize()
         ) {
             composable(Screen.Login.route) {
@@ -167,7 +182,7 @@ fun AppNavigation() {
             composable(Screen.Register.route) {
                 RegisterScreen(
                     onSignUpClick = {
-                        navController.navigate(Screen.Login.route) {
+                        navController.navigate(Screen.CompleteRegister.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }
                         }
                     },
@@ -212,6 +227,9 @@ fun AppNavigation() {
                         navController.popBackStack()
                     }
                 )
+            }
+            composable(Screen.CompleteRegister.route) {
+                CompleteRegisterScreen()
             }
         }
     }

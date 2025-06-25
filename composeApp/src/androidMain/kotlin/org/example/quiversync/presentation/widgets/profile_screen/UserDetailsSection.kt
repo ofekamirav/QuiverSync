@@ -29,12 +29,12 @@ fun UserDetailsSection(user: User){
     ) {
         UserDetailItem(R.drawable.ic_mail, "Email", user.email)
         Divider(color = Color(0xFFE0E0E0), thickness = 0.5.dp)
-        UserDetailItem(R.drawable.ic_date, "Date of Birth", user.dateOfBirth)
+        UserDetailItem(R.drawable.ic_date, "Date of Birth", user.dateOfBirth.toString())
         Divider(color = Color(0xFFE0E0E0), thickness = 0.5.dp)
         UserDetailItem(R.drawable.ic_height, "Height", "${user.heightCm} cm")
         Divider(color = Color(0xFFE0E0E0), thickness = 0.5.dp)
         UserDetailItem(R.drawable.ic_weight, "Weight", "${user.weightKg} kg")
         Divider(color = Color(0xFFE0E0E0), thickness = 0.5.dp)
-        UserDetailItem(R.drawable.ic_quiver, "Surf Level", user.surfLevel)
+        UserDetailItem(R.drawable.ic_quiver, "Surf Level", user.surfLevel.toString())
     }
 }

@@ -4,8 +4,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.example.quiversync.domain.model.Forecast.DailyForecast
-import org.example.quiversync.domain.model.Forecast.WeeklyForecast
+import org.example.quiversync.domain.model.forecast.DailyForecast
+import org.example.quiversync.domain.model.forecast.WeeklyForecast
 import org.example.quiversync.features.BaseViewModel
 
 class ForecastViewModel: BaseViewModel() {

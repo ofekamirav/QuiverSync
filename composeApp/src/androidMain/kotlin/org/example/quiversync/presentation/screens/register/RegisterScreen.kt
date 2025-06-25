@@ -1,6 +1,7 @@
-package org.example.quiversync.presentation.screens
+package org.example.quiversync.presentation.screens.register
 
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -26,27 +27,39 @@ import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.components.GradientButton
 import org.example.quiversync.R
+import org.example.quiversync.features.register.RegisterState
+import org.example.quiversync.features.register.RegisterViewModel
 import org.example.quiversync.presentation.components.CustomTextField
-import org.example.quiversync.presentation.components.DropdownTextField
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RegisterScreen(
+    viewModel: RegisterViewModel = koinViewModel(),
     onSignUpClick: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var height by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
-    var level by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val registerState by viewModel.registerState.collectAsState()
+    val isError = registerState is RegisterState.Error
+    val errorMessage = if (registerState is RegisterState.Error) {
+        (registerState as RegisterState.Error).message
+    } else null
+
+    LaunchedEffect(registerState) {
+        if (registerState is RegisterState.Success) {
+            onSignUpClick()
+            viewModel.resetState()
+        }
+    }
 
     val isDark = isSystemInDarkTheme()
     val backgroundBrush = Brush.verticalGradient(
@@ -104,6 +117,8 @@ fun RegisterScreen(
                 onValueChange = { name = it },
                 label = "Name",
                 leadingIcon = Icons.Default.Person,
+                isError = isError,
+                errorMessage = if (isError) errorMessage else null,
                 imeAction = ImeAction.Next
             )
 
@@ -114,35 +129,13 @@ fun RegisterScreen(
                 onValueChange = { email = it },
                 label = "Email",
                 leadingIcon = Icons.Default.MailOutline,
+                isError = isError,
+                errorMessage = if (isError) errorMessage else null,
                 imeAction = ImeAction.Next
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                CustomTextField(
-                    modifier = Modifier.weight(1f),
-                    value = height ,
-                    onValueChange = { height=it },
-                    label = "Height",
-                    keyboardType = KeyboardType.Number
-                )
-                CustomTextField(
-                    modifier = Modifier.weight(1f),
-                    value = weight,
-                    onValueChange = { weight=it },
-                    label = "Weight",
-                    keyboardType = KeyboardType.Number
-                )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            DropdownTextField(
-                label = "Surf Level",
-                options = listOf("Beginner", "Intermediate", "Advanced", "Pro"),
-                selectedOption = level,
-                onOptionSelected = { level = it },
-                modifier = Modifier.fillMaxWidth()
-            )
             Spacer(modifier = Modifier.height(12.dp))
             CustomTextField(
                 value = password,
@@ -150,52 +143,19 @@ fun RegisterScreen(
                 label = "Password",
                 leadingIcon = Icons.Default.Lock,
                 isPassword = true,
+                isError = isError,
+                errorMessage = if (isError) errorMessage else null,
                 imeAction = ImeAction.Done
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Box {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(110.dp)
-                        .clip(CircleShape)
-                        .background(if (isDark) OceanPalette.DarkSurface else OceanPalette.FoamWhite),
-                    tint = logoTint
-                )
-                IconButton(
-                    onClick = { /* Handle change photo */ },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .offset(x = 4.dp, y = 4.dp)
-                        .size(30.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = "Change Photo",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Tap to upload profile pic",
-                fontSize = 12.sp,
-                color = Color.Gray
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             GradientButton(
                 text = "Sign Up",
-                onClick = { onSignUpClick() },
+                onClick = {
+                    viewModel.onRegisterClick(name, email, password)
+                    onSignUpClick()
+                          },
                 shape = RoundedCornerShape(16.dp)
             )
 
@@ -214,7 +174,7 @@ fun RegisterScreen(
 
 
 @Preview(showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES
     )
 @Composable
 fun PreviewRegisterScreen() {

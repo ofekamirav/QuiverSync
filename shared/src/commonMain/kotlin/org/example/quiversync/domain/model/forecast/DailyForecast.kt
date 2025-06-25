@@ -1,4 +1,4 @@
-package org.example.quiversync.domain.model.Forecast
+package org.example.quiversync.domain.model.forecast
 
 data class DailyForecast (
     val date : String,

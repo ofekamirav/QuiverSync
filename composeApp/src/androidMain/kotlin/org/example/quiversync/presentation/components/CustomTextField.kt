@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -39,11 +40,19 @@ fun CustomTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     readOnly: Boolean = false,
     isError: Boolean = false,
-    supportingText: @Composable (() -> Unit)? = null
+    errorMessage: String? = null,
+    supportingText: @Composable (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val colors = MaterialTheme.colorScheme
+
+    val clickableModifier = if (readOnly && onClick != null) {
+        modifier.clickable { onClick() }
+    } else {
+        modifier
+    }
 
     OutlinedTextField(
         value = value,
@@ -85,7 +94,7 @@ fun CustomTextField(
             disabledContainerColor = Color.Transparent,
             errorContainerColor = Color.Transparent
         ),
-        modifier = modifier,
+        modifier = clickableModifier,
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
             imeAction = imeAction
@@ -99,6 +108,17 @@ fun CustomTextField(
         ),
         readOnly = readOnly,
         isError = isError,
-        supportingText = supportingText,
+        supportingText = {
+            when {
+                supportingText != null -> supportingText()
+                isError && !errorMessage.isNullOrBlank() -> {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        }
     )
 }

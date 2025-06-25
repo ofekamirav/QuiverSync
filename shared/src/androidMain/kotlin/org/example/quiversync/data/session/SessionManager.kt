@@ -1,45 +1,34 @@
 package org.example.quiversync.data.session
 
 import android.content.Context
-import android.content.SharedPreferences
+import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.first
+
+private val Context.dataStore by preferencesDataStore("quiver_sync_prefs")
 
 actual class SessionManager(private val context: Context) {
-    private val prefs: SharedPreferences =
-        context.getSharedPreferences("quiverSync_session", Context.MODE_PRIVATE)
 
-    actual suspend fun isLoggedIn(): Boolean {
-        return prefs.getString("token", null) != null
-    }
+    private val uidKey = stringPreferencesKey("uid")
+    private val welcomeKey = booleanPreferencesKey("has_seen_welcome")
 
-    actual suspend fun getUserId(): String? {
-        return prefs.getString("user_id", null)
-    }
-
-    actual suspend fun getToken(): String? {
-        return prefs.getString("token", null)
-    }
-
-    actual suspend fun getRefreshToken(): String? {
-        return prefs.getString("refresh_token", null)
-    }
-
-    actual suspend fun setSession(userId: String, token: String, refreshToken: String) {
-        prefs.edit()
-            .putString("user_id", userId)
-            .putString("token", token)
-            .putString("refresh_token", refreshToken)
-            .apply()
-    }
-
-    actual suspend fun clearSession() {
-        prefs.edit().clear().apply()
+    actual suspend fun clearAll() {
+        context.dataStore.edit { it.clear() }
     }
 
     actual suspend fun hasSeenWelcome(): Boolean {
-        return prefs.getBoolean("has_seen_welcome", false)
+        return context.dataStore.data.first()[welcomeKey] ?: false
     }
 
     actual suspend fun setWelcomeSeen() {
-        prefs.edit().putBoolean("has_seen_welcome", true).apply()
+        context.dataStore.edit { it[welcomeKey] = true }
+    }
+
+    actual suspend fun getUid(): String? {
+        return context.dataStore.data.first()[uidKey]
+    }
+
+    actual suspend fun setUid(uid: String) {
+        context.dataStore.edit { it[uidKey] = uid }
     }
 }
