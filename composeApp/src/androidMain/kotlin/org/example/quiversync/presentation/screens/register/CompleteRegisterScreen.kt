@@ -217,7 +217,7 @@ fun CompleteRegisterScreen(
 
                 CustomTextField(
                     value = state.heightCm.toString(),
-                    onValueChange = { onEvent(OnboardingEvent.HeightChanged(it.toDouble())) },
+                    onValueChange = { onEvent(OnboardingEvent.HeightChanged(it)) },
                     label = "Height (cm)",
                     isError = state.heightError != null,
                     errorMessage = state.heightError,
@@ -227,7 +227,7 @@ fun CompleteRegisterScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 CustomTextField(
                     value = state.weightKg.toString(),
-                    onValueChange = { onEvent(OnboardingEvent.WeightChanged(it.toDouble())) },
+                    onValueChange = { onEvent(OnboardingEvent.WeightChanged(it)) },
                     label = "Weight (kg)",
                     isError = state.weightError != null,
                     errorMessage = state.weightError,
@@ -255,7 +255,7 @@ fun CompleteRegisterScreen(
                     errorMessage = state.profileImageError
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
 
                 Text(
@@ -264,7 +264,7 @@ fun CompleteRegisterScreen(
                     color = Color.Gray
                 )
 
-                Spacer(modifier = Modifier.height(96.dp))
+                Spacer(modifier = Modifier.height(80.dp))
             }
             if (showImageOptions) {
                 ImageSourceSelectorSheet(

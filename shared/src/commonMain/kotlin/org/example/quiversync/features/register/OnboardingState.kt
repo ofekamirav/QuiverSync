@@ -8,8 +8,8 @@ sealed class OnboardingState {
     data class Idle(
         // Data fields
         val dateOfBirth: String = "",
-        val heightCm: Double = 0.0 ,
-        val weightKg: Double = 0.0 ,
+        val heightCm: String = "",
+        val weightKg: String = "",
         val selectedSurfLevel: SurfLevel? = null,
         val profileImageUrl: String? = null,
         val isUploadingImage: Boolean = false,

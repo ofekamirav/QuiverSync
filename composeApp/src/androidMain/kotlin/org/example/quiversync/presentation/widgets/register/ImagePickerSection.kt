@@ -50,8 +50,6 @@ fun ImagePickerSection(
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(8.dp)
             )
             IconButton(
                 onClick = onChangePhotoClick,

@@ -82,16 +82,23 @@ class OnboardingViewModel(
     private fun validateAndComplete() {
         val currentState = _onboardingState.value
         if (currentState !is OnboardingState.Idle) return
+        val height = currentState.heightCm.toDoubleOrNull()
+        val weight = currentState.weightKg.toDoubleOrNull()
+
+        val heightError = when {
+            height == null -> "Height is required"
+            height > 250.0 || height < 50.0 -> "Enter a valid height"
+            else -> null
+        }
+
+        val weightError = when {
+            weight == null -> "Weight is required"
+            weight > 200.0 || weight < 20.0 -> "Enter a valid weight"
+            else -> null
+        }
 
         val dateError = if (currentState.dateOfBirth.isBlank()) "Date of birth is required" else null
-        val heightError = {
-            if (currentState.heightCm == 0.0) "Height is required" else null
-            if (currentState.heightCm > 250.00 || currentState.heightCm < 50.00) "Enter a valid height" else null
-        }
-        val weightError = {
-            if (currentState.weightKg == 0.0) "Weight is required" else null
-            if (currentState.weightKg > 200.00 || currentState.weightKg < 20.00) "Enter a valid weight" else null
-        }
+
         val surfLevelError = if (currentState.selectedSurfLevel == null) "Select your surf level" else null
         val imageError = if (currentState.profileImageUrl == null) "Please upload a profile picture" else null
 
@@ -113,8 +120,8 @@ class OnboardingViewModel(
             _onboardingState.value = OnboardingState.Loading
             val details = OnboardingProfileDetails(
                 dateOfBirth = currentState.dateOfBirth,
-                heightCm = currentState.heightCm,
-                weightKg = currentState.weightKg,
+                heightCm = height ?: 0.0,
+                weightKg = weight ?: 0.0,
                 surfLevel = currentState.selectedSurfLevel!!.label,
                 profilePicture = currentState.profileImageUrl
             )
