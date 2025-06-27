@@ -20,14 +20,14 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import org.example.quiversync.data.repository.AuthRepositoryImpl
-import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.domain.repository.AuthRepository
+import org.example.quiversync.domain.usecase.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.UpdateUserLocationUseCase
-import org.example.quiversync.features.quiver.QuiverViewModel
+import org.example.quiversync.domain.usecase.UpdateUserProfileUseCase
+import org.example.quiversync.domain.usecase.UploadImageUseCase
 import org.example.quiversync.features.register.OnboardingViewModel
 import org.example.quiversync.features.register.RegisterUseCases
 import org.example.quiversync.features.register.RegisterViewModel
-import org.koin.core.module.dsl.viewModelOf
 
 
 fun initKoin(config: KoinAppDeclaration? = null) {
@@ -56,19 +56,26 @@ val commonModule= module {
    //Repositories
    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
 
+   // Cloudinary
+
+
    //UseCases
+   single { UpdateUserLocationUseCase(get(), get()) }
+   singleOf(::RegisterUserUseCase)
+   singleOf(::UpdateUserProfileUseCase)
+   singleOf(::UploadImageUseCase)
+
    single {
       RegisterUseCases(
          registerUser = get(),
          updateUserProfile = get()
       )
    }
-   single { UpdateUserLocationUseCase(get(), get()) }
-
    // ViewModels
    single { RegisterViewModel(get()) }
-   single { OnboardingViewModel(get()) }
+   single { OnboardingViewModel(get(), get()) }
    //single { QuiverViewModel(get()) }
+
 
 }
 

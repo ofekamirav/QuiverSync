@@ -97,6 +97,13 @@ dependencies {
     //firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.common.ktx)
+    //Coil
+    implementation(libs.coil.compose)
+    //Permissions
+    implementation(libs.accompanist.permissions)
+    //Cloudinary
+    implementation(libs.cloudinary.android)
+
 
 
 

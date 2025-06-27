@@ -2,6 +2,7 @@ package org.example.quiversync.presentation.screens.register
 
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -25,16 +26,21 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.components.GradientButton
 import org.example.quiversync.R
+import org.example.quiversync.features.register.RegisterEvent
 import org.example.quiversync.features.register.RegisterState
 import org.example.quiversync.features.register.RegisterViewModel
 import org.example.quiversync.presentation.components.CustomTextField
+import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
 import org.koin.androidx.compose.koinViewModel
@@ -42,25 +48,54 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = koinViewModel(),
-    onSignUpClick: () -> Unit = {}
+    onSignUpSuccess: () -> Unit,
+    onLoginClick: () -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val state by viewModel.registerState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    val registerState by viewModel.registerState.collectAsState()
-    val isError = registerState is RegisterState.Error
-    val errorMessage = if (registerState is RegisterState.Error) {
-        (registerState as RegisterState.Error).message
-    } else null
-
-    LaunchedEffect(registerState) {
-        if (registerState is RegisterState.Success) {
-            onSignUpClick()
-            viewModel.resetState()
+    when (val currentState = state) {
+        is RegisterState.Idle -> {
+            RegisterScreenContent(
+                state = currentState,
+                onEvent = viewModel::onEvent,
+                onLoginClick = onLoginClick
+            )
+        }
+        is RegisterState.Loading -> {
+            RegisterScreenContent(state = RegisterState.Idle(), onEvent = {}, onLoginClick = {}, isLoading = true)
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
+            }
+        }
+        is RegisterState.Success -> {
+            LaunchedEffect(Unit) {
+                onSignUpSuccess()
+                Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
+                viewModel.resetState()
+            }
+        }
+        is RegisterState.Error -> {
+            LaunchedEffect(currentState) {
+                Toast.makeText(context, currentState.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
         }
     }
+}
 
+
+
+@Composable
+fun RegisterScreenContent(
+    state: RegisterState.Idle,
+    onEvent: (RegisterEvent) -> Unit,
+    onLoginClick: () -> Unit,
+    isLoading: Boolean = false
+) {
     val isDark = isSystemInDarkTheme()
     val backgroundBrush = Brush.verticalGradient(
         if (isDark) OceanPalette.LoginGradientDark else OceanPalette.LoginGradientLight
@@ -101,7 +136,7 @@ fun RegisterScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 "Create Account",
@@ -110,60 +145,59 @@ fun RegisterScreen(
                 color = textColor
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             CustomTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = state.name,
+                onValueChange = { onEvent(RegisterEvent.NameChanged(it)) },
                 label = "Name",
                 leadingIcon = Icons.Default.Person,
-                isError = isError,
-                errorMessage = if (isError) errorMessage else null,
+                isError = state.nameError != null,
+                errorMessage = state.nameError,
                 imeAction = ImeAction.Next
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             CustomTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = state.email,
+                onValueChange = { onEvent(RegisterEvent.EmailChanged(it)) },
                 label = "Email",
                 leadingIcon = Icons.Default.MailOutline,
-                isError = isError,
-                errorMessage = if (isError) errorMessage else null,
-                imeAction = ImeAction.Next
+                isError = state.emailError != null,
+                errorMessage = state.emailError,
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Email
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             CustomTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = state.password,
+                onValueChange = { onEvent(RegisterEvent.PasswordChanged(it)) },
                 label = "Password",
                 leadingIcon = Icons.Default.Lock,
                 isPassword = true,
-                isError = isError,
-                errorMessage = if (isError) errorMessage else null,
-                imeAction = ImeAction.Done
+                isError = state.passwordError != null,
+                errorMessage = state.passwordError,
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Password
             )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
             GradientButton(
                 text = "Sign Up",
-                onClick = {
-                    viewModel.onRegisterClick(name, email, password)
-                    onSignUpClick()
-                          },
-                shape = RoundedCornerShape(16.dp)
+                onClick = { if (!isLoading) onEvent(RegisterEvent.SignUpClicked) },
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = "Already have an account? Sign in",
-                modifier = Modifier.clickable { /* Navigate to login */ },
+                modifier = Modifier.clickable { onLoginClick() },
                 color = logoTint,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center
@@ -172,13 +206,3 @@ fun RegisterScreen(
     }
 }
 
-
-@Preview(showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-    )
-@Composable
-fun PreviewRegisterScreen() {
-    QuiverSyncTheme(darkTheme = true) {
-        RegisterScreen()
-    }
-}

@@ -55,13 +55,8 @@ fun RentalPublishDialog(
                     label = "Price per day ($)",
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done,
-                    onImeAction = performConfirm,
                     isError = isError,
-                    supportingText = {
-                        if (isError) {
-                            Text("Please enter a valid price")
-                        }
-                    },
+                    errorMessage = if (isError) "Please enter a valid price" else null
                 )
             }
         },
