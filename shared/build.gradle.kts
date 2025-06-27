@@ -1,13 +1,39 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     kotlin("plugin.serialization") version "2.1.0"
     id("co.touchlab.skie") version "0.10.1"
+    id("com.codingfeline.buildkonfig") version "0.15.1"
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+buildkonfig {
+    packageName = "org.example.quiversync"
+
+    defaultConfigs {
+        buildConfigField(
+          FieldSpec.Type.STRING,
+            "CLOUD_NAME",
+            localProperties.getProperty("cloudinary.cloudName", "")
+        )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "UPLOAD_PRESET",
+            localProperties.getProperty("cloudinary.uploadPreset", "")
+        )
+    }
+}
+
 
 kotlin {
 
@@ -32,7 +58,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
@@ -41,6 +67,7 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.cio)
             //Koin
             api(libs.koin.core)
             implementation(libs.koin.compose)
@@ -53,8 +80,6 @@ kotlin {
             implementation(libs.firebase.auth)
             implementation(libs.firebase.common)
             implementation(libs.firebase.storage)
-            //Date
-            implementation(libs.kotlinx.datetime)
 
 
         }
@@ -69,6 +94,8 @@ kotlin {
             implementation(libs.androidx.material3.window.size)
             //DataStore
             implementation(libs.androidx.datastore.preferences)
+            //Cloudinary
+            implementation(libs.cloudinary.android)
 
         }
         iosMain.dependencies {

@@ -29,6 +29,7 @@ import org.example.quiversync.presentation.screens.home.HomeScreen
 import org.example.quiversync.presentation.screens.quiver.QuiverScreen
 import org.example.quiversync.presentation.screens.quiver.add_board.AddSurfboardFlowScreen
 import org.example.quiversync.presentation.screens.register.CompleteRegisterScreen
+import org.example.quiversync.presentation.screens.register.OnboardingScreen
 import org.example.quiversync.presentation.screens.rentals.RentalsHubScreen
 import org.example.quiversync.presentation.screens.spots.FavoriteSpotsScreen
 import org.example.quiversync.presentation.theme.OceanPalette
@@ -181,11 +182,12 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
             }
             composable(Screen.Register.route) {
                 RegisterScreen(
-                    onSignUpClick = {
-                        navController.navigate(Screen.CompleteRegister.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
+                    onSignUpSuccess = {
+                        navController.navigate(Screen.CompleteRegister.route)
                     },
+                    onLoginClick = {
+                        navController.navigate(Screen.Login.route)
+                    }
                 )
             }
             composable(Screen.Home.route) {
@@ -229,7 +231,13 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 )
             }
             composable(Screen.CompleteRegister.route) {
-                CompleteRegisterScreen()
+                OnboardingScreen(
+                    onCompleteClick = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(0)
+                        }
+                    }
+                )
             }
         }
     }

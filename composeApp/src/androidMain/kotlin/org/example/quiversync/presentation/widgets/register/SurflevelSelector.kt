@@ -20,12 +20,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.example.quiversync.domain.model.SurfLevel
 import org.example.quiversync.presentation.theme.OceanPalette
 
 @Composable
 fun SurfLevelSelector(
     selectedLevel: SurfLevel?,
-    onLevelSelected: (SurfLevel) -> Unit
+    onLevelSelected: (SurfLevel) -> Unit,
+    errorMessage: String? = null
 ) {
     val isDark = isSystemInDarkTheme()
     val background = if (isDark) OceanPalette.DarkSurface else OceanPalette.FoamWhite
@@ -55,12 +57,16 @@ fun SurfLevelSelector(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+        }
+
     }
-}
-
-
-enum class SurfLevel(val label: String) {
-    BEGINNER("Beginner"),
-    INTERMEDIATE("Intermediate"),
-    PRO("Pro")
 }

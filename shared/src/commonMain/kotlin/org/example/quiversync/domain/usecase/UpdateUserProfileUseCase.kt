@@ -15,9 +15,10 @@ class UpdateUserProfileUseCase(
         }
         val updatedUser = currentUser.copy(
             dateOfBirth = details.dateOfBirth,
-            heightCm = details.heightCm.toIntOrNull(),
-            weightKg = details.weightKg.toIntOrNull(),
-            surfLevel = details.surfLevel
+            heightCm = details.heightCm,
+            weightKg = details.weightKg,
+            surfLevel = details.surfLevel,
+            profilePicture = details.profilePicture
         )
         return authRepository.updateUserProfile(updatedUser)
     }

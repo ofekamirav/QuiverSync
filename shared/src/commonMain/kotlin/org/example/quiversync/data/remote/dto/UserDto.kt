@@ -10,8 +10,8 @@ data class UserDto(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val dateOfBirth: String? = null,
-    val heightCm: Int? = null,
-    val weightKg: Int? = null,
+    val heightCm: Double? = null,
+    val weightKg: Double? = null,
     val surfLevel: String? = null,
     val profilePicture: String? = null,
 )

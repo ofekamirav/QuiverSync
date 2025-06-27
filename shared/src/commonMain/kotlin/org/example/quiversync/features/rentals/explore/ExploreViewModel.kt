@@ -85,8 +85,8 @@ class ExploreViewModel : BaseViewModel(){
             latitude = 32.0853,
             longitude = 34.7818,
             dateOfBirth = "",
-            heightCm = 0,
-            weightKg = 0,
+            heightCm = 0.0,
+            weightKg = 0.0,
             surfLevel = "",
         )
     }

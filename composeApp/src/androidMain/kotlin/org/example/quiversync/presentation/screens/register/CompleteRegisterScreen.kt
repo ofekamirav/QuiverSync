@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -24,74 +25,130 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.android.volley.toolbox.ImageRequest
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 import org.example.quiversync.domain.model.OnboardingProfileDetails
+import org.example.quiversync.features.register.OnboardingState
+import org.example.quiversync.features.register.OnboardingViewModel
 import org.example.quiversync.presentation.components.CustomTextField
 import org.example.quiversync.presentation.components.DateOfBirthPicker
 import org.example.quiversync.presentation.components.GradientButton
+import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
-import org.example.quiversync.presentation.widgets.register.SurfLevel
 import org.example.quiversync.presentation.widgets.register.SurfLevelSelector
-import org.example.quiversync.utils.FirebaseStorageUploader
-import org.example.quiversync.utils.toCompressedByteArray
+import org.koin.androidx.compose.koinViewModel
+import org.example.quiversync.R
+import org.example.quiversync.domain.model.SurfLevel
+import org.example.quiversync.features.register.OnboardingEvent
+import org.example.quiversync.presentation.components.ImageSourceSelectorSheet
+import org.example.quiversync.presentation.components.RequestPermissionsDirectly
+import org.example.quiversync.presentation.widgets.register.ImagePickerSection
+import org.example.quiversync.utils.extentions.toCompressedByteArray
+
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun OnboardingScreen(
+    viewModel: OnboardingViewModel = koinViewModel(),
+    onCompleteClick:  () -> Unit,
+) {
+    val uiState by viewModel.onboardingState.collectAsStateWithLifecycle()
+
+    val cameraPermission = rememberPermissionState(android.Manifest.permission.CAMERA)
+    val storagePermission = rememberPermissionState(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+    val locationPermission = rememberPermissionState(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
+    val allPermissionsGranted =
+        cameraPermission.status.isGranted &&
+                storagePermission.status.isGranted &&
+                locationPermission.status.isGranted
+
+    if (!allPermissionsGranted) {
+        RequestPermissionsDirectly(
+            onAllPermissionsGranted = { /* no-op, UI will recompose */ }
+        )
+        return
+    }
+
+    when (val currentState = uiState) {
+        is OnboardingState.Idle -> {
+            CompleteRegisterScreen(
+                state = currentState,
+                onEvent = viewModel::onEvent,
+            )
+        }
+        is OnboardingState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
+            }
+
+        }
+        is OnboardingState.Success -> {
+            LaunchedEffect(Unit) {
+                onCompleteClick()
+                viewModel.resetStateToIdle()
+            }
+        }
+        is OnboardingState.Error -> {
+            val errorMessage = (uiState as OnboardingState.Error).message
+            Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompleteRegisterScreen(
-    onCompleteClick: (OnboardingProfileDetails) -> Unit = {},
+    state: OnboardingState.Idle,
+    onEvent: (OnboardingEvent) -> Unit
 ) {
-    var dateOfBirth by remember { mutableStateOf ("") }
-    var heightCm by remember { mutableStateOf("") }
-    var weightKg by remember { mutableStateOf("") }
-    var selectedSurfLevel by remember { mutableStateOf<SurfLevel?>(null) }
     val isDark = isSystemInDarkTheme()
-    val logoTint = if (isDark) OceanPalette.SkyBlue else OceanPalette.DeepBlue
+    val placeholderRes = if (isDark) R.drawable.placeholder_dark else R.drawable.placeholder_light
     val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var imageUploading by remember { mutableStateOf(false) }
-    var imageUrl by remember { mutableStateOf<String?>(null) }
+    var showImageOptions by remember { mutableStateOf(false) }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
+
+    val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        selectedImageUri = uri
         uri?.let {
-            imageUploading = true
             val bitmap = if (Build.VERSION.SDK_INT < 28) {
-                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                MediaStore.Images.Media.getBitmap(context.contentResolver, it)
             } else {
-                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                val source = ImageDecoder.createSource(context.contentResolver, it)
                 ImageDecoder.decodeBitmap(source)
             }
-
-            val uploader = FirebaseStorageUploader()
-            coroutineScope.launch {
-                val result  = uploader.uploadImage(
-                    imageBytes = bitmap.toCompressedByteArray(),
-                    name = "profile_${System.currentTimeMillis()}",
-                    folder = "profile_pictures",
-                    onSuccess = {
-                        imageUrl = it
-                        imageUploading = false
-                    },
-                    onError = {
-                        Log.e("Upload", "Error: $it")
-                        imageUploading = false
-                    }
-                )
-            }
-
+            onEvent(OnboardingEvent.ProfileImageSelected(bitmap.toCompressedByteArray()))
+            Log.d("OnboardingScreen", "Image URI: $uri")
         }
     }
 
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        bitmap?.let {
+            onEvent(OnboardingEvent.ProfileImageSelected(bitmap.toCompressedByteArray()))
+            Log.d("OnboardingScreen", "Image URI: $it")
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -115,16 +172,7 @@ fun CompleteRegisterScreen(
                 GradientButton(
                     text = "Continue",
                     onClick = {
-                        if (selectedSurfLevel != null) {
-                            onCompleteClick(
-                                OnboardingProfileDetails(
-                                    dateOfBirth = dateOfBirth,
-                                    heightCm = heightCm,
-                                    weightKg = weightKg,
-                                    surfLevel = selectedSurfLevel!!.label
-                                )
-                            )
-                        }
+                         onEvent(OnboardingEvent.ContinueClicked)
                     },
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -160,26 +208,31 @@ fun CompleteRegisterScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 DateOfBirthPicker(
-                    selectedDate = dateOfBirth,
-                    onDateSelected = { dateOfBirth = it }
+                    selectedDate = state.dateOfBirth,
+                    onDateSelected = { onEvent(OnboardingEvent.DateOfBirthChanged(it)) },
+                    errorMessage = state.dateOfBirthError
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 CustomTextField(
-                    value = heightCm,
-                    onValueChange = { heightCm = it },
+                    value = state.heightCm.toString(),
+                    onValueChange = { onEvent(OnboardingEvent.HeightChanged(it.toDouble())) },
                     label = "Height (cm)",
+                    isError = state.heightError != null,
+                    errorMessage = state.heightError,
+                    keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next,
-                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 CustomTextField(
-                    value = weightKg,
-                    onValueChange = { weightKg = it },
+                    value = state.weightKg.toString(),
+                    onValueChange = { onEvent(OnboardingEvent.WeightChanged(it.toDouble())) },
                     label = "Weight (kg)",
-                    imeAction = ImeAction.Next,
-                    modifier = Modifier.fillMaxWidth()
+                    isError = state.weightError != null,
+                    errorMessage = state.weightError,
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -188,38 +241,20 @@ fun CompleteRegisterScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 SurfLevelSelector(
-                    selectedLevel = selectedSurfLevel,
-                    onLevelSelected = { selectedSurfLevel = it }
+                    selectedLevel = state.selectedSurfLevel,
+                    onLevelSelected = { onEvent(OnboardingEvent.SurfLevelChanged(it)) },
+                    errorMessage = state.surfLevelError
                 )
                 Spacer(modifier = Modifier.height(12.dp))
+                ImagePickerSection(
+                    imageUrl = state.profileImageUrl,
+                    isUploading = state.isUploadingImage,
+                    onChangePhotoClick = { showImageOptions = true },
+                    placeholderRes = placeholderRes,
+                    isDarkTheme = isDark,
+                    errorMessage = state.profileImageError
+                )
 
-                Box {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(110.dp)
-                            .clip(CircleShape)
-                            .background(if (isDark) OceanPalette.DarkSurface else OceanPalette.FoamWhite),
-                        tint = logoTint
-                    )
-                    IconButton(
-                        onClick = { /* Handle change photo */ },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .offset(x = 4.dp, y = 4.dp)
-                            .size(30.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AddAPhoto,
-                            contentDescription = "Change Photo",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
                 Spacer(modifier = Modifier.height(16.dp))
 
 
@@ -231,15 +266,28 @@ fun CompleteRegisterScreen(
 
                 Spacer(modifier = Modifier.height(96.dp))
             }
+            if (showImageOptions) {
+                ImageSourceSelectorSheet(
+                    onDismiss = { showImageOptions = false },
+                    onTakePhoto = {
+                        showImageOptions = false
+                        cameraLauncher.launch(null)
+                    },
+                    onChooseFromGallery = {
+                        showImageOptions = false
+                        galleryLauncher.launch("image/*")
+                    }
+                )
+            }
         }
     )
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun PreviewOnboardingScreenNoScaffold() {
+fun OnboardingScreenPreview() {
     QuiverSyncTheme {
-        CompleteRegisterScreen()
+        OnboardingScreen(onCompleteClick = {})
     }
 }
+

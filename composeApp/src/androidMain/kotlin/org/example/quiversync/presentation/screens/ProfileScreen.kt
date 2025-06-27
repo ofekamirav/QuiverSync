@@ -8,6 +8,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -18,6 +22,7 @@ import org.example.quiversync.R
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.features.user.UserState
 import org.example.quiversync.features.user.UserViewModel
+import org.example.quiversync.presentation.components.CustomDialog
 import org.example.quiversync.presentation.components.ErrorContent
 import org.example.quiversync.presentation.screens.skeletons.ProfileSkeleton
 import org.example.quiversync.presentation.theme.OceanPalette
@@ -64,6 +69,7 @@ fun ProfileScreenContent(
     onEdit: () -> Unit
 ) {
     val windowInfo = LocalWindowInfo.current
+
     when (windowInfo.widthSize) {
         WindowWidthSize.COMPACT -> {
             Column(
@@ -106,6 +112,21 @@ fun ProfileScreenContent(
 
 @Composable
 fun ProfileActionButtons(onLogout: () -> Unit, onEdit: () -> Unit) {
+    var isDialogOpen by remember { mutableStateOf(false) }
+    if (isDialogOpen) {
+        CustomDialog(
+            title = "Log Out",
+            message = "Are you sure you want to log out?",
+            onDismiss = { isDialogOpen = false },
+            onConfirm = {
+                isDialogOpen = false
+                onLogout()
+            },
+            confirmText = "Log Out",
+            cancelText = "Cancel",
+            showTitle = true
+        )
+    }
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
@@ -113,7 +134,7 @@ fun ProfileActionButtons(onLogout: () -> Unit, onEdit: () -> Unit) {
             .padding(top = 8.dp)
     ) {
         Button(
-            onClick = onLogout,
+            onClick = { isDialogOpen = true },
             colors = ButtonDefaults.buttonColors(containerColor = OceanPalette.SandOrange),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.width(140.dp)
