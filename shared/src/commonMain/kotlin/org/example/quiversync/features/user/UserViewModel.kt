@@ -30,19 +30,26 @@ class UserViewModel: BaseViewModel() {
         }
     }
 
-    fun createMockUser(): User {
-        return User(
-            uid = "1234",
-            name = "Ofek",
-            locationName = "San Diego, CA",
-            latitude = 32.7157,
-            longitude = -117.1611,
-            profilePicture = "",
-            heightCm = 169.0,
-            weightKg = 62.0,
-            surfLevel = "Intermediate",
-            email = "MikeRod@gmail.com",
-            dateOfBirth = "01/01/2000",
-        )
-    }
 }
+
+private fun createMockUser(): User {
+    return User(
+        id = "1",
+        name = "Mike Rodriguez",
+        email = "MikeRod@gmail.com",
+        password = "mockPassword123", // Add a mock password
+        locationName = "San Diego, CA",
+        latitude = 32.7157,
+        longitude = -117.1611,
+        boards = 3,     // Example count
+        spots = 2,      // Example count
+        rentals = 1,    // Example count
+        dateOfBirth = "2000-01-01",
+        heightCm = 169,
+        weightKg = 62,
+        surfLevel = "Intermediate",
+        imageUrl = "hs_shortboard",
+        updatedAt = "2025-06-20T12:00:00Z"
+    )
+}
+

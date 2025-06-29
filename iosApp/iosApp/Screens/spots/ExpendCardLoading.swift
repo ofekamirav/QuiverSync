@@ -9,6 +9,8 @@
 import SwiftUI
 import Shared
 
+
+//load the view model 
 public struct ExpendCardLoading: View {
     @ObservedObject private(set) var viewModel = CombinedForecastQuiverWrapper()
     let favSpot: FavoriteSpot

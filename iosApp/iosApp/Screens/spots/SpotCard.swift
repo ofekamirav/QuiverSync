@@ -1,59 +1,50 @@
-//
-//  SpotCard.swift
-//  iosApp
-//
-//  Created by gal levi on 20/06/2025.
-//  Copyright © 2025 orgName. All rights reserved.
-//
-
 import SwiftUI
 import Shared
 
 public struct SpotCard: View {
-    
     let favSpot: FavoriteSpot
-    
+    @Binding var selectedSpot: FavoriteSpot?
     @State private var isExpanded = false
-    
+    @State private var isShowingPopup = false  
+
     public var body: some View {
-        Spacer()
-        VStack(spacing:16){
-            HStack{
-                VStack{
-                    Text("\(favSpot.name)")
-                        .font(.headline)
-                        .foregroundColor(AppColors.deepBlue)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+        ZStack {
+            //  Base Card UI
+            VStack(spacing: 16) {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(favSpot.name)
+                            .font(.headline)
+                            .foregroundColor(AppColors.deepBlue)
 
-                    Text("\(favSpot.location)")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                }
-                
-                
-                Button(action: {
-                    withAnimation(
-                        .easeInOut(duration: 0.3)){
+                        Text(favSpot.location)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                    Spacer()
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
                             isExpanded.toggle()
                         }
-                     }) {
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .foregroundColor(.gray)
+                    }) {
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .foregroundColor(.gray)
+                    }
                 }
-                
-            }
-            .padding(.vertical, 8)
-            .padding(.horizontal)
-            .background(AppColors.foamWhite)
-            
-            if isExpanded {
-                Divider()
-                ExpendCardLoading(favSpot: favSpot)
+                .padding(.vertical, 8)
+                .padding(.horizontal)
+
+                if isExpanded {
+                    ExtendCard(favSpot: favSpot, showPopup: {
+                        withAnimation {
+                            isShowingPopup = true
+                        }
+                    } , selectedSpot: $selectedSpot)
+                }
             }
         }
         .padding()
+        .blur(radius: selectedSpot != nil ? 6 : 0)
         
     }
 }
