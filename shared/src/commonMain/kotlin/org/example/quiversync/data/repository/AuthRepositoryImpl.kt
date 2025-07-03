@@ -91,19 +91,4 @@ class AuthRepositoryImpl(
             Result.failure(e)
         }
     }
-
-    override suspend fun updateUserLocation(location: Location): Result<Unit> {
-        val uid = auth.currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
-        return try {
-            firestore.collection("users").document(uid).update(
-                mapOf(
-                    "latitude" to location.latitude,
-                    "longitude" to location.longitude
-                )
-            )
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 }

@@ -31,11 +31,12 @@ import org.example.quiversync.presentation.widgets.profile_screen.ProfileHeader
 import org.example.quiversync.presentation.widgets.profile_screen.UserDetailsSection
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    viewModel: UserViewModel = UserViewModel(),
+    viewModel: UserViewModel = koinViewModel(),
     onLogout: () -> Unit,
     onEdit: () -> Unit = {}
 ) {

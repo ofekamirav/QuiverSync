@@ -1,0 +1,43 @@
+CREATE TABLE GeminiMatchEntity (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    boardId TEXT NOT NULL,
+    userId TEXT NOT NULL,
+    forecastDate TEXT NOT NULL,
+    forecastLatitude REAL NOT NULL,
+    forecastLongitude REAL NOT NULL,
+    score INTEGER NOT NULL
+);
+
+DELETE_BEST_MATCH_FOR_DATE:
+DELETE FROM GeminiMatchEntity
+WHERE userId = ?
+  AND forecastDate = ?
+  AND forecastLatitude = ?
+  AND forecastLongitude = ?;
+
+INSERT_BEST_MATCH:
+INSERT INTO GeminiMatchEntity(
+    boardId, userId, forecastDate, forecastLatitude, forecastLongitude, score
+) VALUES (?, ?, ?, ?, ?, ?);
+
+GET_BEST_MATCH:
+SELECT * FROM GeminiMatchEntity
+WHERE userId = ?
+  AND forecastDate = ?
+  AND forecastLatitude = ?
+  AND forecastLongitude = ?
+LIMIT 1;
+
+deleteMatchesBySpot:
+DELETE FROM GeminiMatchEntity
+WHERE forecastLatitude = ?
+  AND forecastLongitude = ?;
+
+GET_TOP_MATCH_BY_USER_SPOT_AND_DATE:
+SELECT * FROM GeminiMatchEntity
+WHERE userId = ?
+  AND forecastDate = ?
+  AND forecastLatitude = ?
+  AND forecastLongitude = ?
+ORDER BY score DESC
+LIMIT 1;

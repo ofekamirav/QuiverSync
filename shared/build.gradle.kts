@@ -7,9 +7,10 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    kotlin("plugin.serialization") version "2.1.0"
     id("co.touchlab.skie") version "0.10.1"
     id("com.codingfeline.buildkonfig") version "0.15.1"
+    alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.sqldelight)
 }
 
 val localProperties = Properties()
@@ -36,6 +37,13 @@ buildkonfig {
 
 
 kotlin {
+    sqldelight {
+        databases {
+            create("QuiverSyncDatabase") {
+                packageName.set("org.example.quiversync")
+            }
+        }
+    }
 
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -80,6 +88,9 @@ kotlin {
             implementation(libs.firebase.auth)
             implementation(libs.firebase.common)
             implementation(libs.firebase.storage)
+            //SQLDelight
+            implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines.extensions)
 
 
         }
@@ -96,11 +107,15 @@ kotlin {
             implementation(libs.androidx.datastore.preferences)
             //Cloudinary
             implementation(libs.cloudinary.android)
+            //SqlDelight
+            implementation(libs.sqldelight.android.driver)
 
         }
         iosMain.dependencies {
             //Ktor
             implementation(libs.ktor.client.darwin)
+            //SqlDelight
+            implementation(libs.sqldelight.native.driver)
 
         }
     }

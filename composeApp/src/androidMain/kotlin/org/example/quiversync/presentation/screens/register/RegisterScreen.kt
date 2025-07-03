@@ -154,7 +154,8 @@ fun RegisterScreenContent(
                 leadingIcon = Icons.Default.Person,
                 isError = state.nameError != null,
                 errorMessage = state.nameError,
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Text
             )
 
             Spacer(modifier = Modifier.height(16.dp))

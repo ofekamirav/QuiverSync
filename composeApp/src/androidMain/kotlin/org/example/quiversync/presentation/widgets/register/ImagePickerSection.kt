@@ -46,7 +46,7 @@ fun ImagePickerSection(
                 placeholder = painterResource(placeholderRes),
                 error = painterResource(placeholderRes),
                 fallback = painterResource(placeholderRes),
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape)
