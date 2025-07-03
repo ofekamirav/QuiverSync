@@ -115,9 +115,6 @@ class MyRentalsViewModel: BaseViewModel() {
         return User(
             uid = ownerId,
             name = "Ofek",
-            locationName = "San Diego, CA",
-            latitude = 32.7157,
-            longitude = -117.1611,
             profilePicture = "",
             heightCm = 169.0,
             weightKg = 62.0,

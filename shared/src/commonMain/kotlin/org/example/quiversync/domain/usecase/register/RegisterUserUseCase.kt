@@ -1,4 +1,5 @@
-package org.example.quiversync.domain.usecase
+package org.example.quiversync.domain.usecase.register
+
 import org.example.quiversync.domain.repository.AuthRepository
 
 class RegisterUserUseCase(

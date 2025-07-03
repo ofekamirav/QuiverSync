@@ -42,13 +42,16 @@ import org.koin.compose.koinInject
 fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     val navController = rememberNavController()
     var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
+    var hasSeenWelcome by remember { mutableStateOf<Boolean?>(null) }
 
     LaunchedEffect(Unit) {
         val uid = sessionManager.getUid()
         isLoggedIn = uid != null
+        hasSeenWelcome = sessionManager.hasSeenWelcome()
+        sessionManager.setWelcomeSeen()
     }
 
-    if (isLoggedIn == null) {
+    if (isLoggedIn == null || hasSeenWelcome == null) {
         Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ){
@@ -191,7 +194,13 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 )
             }
             composable(Screen.Home.route) {
-                HomeScreen(modifier = Modifier.padding(innerPadding))
+                HomeScreen(
+                    showWelcomeBottomSheetOnStart =  if (hasSeenWelcome == false) {
+                        hasSeenWelcome = true
+                        true
+                    } else false,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
             composable(Screen.Spots.route) {
                 FavoriteSpotsScreen(modifier = Modifier.padding(innerPadding))
