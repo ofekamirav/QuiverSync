@@ -1,15 +1,14 @@
 package org.example.quiversync.features.user
 
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.quiversync.features.BaseViewModel
-import org.example.quiversync.features.user.UserState
-import org.example.quiversync.domain.model.User
 
 
-class UserViewModel: BaseViewModel() {
+class UserViewModel(
+    private val userUseCases: UserUseCases
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
     val uiState: StateFlow<UserState> get() = _uiState
@@ -20,29 +19,19 @@ class UserViewModel: BaseViewModel() {
 
     fun fetchUser() {
         scope.launch {
-            val user = createMockUser()
-            delay(1500)
-
-
-            _uiState.emit(
-                UserState.Loaded(user)
-            )
+            _uiState.value = UserState.Loading
+            val result = userUseCases.getUserProfileUseCase()
+            result
+                .onSuccess { user ->
+                    _uiState.emit(
+                        UserState.Loaded(user)
+                    )
+                }
+                .onFailure { e ->
+                    _uiState.emit(
+                        UserState.Error(e.message ?: "Unknown error")
+                    )
+                }
         }
-    }
-
-    fun createMockUser(): User {
-        return User(
-            uid = "1234",
-            name = "Ofek",
-            locationName = "San Diego, CA",
-            latitude = 32.7157,
-            longitude = -117.1611,
-            profilePicture = "",
-            heightCm = 169.0,
-            weightKg = 62.0,
-            surfLevel = "Intermediate",
-            email = "MikeRod@gmail.com",
-            dateOfBirth = "01/01/2000",
-        )
     }
 }

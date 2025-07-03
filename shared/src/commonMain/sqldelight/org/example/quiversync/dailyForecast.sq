@@ -1,0 +1,30 @@
+CREATE TABLE DailyForecastEntity (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        latitude REAL NOT NULL,
+        longitude REAL NOT NULL,
+        waveHeight REAL,
+        windSpeed REAL,
+        windDirection REAL,
+        swellPeriod REAL,
+        swellDirection REAL
+);
+
+selectAll:
+SELECT * FROM DailyForecastEntity;
+
+insertOrReplace:
+INSERT OR REPLACE INTO DailyForecastEntity(
+    date, latitude, longitude, waveHeight, windSpeed, windDirection, swellPeriod, swellDirection
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteAll:
+DELETE FROM DailyForecastEntity;
+
+selectToday:
+SELECT * FROM DailyForecastEntity
+WHERE date = ? AND latitude = ? AND longitude = ? LIMIT 1;
+
+deleteBySpot:
+DELETE FROM DailyForecastEntity
+WHERE latitude = ? AND longitude = ?;

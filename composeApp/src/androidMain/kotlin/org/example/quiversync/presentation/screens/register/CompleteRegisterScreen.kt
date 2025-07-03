@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.screens.register
 
+import android.Manifest
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
@@ -54,7 +55,6 @@ import org.example.quiversync.R
 import org.example.quiversync.domain.model.SurfLevel
 import org.example.quiversync.features.register.OnboardingEvent
 import org.example.quiversync.presentation.components.ImageSourceSelectorSheet
-import org.example.quiversync.presentation.components.RequestPermissionsDirectly
 import org.example.quiversync.presentation.widgets.register.ImagePickerSection
 import org.example.quiversync.utils.extentions.toCompressedByteArray
 
@@ -66,22 +66,6 @@ fun OnboardingScreen(
     onCompleteClick:  () -> Unit,
 ) {
     val uiState by viewModel.onboardingState.collectAsStateWithLifecycle()
-
-    val cameraPermission = rememberPermissionState(android.Manifest.permission.CAMERA)
-    val storagePermission = rememberPermissionState(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-    val locationPermission = rememberPermissionState(android.Manifest.permission.ACCESS_FINE_LOCATION)
-
-    val allPermissionsGranted =
-        cameraPermission.status.isGranted &&
-                storagePermission.status.isGranted &&
-                locationPermission.status.isGranted
-
-    if (!allPermissionsGranted) {
-        RequestPermissionsDirectly(
-            onAllPermissionsGranted = { /* no-op, UI will recompose */ }
-        )
-        return
-    }
 
     when (val currentState = uiState) {
         is OnboardingState.Idle -> {
@@ -112,7 +96,7 @@ fun OnboardingScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun CompleteRegisterScreen(
     state: OnboardingState.Idle,
@@ -124,6 +108,15 @@ fun CompleteRegisterScreen(
 
     val context = LocalContext.current
     var showImageOptions by remember { mutableStateOf(false) }
+
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    val storagePermissionState = rememberPermissionState(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+    )
 
 
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -216,7 +209,7 @@ fun CompleteRegisterScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 CustomTextField(
-                    value = state.heightCm.toString(),
+                    value = state.heightCm,
                     onValueChange = { onEvent(OnboardingEvent.HeightChanged(it)) },
                     label = "Height (cm)",
                     isError = state.heightError != null,
@@ -226,7 +219,7 @@ fun CompleteRegisterScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 CustomTextField(
-                    value = state.weightKg.toString(),
+                    value = state.weightKg,
                     onValueChange = { onEvent(OnboardingEvent.WeightChanged(it)) },
                     label = "Weight (kg)",
                     isError = state.weightError != null,
@@ -271,23 +264,23 @@ fun CompleteRegisterScreen(
                     onDismiss = { showImageOptions = false },
                     onTakePhoto = {
                         showImageOptions = false
-                        cameraLauncher.launch(null)
+                        if (cameraPermissionState.status.isGranted) {
+                            cameraLauncher.launch(null)
+                        } else {
+                            cameraPermissionState.launchPermissionRequest()
+                        }
                     },
                     onChooseFromGallery = {
                         showImageOptions = false
-                        galleryLauncher.launch("image/*")
+                        if (storagePermissionState.status.isGranted) {
+                            galleryLauncher.launch("image/*")
+                        } else {
+                            storagePermissionState.launchPermissionRequest()
+                        }
                     }
                 )
             }
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun OnboardingScreenPreview() {
-    QuiverSyncTheme {
-        OnboardingScreen(onCompleteClick = {})
-    }
 }
 

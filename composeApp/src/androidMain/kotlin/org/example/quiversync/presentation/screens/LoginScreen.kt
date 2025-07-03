@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -95,7 +96,8 @@ fun LoginScreen(
                 onValueChange = { email = it },
                 label = "Email",
                 leadingIcon = Icons.Default.MailOutline,
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Email
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -106,7 +108,8 @@ fun LoginScreen(
                 label = "Password",
                 leadingIcon = Icons.Default.Lock,
                 isPassword = true,
-                imeAction = ImeAction.Done
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Password
             )
 
             Spacer(modifier = Modifier.height(8.dp))

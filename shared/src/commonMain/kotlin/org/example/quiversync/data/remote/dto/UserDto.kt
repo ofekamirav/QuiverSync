@@ -6,9 +6,6 @@ import kotlinx.serialization.Serializable
 data class UserDto(
     val name: String? = null,
     val email: String? = null,
-    val locationName: String? = null,
-    val latitude: Double? = null,
-    val longitude: Double? = null,
     val dateOfBirth: String? = null,
     val heightCm: Double? = null,
     val weightKg: Double? = null,

@@ -23,10 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.presentation.theme.OceanPalette
 
 @Composable
-fun MainConditions(expanded: Boolean, onExpandToggle: () -> Unit) {
+fun MainConditions(
+    forecast: DailyForecast,
+    expanded: Boolean,
+    onExpandToggle: () -> Unit
+) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -43,7 +48,7 @@ fun MainConditions(expanded: Boolean, onExpandToggle: () -> Unit) {
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                "Pipeline, North Shore",
+                "Your Location",
                 color = OceanPalette.DeepBlue,
                 fontWeight = FontWeight.SemiBold,
                 style = MaterialTheme.typography.titleMedium,
@@ -58,7 +63,11 @@ fun MainConditions(expanded: Boolean, onExpandToggle: () -> Unit) {
         }
 
         AnimatedVisibility(visible = expanded) {
-            CurrentConditions("3-4ft", "15mph", "Rising")
+            CurrentConditions(
+                waveHeight = "${forecast.waveHeight} m",
+                wind = "${forecast.windSpeed} m/s",
+                tide = "${forecast.swellPeriod} s period"
+            )
         }
 
         BoardRecommendationCard()

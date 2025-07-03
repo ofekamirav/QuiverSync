@@ -1,8 +1,7 @@
-package org.example.quiversync.domain.usecase
+package org.example.quiversync.domain.usecase.register
 
 import org.example.quiversync.domain.model.OnboardingProfileDetails
 import org.example.quiversync.domain.repository.AuthRepository
-import kotlinx.coroutines.flow.firstOrNull
 
 class UpdateUserProfileUseCase(
     private val authRepository: AuthRepository
