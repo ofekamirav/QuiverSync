@@ -46,6 +46,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
 
     LaunchedEffect(Unit) {
         val uid = sessionManager.getUid()
+        println( "AppNavigation: User ID from SessionManager: $uid")
         isLoggedIn = uid != null
         hasSeenWelcome = sessionManager.hasSeenWelcome()
         sessionManager.setWelcomeSeen()

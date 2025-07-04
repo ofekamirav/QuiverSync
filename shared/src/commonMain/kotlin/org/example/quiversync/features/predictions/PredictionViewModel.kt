@@ -2,7 +2,7 @@ package org.example.quiversync.features.predictions
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.example.quiversync.domain.model.Forecast.DailyForecast
+import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.Prediction.DailyPrediction
 import org.example.quiversync.domain.model.Prediction.WeeklyPrediction
 import org.example.quiversync.domain.model.Surfboard

@@ -121,6 +121,10 @@ class MyRentalsViewModel: BaseViewModel() {
             surfLevel = "Intermediate",
             email = "MikeRod@gmail.com",
             dateOfBirth = "01/01/2000",
+            password = "mockPassword123",
+            boards = 3,
+            spots = 2,
+            rentals = 1,
         )
     }
 

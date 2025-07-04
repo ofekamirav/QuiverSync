@@ -1,8 +1,6 @@
 package org.example.quiversync.data.session
 
-import org.example.quiversync.utils.Location
-
-expect class SessionManager(context: Any?) {
+expect class SessionManager {
     suspend fun clearAll()
     suspend fun hasSeenWelcome(): Boolean
     suspend fun setWelcomeSeen()

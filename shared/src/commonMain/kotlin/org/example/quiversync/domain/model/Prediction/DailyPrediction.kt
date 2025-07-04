@@ -1,7 +1,7 @@
 package org.example.quiversync.domain.model.Prediction
 
-import org.example.quiversync.domain.model.Forecast.DailyForecast
 import org.example.quiversync.domain.model.Surfboard
+import org.example.quiversync.domain.model.forecast.DailyForecast
 
 data class DailyPrediction (
     val DailyForecast: DailyForecast,

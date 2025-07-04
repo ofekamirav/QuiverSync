@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.domain.model.FavoriteSpots
-import org.example.quiversync.domain.model.Forecast.DailyForecast
+import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.Prediction.DailyPrediction
 import org.example.quiversync.domain.model.Prediction.WeeklyPrediction
 import org.example.quiversync.domain.model.Surfboard

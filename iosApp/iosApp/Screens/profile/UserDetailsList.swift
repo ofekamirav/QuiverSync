@@ -17,13 +17,13 @@ struct UserDetailsList: View {
         VStack(spacing: 0) {
             UserDetailRow(icon: "envelope", label: "Email", value: user.email)
             Divider()
-            UserDetailRow(icon: "calendar", label: "Date of Birth", value: user.dateOfBirth)
+            UserDetailRow(icon: "calendar", label: "Date of Birth", value: user.dateOfBirth ?? "Unknown")
             Divider()
-            UserDetailRow(icon: "ruler", label: "Height", value: "\(user.heightCm) cm")
+            UserDetailRow(icon: "ruler", label: "Height", value: "\(user.heightCm ?? 0) cm")
             Divider()
-            UserDetailRow(icon: "scalemass", label: "Weight", value: "\(user.weightKg) kg")
+            UserDetailRow(icon: "scalemass", label: "Weight", value: "\(user.weightKg ?? 0) kg")
             Divider()
-            UserDetailRow(icon: "waveform.path.ecg", label: "Surf Level", value: user.surfLevel)
+            UserDetailRow(icon: "waveform.path.ecg", label: "Surf Level", value: user.surfLevel ?? "Unknown")
         }
         .padding()
         .background(Color.white)

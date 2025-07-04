@@ -11,4 +11,5 @@ data class UserDto(
     val weightKg: Double? = null,
     val surfLevel: String? = null,
     val profilePicture: String? = null,
+    val password: String? = null,
 )

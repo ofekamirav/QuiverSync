@@ -14,6 +14,7 @@ fun UserDto.toDomain(uid: String): User {
         weightKg = this.weightKg,
         surfLevel = this.surfLevel ?: "Beginner",
         profilePicture = this.profilePicture,
+        password = this.password ?: "",
     )
 }
 

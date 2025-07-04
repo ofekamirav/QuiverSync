@@ -16,6 +16,8 @@ actual class SessionManager actual constructor(context: Any?) {
     private val latitudeKey = doublePreferencesKey("latitude")
     private val longitudeKey = doublePreferencesKey("longitude")
 
+    private val context = context as Context
+
     actual suspend fun clearAll() {
         context.dataStore.edit { it.clear() }
     }

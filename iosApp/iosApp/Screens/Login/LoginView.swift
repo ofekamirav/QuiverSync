@@ -7,15 +7,21 @@
 //
 
 import SwiftUI
+import Shared
 
-struct LoginScreen: View {
+struct LoginView: View {
     @Environment(\.colorScheme) var colorScheme
 
+    let onRegisterClick: () -> Void
+    
+    let loginData: LoginData
+    
+    let loginViewModel: LoginViewModel
+    
     @State private var email: String = ""
     @State private var password: String = ""
 
-    let onRegisterClick: () -> Void
-    let onSignInClick: () -> Void
+
 
     var logoTint: Color {
             colorScheme == .dark ? AppColors.skyBlue : AppColors.deepBlue
@@ -62,6 +68,19 @@ struct LoginScreen: View {
                         text: $email,
                         systemImage: "envelope"
                     )
+                    .onChange(of: email){ newValue in
+                        print("this is the state before the event \(loginData)")
+                        loginViewModel.onEvent(event:
+                                                LoginEventEmailChanged(value: newValue))
+                        print("this is the state after the event \(loginData)")
+                    }
+                    if let emailError = loginData.emailError {
+                        Text(emailError)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 4)
+                    }
 
                     CustomInputField(
                         label: "Password",
@@ -69,6 +88,25 @@ struct LoginScreen: View {
                         systemImage: "lock",
                         isSecure: true
                     )
+                    .onChange(of: password) { newValue in
+                        print("this is the state before the event \(loginData)")
+                        print("this is the newValue \(newValue)")
+
+
+                        loginViewModel.onEvent(event:
+                                                LoginEventPasswordChanged(value: newValue))
+                        print("this is the state after the event \(loginData)")
+//                        print(loginData)
+
+                    }
+                    
+                    if let passwordError = loginData.passwordError {
+                        Text(passwordError)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 4)
+                    }
 
                     HStack {
                         Spacer()
@@ -79,7 +117,14 @@ struct LoginScreen: View {
                         .foregroundColor(.gray)
                     }
 
-                    GradientButton(text: "Sign In", action: onSignInClick)
+                    GradientButton(text: "Sign In"){
+                        print("this is the state now \(loginData)")
+                        loginViewModel.onEvent(event:
+                                                LoginEventSignUpClicked())
+                        print("this is the state after the event \(loginData)")
+
+                                                
+                    }
 
                     DividerWithText(text: "Or continue with")
 
@@ -106,10 +151,3 @@ struct LoginScreen: View {
         }
     }
 }
-
-//#Preview {
-//    LoginScreen(
-//        onRegisterClick: {},
-//        onSignInClick: {}
-//    )
-//}

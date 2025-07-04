@@ -79,6 +79,7 @@ class ExploreViewModel : BaseViewModel(){
         return User(
             uid = "1",
             name = "John Doe",
+            password = "mockPassword123",
             email = "william.henry.harrison@example-pet-store.com",
             profilePicture = "",
             dateOfBirth = "",
