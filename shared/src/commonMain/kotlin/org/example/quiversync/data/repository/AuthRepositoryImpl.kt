@@ -29,7 +29,7 @@ class AuthRepositoryImpl(
             val uid = userCredential.user?.uid
 
             if (uid != null) {
-                val userDto = UserDto(email = email, name = name , password = password)
+                val userDto = UserDto(email = email, name = name)
                 firestore.collection("users").document(uid).set(userDto)
                 // Set the user's UID in the session manager
                 sessionManager.setUid(uid)

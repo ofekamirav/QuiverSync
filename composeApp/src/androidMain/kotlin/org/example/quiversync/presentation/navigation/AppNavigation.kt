@@ -43,6 +43,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     val navController = rememberNavController()
     var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
     var hasSeenWelcome by remember { mutableStateOf<Boolean?>(null) }
+    var isLogOut by remember { mutableStateOf<Boolean>(false) }
 
     LaunchedEffect(Unit) {
         val uid = sessionManager.getUid()
@@ -50,6 +51,9 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
         isLoggedIn = uid != null
         hasSeenWelcome = sessionManager.hasSeenWelcome()
         sessionManager.setWelcomeSeen()
+        if (isLogOut){
+            sessionManager.clearAll()
+        }
     }
 
     if (isLoggedIn == null || hasSeenWelcome == null) {
@@ -175,6 +179,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 LoginScreen(
                     onSignInClick = {
                         isLoggedIn = true
+                        isLogOut = false
                         navController.navigate(Screen.Home.route) {
                             popUpTo(0)
                         }
@@ -187,6 +192,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
             composable(Screen.Register.route) {
                 RegisterScreen(
                     onSignUpSuccess = {
+                        isLogOut = false
                         navController.navigate(Screen.CompleteRegister.route)
                     },
                     onLoginClick = {
@@ -220,9 +226,11 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                     modifier = Modifier.padding(innerPadding),
                     onLogout = {
                         isLoggedIn = false
+                        isLogOut = true
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0)
                         }
+
                     }
                 )
             }

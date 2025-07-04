@@ -19,6 +19,10 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import org.example.quiversync.QuiverSyncDatabase
+import org.example.quiversync.data.local.dao.UserDao
+import org.example.quiversync.data.remote.api.GeminiApi
+import org.example.quiversync.data.remote.api.StormGlassApi
 import org.example.quiversync.data.repository.AuthRepositoryImpl
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.data.repository.ForecastRepositoryImpl
@@ -31,20 +35,15 @@ import org.example.quiversync.domain.usecase.GetWeeklyForecastBySpotUseCase
 import org.example.quiversync.domain.usecase.register.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.UploadImageUseCase
-import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
 import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
 import org.example.quiversync.features.home.HomeUseCases
-import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.register.OnboardingViewModel
 import org.example.quiversync.features.register.RegisterUseCases
 import org.example.quiversync.features.register.RegisterViewModel
-import org.example.quiversync.features.user.UserViewModel
-import org.koin.core.module.dsl.factoryOf
 import org.example.quiversync.features.user.UserUseCases
 import org.example.quiversync.features.user.UserViewModel
-import org.koin.core.module.dsl.viewModelOf
 
 
 fun initKoin(config: KoinAppDeclaration? = null) {

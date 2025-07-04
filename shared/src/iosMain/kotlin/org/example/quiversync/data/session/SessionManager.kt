@@ -1,8 +1,9 @@
 package org.example.quiversync.data.session
 
+import org.example.quiversync.utils.Location
 import platform.Foundation.NSUserDefaults
 
-actual class SessionManager {
+actual class SessionManager actual constructor(context: Any?) {
 
     private val defaults = NSUserDefaults.standardUserDefaults
 

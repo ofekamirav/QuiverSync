@@ -2,7 +2,7 @@
 accompanistPager = "0.34.0"
 accompanistPermissions = "0.31.5-beta"
 accompanistPlaceholderMaterial = "0.33.2-alpha"
-agp = "8.11.0"
+agp = "8.9.2"
 android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "35"
