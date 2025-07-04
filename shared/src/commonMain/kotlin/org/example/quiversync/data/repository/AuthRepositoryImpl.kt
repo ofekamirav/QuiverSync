@@ -66,6 +66,7 @@ class AuthRepositoryImpl(
             val userCredential = auth.signInWithEmailAndPassword(email, password)
             val uid = userCredential.user?.uid
             if (uid != null) {
+                getCurrentUser()
                 sessionManager.setUid(uid)
                 Result.success(Unit)
             } else {

@@ -26,6 +26,7 @@ import org.example.quiversync.data.local.dao.UserDao
 import org.example.quiversync.data.remote.api.GeminiApi
 import org.example.quiversync.data.remote.api.StormGlassApi
 import org.example.quiversync.data.repository.AuthRepositoryImpl
+import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.data.repository.ForecastRepositoryImpl
 import org.example.quiversync.data.repository.UserRepositoryImpl
 import org.example.quiversync.domain.repository.AuthRepository
@@ -36,6 +37,10 @@ import org.example.quiversync.domain.usecase.GetWeeklyForecastBySpotUseCase
 import org.example.quiversync.domain.usecase.register.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.UploadImageUseCase
+import org.example.quiversync.features.home.HomeViewModel
+import org.example.quiversync.features.login.LoginViewModel
+import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
+import org.example.quiversync.features.home.HomeUseCases
 import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
 import org.example.quiversync.features.home.HomeUseCases
 import org.example.quiversync.features.home.HomeViewModel
@@ -73,6 +78,9 @@ val commonModule= module {
    single{ GeminiApi(get()) }
    single{ StormGlassApi(get()) }
 
+   single<SessionManager> { SessionManager(get()) }
+
+
    //Repositories
    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
    single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get()) }
@@ -86,8 +94,6 @@ val commonModule= module {
    single { get<QuiverSyncDatabase>().geminiMatchQueries }
    single { get<QuiverSyncDatabase>().userProfileQueries }
    single{ UserDao(get()) }
-
-
 
 
    //UseCases
@@ -121,6 +127,9 @@ val commonModule= module {
    single { OnboardingViewModel(get(), get()) }
    single { UserViewModel(get()) }
    single { HomeViewModel(get()) }
+   single { LoginViewModel(get()) }
+
+   single { OnboardingViewModel(get(), get()) }
    //single { QuiverViewModel(get()) }
 
 

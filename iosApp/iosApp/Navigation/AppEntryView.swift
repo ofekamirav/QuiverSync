@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Shared
+import Foundation
 
 struct AppEntryView: View {
     @State private var path = NavigationPath()
@@ -21,10 +22,11 @@ struct AppEntryView: View {
                 } else {
                     LoginScreen(
                         onRegisterClick: { path.append(AppRoute.register) },
-                        onSignInClick: {
-                            isLoggedIn = true
-                            path.removeLast(path.count) // Clear to main
-                        }
+//                        onSignInClick: {
+//                            isLoggedIn = true
+//                            path.removeLast(path.count) // Clear to main
+//                        }
+                       
                     )
                 }
             }
@@ -32,7 +34,16 @@ struct AppEntryView: View {
                 switch route {
                 case .register:
                     RegisterScreen(
-                        onSignUpClick: {path.removeLast()}
+//                        onReturnToMain : {
+//                            path.removeLast(path.count) // Clear to main
+//                        }
+                        onBackBtn: {
+//                            isLoggedIn = true
+                            path.removeLast(path.count) // Clear to main
+                        },
+                        onSuccess: {
+                                isLoggedIn = true
+                        },
                     )
                 case .main:
                     MainTabView()
@@ -41,19 +52,16 @@ struct AppEntryView: View {
                         onDismiss: { path = .init() },
                         onGetStarted: { path.append(AppRoute.main) }
                     )
-                default:
-                    EmptyView()
                 }
             }
         }
     }
-}
-
-
-import Foundation
-
-enum AppRoute: Hashable {
-    case register
-    case main
-    case welcomeSheet
+    
+    
+    
+    enum AppRoute: Hashable {
+        case register
+        case main
+        case welcomeSheet
+    }
 }

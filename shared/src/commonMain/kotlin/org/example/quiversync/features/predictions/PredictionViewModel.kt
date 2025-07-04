@@ -1,50 +1,30 @@
-package org.example.quiversync.features.spots
+package org.example.quiversync.features.predictions
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import org.example.quiversync.domain.model.FavoriteSpot
-import org.example.quiversync.domain.model.FavoriteSpots
 import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.Prediction.DailyPrediction
 import org.example.quiversync.domain.model.Prediction.WeeklyPrediction
 import org.example.quiversync.domain.model.Surfboard
+import kotlinx.coroutines.launch
 import org.example.quiversync.features.BaseViewModel
 
-class FavSpotsViewModel: BaseViewModel() {
-
-    private val _uiState = MutableStateFlow<FavSpotsState>(FavSpotsState.Loading)
-    val uiState: StateFlow<FavSpotsState> get() = _uiState
+class PredictionViewModel:BaseViewModel() {
+    private val _uiState = MutableStateFlow<PredictionState>(PredictionState.Loading)
+    val uiState: StateFlow<PredictionState> get() = _uiState
 
     init {
-        fetchFavSpots()
+        fetchPrediction()
     }
-    private fun fetchFavSpots(){
+    private fun fetchPrediction() {
         scope.launch {
-            val favSpots = createMockSpots()
+            val prediction = createMockPrediction()
             _uiState.emit(
-                FavSpotsState.Loaded(favSpots)
+                PredictionState.Loaded(prediction)
             )
         }
     }
-
-
-
 }
-
-private fun createMockSpots(): FavoriteSpots {
-    val favSpots = listOf(
-        FavoriteSpot("Pipeline", "North Shore, HI", "Pipeline", "94", 3.2,3.1,"1" , 2 , "d" , "4" , createMockPrediction()),
-        FavoriteSpot("Punta Roca", "North Shore, HI", "Punta Roca", "94", 3.2,3.1,"2" , 2 , "d" , "4",createMockPrediction()),
-        FavoriteSpot("Trestles", "North Shore, HI", "Trestles", "94", 3.2,3.1,"1" , 2 , "d" , "4",createMockPrediction())
-    )
-
-    return FavoriteSpots(items = favSpots)
-}
-
-
-
-
 
 private fun createMockPrediction(): WeeklyPrediction {
     val boards = listOf(

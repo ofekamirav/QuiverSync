@@ -16,7 +16,7 @@ public struct ProfileHeader: View {
     public var body: some View {
         VStack{
             ZStack(alignment: .bottomTrailing){
-                Image("\(user.imageUrl)")
+                Image("\(user.profilePicture)")
                     .resizable()
                     .frame(width: 120, height: 120)
                     .background(AppColors.borderGray)

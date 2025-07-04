@@ -9,7 +9,7 @@ import org.example.quiversync.features.BaseViewModel
 class RegisterViewModel(
     private val registerUseCases: RegisterUseCases
 ): BaseViewModel() {
-    private val _registerState = MutableStateFlow<RegisterState>(RegisterState.Idle())
+    private val _registerState = MutableStateFlow<RegisterState>(RegisterState.Idle(RegisterFormData()))
     val registerState: StateFlow<RegisterState> = _registerState
 
     fun onEvent(event: RegisterEvent) {
@@ -33,9 +33,9 @@ class RegisterViewModel(
     private fun validateAndRegister() {
         val currentState = _registerState.value as? RegisterState.Idle ?: return
 
-        val nameError = if (currentState.name.isBlank()) "Name is required" else null
-        val emailError = if (!isEmailValid(currentState.email)) "Invalid email address" else null
-        val passwordError = validatePasswordStrength(currentState.password)
+        val nameError = if (currentState.data.name.isBlank()) "Name is required" else null
+        val emailError = if (!isEmailValid(currentState.data.email)) "Invalid email address" else null
+        val passwordError = validatePasswordStrength(currentState.data.password)
 
         val hasErrors = listOf(nameError, emailError, passwordError).any { it != null }
 
@@ -52,13 +52,13 @@ class RegisterViewModel(
         scope.launch {
             _registerState.value = RegisterState.Loading
             val result = registerUseCases.registerUser(
-                name = currentState.name,
-                email = currentState.email,
-                password = currentState.password
+                name = currentState.data.name,
+                email = currentState.data.email,
+                password = currentState.data.password
             )
 
             result.onSuccess {
-                _registerState.value = RegisterState.Success
+                _registerState.value = RegisterState.Loaded
             }.onFailure { exception ->
                 _registerState.value = RegisterState.Error(exception.message ?: "Registration failed")
             }
@@ -81,10 +81,10 @@ class RegisterViewModel(
         return null
     }
 
-    private fun updateState(update: (RegisterState.Idle) -> RegisterState.Idle) {
+    private fun updateState(update: (RegisterFormData) -> RegisterFormData) {
         val currentState = _registerState.value
         if (currentState is RegisterState.Idle) {
-            _registerState.update { update(currentState) }
+            _registerState.update { RegisterState.Idle(update(currentState.data)) }
         }
     }
 }

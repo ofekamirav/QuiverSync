@@ -57,13 +57,13 @@ fun RegisterScreen(
     when (val currentState = state) {
         is RegisterState.Idle -> {
             RegisterScreenContent(
-                state = currentState,
+                currentState = currentState,
                 onEvent = viewModel::onEvent,
                 onLoginClick = onLoginClick
             )
         }
         is RegisterState.Loading -> {
-            RegisterScreenContent(state = RegisterState.Idle(), onEvent = {}, onLoginClick = {}, isLoading = true)
+            RegisterScreenContent(currentState = RegisterState.Idle(), onEvent = {}, onLoginClick = {}, isLoading = true)
             Box(
                 modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
                 contentAlignment = Alignment.Center
@@ -71,7 +71,7 @@ fun RegisterScreen(
                 LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
             }
         }
-        is RegisterState.Success -> {
+        is RegisterState.Loaded -> {
             LaunchedEffect(Unit) {
                 onSignUpSuccess()
                 Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
@@ -91,7 +91,7 @@ fun RegisterScreen(
 
 @Composable
 fun RegisterScreenContent(
-    state: RegisterState.Idle,
+    currentState: RegisterState.Idle,
     onEvent: (RegisterEvent) -> Unit,
     onLoginClick: () -> Unit,
     isLoading: Boolean = false
@@ -104,6 +104,8 @@ fun RegisterScreenContent(
     val textColor = MaterialTheme.colorScheme.onSurface
     val logoTint = if (isDark) OceanPalette.SkyBlue else OceanPalette.DeepBlue
     val windowInfo = LocalWindowInfo.current
+    val state = currentState.data
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -117,8 +119,8 @@ fun RegisterScreenContent(
                     .padding(20.dp)
             else
                 Modifier.widthIn(max = 500.dp)
-                .background(cardColor, RoundedCornerShape(16.dp))
-                .padding(20.dp),
+                    .background(cardColor, RoundedCornerShape(16.dp))
+                    .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
@@ -206,4 +208,3 @@ fun RegisterScreenContent(
         }
     }
 }
-

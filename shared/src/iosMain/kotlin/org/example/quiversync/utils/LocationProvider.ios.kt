@@ -6,7 +6,7 @@ import platform.CoreLocation.*
 import platform.darwin.NSObject
 import platform.CoreLocation.CLLocationCoordinate2D
 
-class IOSLocationProvider : NSObject(), LocationProvider {
+class IOSLocationProvider : LocationProvider {
 
     private val locationManager = CLLocationManager().apply {
         desiredAccuracy = kCLLocationAccuracyBest
@@ -19,6 +19,4 @@ class IOSLocationProvider : NSObject(), LocationProvider {
         //later
         return Location(27.2536, 34.6526)
     }
-
-
 }
