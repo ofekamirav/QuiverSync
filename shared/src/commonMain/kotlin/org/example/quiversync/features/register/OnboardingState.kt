@@ -2,8 +2,6 @@ package org.example.quiversync.features.register
 
 import org.example.quiversync.domain.model.SurfLevel
 
-// In features/register/OnboardingState.kt
-
 sealed class OnboardingState {
     data class Idle(
         // Data fields

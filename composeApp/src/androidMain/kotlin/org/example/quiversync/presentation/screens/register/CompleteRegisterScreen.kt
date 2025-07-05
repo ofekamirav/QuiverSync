@@ -244,7 +244,6 @@ fun CompleteRegisterScreen(
                     isUploading = state.isUploadingImage,
                     onChangePhotoClick = { showImageOptions = true },
                     placeholderRes = placeholderRes,
-                    isDarkTheme = isDark,
                     errorMessage = state.profileImageError
                 )
 

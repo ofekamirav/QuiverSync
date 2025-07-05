@@ -1,0 +1,55 @@
+CREATE TABLE surfboardEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    ownerId TEXT NOT NULL,
+    model TEXT NOT NULL,
+    company TEXT NOT NULL,
+    type TEXT NOT NULL,
+    height TEXT NOT NULL,
+    width TEXT NOT NULL,
+    volume TEXT NOT NULL,
+    finSetup TEXT NOT NULL,
+    imageRes TEXT NOT NULL,
+    latitude REAL,
+    longitude REAL,
+    addedDate TEXT NOT NULL,
+    isRentalPublished INTEGER,
+    isRentalAvailable INTEGER,
+    pricePerDay REAL
+);
+
+getSurfboardById:
+SELECT * FROM surfboardEntity WHERE id = ? LIMIT 1;
+
+insertOrReplaceSurfboard:
+INSERT OR REPLACE INTO surfboardEntity (
+    id, ownerId, model, company, type, height, width, volume,
+    finSetup, imageRes, latitude, longitude, addedDate, isRentalPublished,
+    isRentalAvailable, pricePerDay
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
+
+deleteSurfboardById:
+DELETE FROM surfboardEntity WHERE id = ?;
+
+deleteSurfboardsByOwnerId:
+DELETE FROM surfboardEntity WHERE ownerId = ?;
+
+getSurfboardsByOwnerId:
+SELECT * FROM surfboardEntity WHERE ownerId = ?;
+
+publishSurfboardForRental:
+UPDATE surfboardEntity SET isRentalPublished = 1, isRentalAvailable = 1
+WHERE id = ?;
+
+unpublishSurfboardForRental:
+UPDATE surfboardEntity SET isRentalPublished = 0, isRentalAvailable = 0
+WHERE id = ?;
+
+updateSurfboardRentalDetails:
+UPDATE surfboardEntity SET
+    longitude = ?,
+    latitude = ?,
+    isRentalPublished = ?,
+    isRentalAvailable = ?,
+    pricePerDay = ?
+WHERE id = ?;
+

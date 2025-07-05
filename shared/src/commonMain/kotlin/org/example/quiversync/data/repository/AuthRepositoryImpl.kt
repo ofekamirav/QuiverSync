@@ -80,7 +80,7 @@ class AuthRepositoryImpl(
 
     override suspend fun logout() {
         auth.signOut()
-        sessionManager.clearAll()
+        sessionManager.clearUserData()
     }
 
     override suspend fun updateUserProfile(user: User): Result<Unit> {

@@ -21,6 +21,15 @@ actual class SessionManager actual constructor(context: Any?) {
         context.dataStore.edit { it.clear() }
     }
 
+    actual suspend fun clearUserData() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(uidKey)
+            preferences.remove(latitudeKey)
+            preferences.remove(longitudeKey)
+        }
+    }
+
+
     actual suspend fun hasSeenWelcome(): Boolean {
         return context.dataStore.data.first()[welcomeKey] ?: false
     }

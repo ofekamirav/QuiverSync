@@ -22,28 +22,36 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import org.example.quiversync.QuiverSyncDatabase
 import org.example.quiversync.data.local.dao.DatabaseDriverFactory
+import org.example.quiversync.data.local.dao.QuiverDao
 import org.example.quiversync.data.local.dao.UserDao
 import org.example.quiversync.data.remote.api.GeminiApi
 import org.example.quiversync.data.remote.api.StormGlassApi
+import org.example.quiversync.data.remote.datasource.quiver.QuiverRemoteDataSource
+import org.example.quiversync.data.remote.datasource.quiver.QuiverRemoteDataSourceService
 import org.example.quiversync.data.repository.AuthRepositoryImpl
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.data.repository.ForecastRepositoryImpl
+import org.example.quiversync.data.repository.QuiverRepositoryImpl
 import org.example.quiversync.data.repository.UserRepositoryImpl
 import org.example.quiversync.domain.repository.AuthRepository
 import org.example.quiversync.domain.repository.ForecastRepository
+import org.example.quiversync.domain.repository.QuiverRepository
 import org.example.quiversync.domain.repository.UserRepository
 import org.example.quiversync.domain.usecase.GetWeeklyForecastByLocationUseCase
 import org.example.quiversync.domain.usecase.GetWeeklyForecastBySpotUseCase
 import org.example.quiversync.domain.usecase.register.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.UploadImageUseCase
+import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
+import org.example.quiversync.domain.usecase.quiver.GetMyQuiverUseCase
 import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
+import org.example.quiversync.domain.usecase.user.LogoutUseCase
 import org.example.quiversync.features.home.HomeUseCases
-import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
-import org.example.quiversync.features.home.HomeUseCases
-import org.example.quiversync.features.home.HomeViewModel
+import org.example.quiversync.features.quiver.QuiverUseCases
+import org.example.quiversync.features.quiver.QuiverViewModel
+import org.example.quiversync.features.quiver.add_board.AddBoardViewModel
 import org.example.quiversync.features.register.OnboardingViewModel
 import org.example.quiversync.features.register.RegisterUseCases
 import org.example.quiversync.features.register.RegisterViewModel
@@ -85,15 +93,19 @@ val commonModule= module {
    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
    single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get()) }
    single<UserRepository> { UserRepositoryImpl(get(), get(),get()) }
+   single<QuiverRepository> { QuiverRepositoryImpl(get(), get(), get()) }
 
-   // Cloudinary
+   // Firebase- Remote Data Source
+   single<QuiverRemoteDataSource>{ QuiverRemoteDataSourceService(get()) }
 
    //SqlDelight + Dao
    single { QuiverSyncDatabase(get()) }
    single { get<QuiverSyncDatabase>().dailyForecastQueries }
    single { get<QuiverSyncDatabase>().geminiMatchQueries }
    single { get<QuiverSyncDatabase>().userProfileQueries }
-   single{ UserDao(get()) }
+   single { get<QuiverSyncDatabase>().surfboardQueries }
+   single { UserDao(get()) }
+   single { QuiverDao(get()) }
 
 
    //UseCases
@@ -103,6 +115,9 @@ val commonModule= module {
    single { GetWeeklyForecastByLocationUseCase(get(), get()) }
    single { GetWeeklyForecastBySpotUseCase(get()) }
    single { GetUserProfileUseCase(get()) }
+   single { LogoutUseCase(get()) }
+   single { AddBoardUseCase(get()) }
+   single { GetMyQuiverUseCase(get()) }
    single{
       HomeUseCases(
           getWeeklyForecastByLocationUseCase = get()
@@ -117,7 +132,13 @@ val commonModule= module {
    single{
       UserUseCases(
             getUserProfileUseCase = get(),
-            updateUserProfileUseCase = get()
+            updateUserProfileUseCase = get(),
+            logoutUseCase = get()
+      )
+   }
+   single {
+      QuiverUseCases(
+         getMyQuiverUseCase = get()
       )
    }
 
@@ -128,9 +149,9 @@ val commonModule= module {
    single { UserViewModel(get()) }
    single { HomeViewModel(get()) }
    single { LoginViewModel(get()) }
-
    single { OnboardingViewModel(get(), get()) }
-   //single { QuiverViewModel(get()) }
+   single { QuiverViewModel(get()) }
+   single { AddBoardViewModel(get(), get()) }
 
 
 }

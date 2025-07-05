@@ -33,7 +33,6 @@ fun ImagePickerSection(
     isUploading: Boolean,
     onChangePhotoClick: () -> Unit,
     placeholderRes: Int,
-    isDarkTheme: Boolean,
     errorMessage: String?
 ) {
     Box(contentAlignment = Alignment.Center) {
@@ -74,20 +73,5 @@ fun ImagePickerSection(
             // Display error message
             Toast.makeText(LocalContext.current, errorMessage, Toast.LENGTH_SHORT).show()
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ImagePickerPreview(){
-    QuiverSyncTheme {
-        ImagePickerSection(
-            imageUrl = null,
-            isUploading = false,
-            onChangePhotoClick = {},
-            placeholderRes = 0,
-            isDarkTheme = false,
-            errorMessage = null
-        )
     }
 }

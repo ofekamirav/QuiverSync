@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import org.example.quiversync.R
-import org.example.quiversync.domain.model.Quiver
 import org.example.quiversync.features.quiver.QuiverState
 import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.domain.model.Surfboard
@@ -52,18 +51,18 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun QuiverScreen(
     modifier: Modifier = Modifier,
-    viewModel: QuiverViewModel = QuiverViewModel(),
+    viewModel: QuiverViewModel = koinViewModel(),
     onAddClick: () -> Unit = {}
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     when (uiState) {
         is QuiverState.Error -> ErrorContent((uiState).message)
         is QuiverState.Loading -> { QuiverScreenSkeleton(modifier) }
-        is QuiverState.Loaded -> QuiverContent(uiState.quiver, onAddClick, modifier)
+        is QuiverState.Loaded -> QuiverContent(uiState.boards, onAddClick, modifier)
     }
 }
 @Composable
-fun QuiverContent(boards: Quiver, onAddClick: () -> Unit = {}, modifier: Modifier) {
+fun QuiverContent(boards: List<Surfboard>, onAddClick: () -> Unit = {}, modifier: Modifier) {
     var selectedBoard by remember { mutableStateOf<Surfboard?>(null) }
 
     Box(
@@ -71,20 +70,42 @@ fun QuiverContent(boards: Quiver, onAddClick: () -> Unit = {}, modifier: Modifie
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 170.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(16.dp)
+    if (boards.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(boards.items.size) { index ->
-                BoardCard(
-                    board = boards.items[index],
-                    onClick = { selectedBoard = boards.items[index] },
-                    onPublishToggle = { /* Handle Publish Toggle */ }
-                )
-            }
+            Text(
+                text = "No Surfboards Found",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Add your first surfboard by clicking the button below.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
+    }
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 170.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        items(boards.size) { index ->
+            BoardCard(
+                board = boards[index],
+                onClick = { selectedBoard = boards[index] },
+                onPublishToggle = { /* Handle Publish Toggle */ }
+            )
+        }
+    }
 
         FloatingActionButton(
             onClick = { onAddClick() },
@@ -111,20 +132,5 @@ fun QuiverContent(boards: Quiver, onAddClick: () -> Unit = {}, modifier: Modifie
             onDismiss = { selectedBoard = null },
             onDelete = { /* Handle Delete */ }
         )
-    }
-}
-
-
-fun getDrawableIdByName(context: Context, name: String): Int {
-    return context.resources.getIdentifier(name, "drawable", context.packageName)
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun QuiverScreenPreview() {
-    QuiverSyncTheme{
-        QuiverScreen(viewModel = QuiverViewModel())
     }
 }

@@ -28,8 +28,8 @@ fun SelectableBoardTypeGrid(
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 120.dp),
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(boardTypes.size) { index ->
             SelectableBoardTypeCard(
@@ -38,6 +38,9 @@ fun SelectableBoardTypeGrid(
                 isSelected = ( boardTypes[index].type == selectedType),
                 onClick = { onTypeSelected(boardTypes[index].type) }
             )
+        }
+        item {
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }

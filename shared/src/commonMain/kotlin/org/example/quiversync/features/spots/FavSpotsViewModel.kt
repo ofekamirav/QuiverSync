@@ -5,10 +5,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.domain.model.FavoriteSpots
+import org.example.quiversync.domain.model.FinsSetup
 import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.Prediction.DailyPrediction
 import org.example.quiversync.domain.model.Prediction.WeeklyPrediction
 import org.example.quiversync.domain.model.Surfboard
+import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.features.BaseViewModel
 
 class FavSpotsViewModel: BaseViewModel() {
@@ -53,30 +55,37 @@ private fun createMockPrediction(): WeeklyPrediction {
             ownerId = "",
             model = "Holly Grail",
             company = "Hayden Shapes",
-            type = "Shortboard",
+            type = SurfboardType.SHORTBOARD,
             imageRes = "hs_shortboard",
             height = "6'2\"",
             volume = "32L",
             width = "19\"",
             addedDate = "2024-05-01",
             isRentalPublished = false,
-            isRentalAvailable = false
+            isRentalAvailable = false,
+            finSetup = FinsSetup.FIVEFINS,
+            latitude = 32.355,
+            longitude = 32.355,
+            pricePerDay = 32.2,
         ),
         Surfboard(
-            id = "2",
+            id = "1",
             ownerId = "",
-            model = "FRK+",
-            company = "Slater Designs",
-            type = "Funboard",
+            model = "Holly Grail",
+            company = "Hayden Shapes",
+            type = SurfboardType.SHORTBOARD,
             imageRes = "hs_shortboard",
-            height = "5'8\"",
-            volume = "28L",
-            width = "20 1/4\"",
-            addedDate = "2024-04-15",
-            isRentalPublished = true,
-            isRentalAvailable = true,
-            pricePerDay = 10.0
-        )
+            height = "6'2\"",
+            volume = "32L",
+            width = "19\"",
+            addedDate = "2024-05-01",
+            isRentalPublished = false,
+            isRentalAvailable = false,
+            finSetup = FinsSetup.FIVEFINS,
+            latitude = 32.355,
+            longitude = 32.355,
+            pricePerDay = 32.2,
+        ),
     )
 
     val forecasts = listOf(

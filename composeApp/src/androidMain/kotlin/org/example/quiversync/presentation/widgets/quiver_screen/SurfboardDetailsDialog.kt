@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,8 +37,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
+import org.example.quiversync.R
 import org.example.quiversync.domain.model.Surfboard
-import org.example.quiversync.presentation.screens.quiver.getDrawableIdByName
 
 @Composable
 fun SurfboardDetailDialog(
@@ -46,9 +48,11 @@ fun SurfboardDetailDialog(
     onDismiss: () -> Unit,
     onDelete: (Surfboard) -> Unit = {}
 ) {
-    val context = LocalContext.current
-    val imageResId = remember(board.imageRes) {
-        getDrawableIdByName(context, board.imageRes)
+    val isDark = isSystemInDarkTheme()
+    val placeholderId = if (isDark) {
+        R.drawable.ic_board_placeholder_dark
+    } else {
+        R.drawable.ic_board_placeholder_light
     }
     AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -74,8 +78,9 @@ fun SurfboardDetailDialog(
                                 color = MaterialTheme.colorScheme.primary
                             )
 
-                            Image(
-                                painter = painterResource(id = imageResId),
+                            AsyncImage(
+                                model = board.imageRes,
+                                placeholder = painterResource(id = placeholderId),
                                 contentDescription = "Surfboard Image",
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -89,7 +94,7 @@ fun SurfboardDetailDialog(
                             RowItem("Volume:", board.volume)
                             RowItem("Added:", board.addedDate)
 
-                            if (board.isRentalPublished) {
+                            if (board.isRentalPublished == true) {
                                 RowItem("Price / Day:", "${board.pricePerDay} $")
                             }
 
