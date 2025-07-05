@@ -6,6 +6,7 @@ expect class SessionManager(context: Any?) {
     suspend fun clearAll()
     suspend fun hasSeenWelcome(): Boolean
     suspend fun setWelcomeSeen()
+    suspend fun clearUserData();
 
     suspend fun getUid(): String?
     suspend fun setUid(uid: String)

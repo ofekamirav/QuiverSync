@@ -1,18 +1,9 @@
 package org.example.quiversync.features.quiver.add_board
 
-import org.example.quiversync.domain.model.SurfboardType
+sealed class AddBoardState {
+    data class Idle(val data: AddBoardFormData = AddBoardFormData()) : AddBoardState()
+    data object Loading : AddBoardState()
+    data object Loaded : AddBoardState()
+    data class Error(val message: String) : AddBoardState()
+}
 
-
-data class AddBoardState (
-    val model: String = "",
-    val company: String = "",
-    val boardType: SurfboardType = SurfboardType.SHORTBOARD,
-    val height: String = "",
-    val width: String = "",
-    val volume: String = "",
-    val currentStep: Int = 1,
-    val totalSteps: Int = 2,
-    val isSubmitting: Boolean = false,
-    val submissionError: String? = null,
-    val submissionSuccess: Boolean = false
-)

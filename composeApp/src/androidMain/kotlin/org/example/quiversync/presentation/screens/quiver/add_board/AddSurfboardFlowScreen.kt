@@ -17,21 +17,66 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.example.quiversync.features.quiver.add_board.AddBoardEvent
 import org.example.quiversync.features.quiver.add_board.AddBoardViewModel
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
+import org.example.quiversync.features.quiver.add_board.AddBoardState
+import org.example.quiversync.features.register.OnboardingEvent
+import org.example.quiversync.features.register.OnboardingState
+import org.example.quiversync.presentation.components.LoadingAnimation
+import org.koin.androidx.compose.koinViewModel
 
+@Composable
+fun AddSurfboardScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AddBoardViewModel = koinViewModel(),
+    onFinish: () -> Unit,
+    onBack: () -> Unit
+){
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    when(val currentState = uiState){
+        is AddBoardState.Idle -> {
+            AddSurfboardFlowScreen(
+                modifier = modifier,
+                state = currentState,
+                onEvent = viewModel::onEvent,
+                onBack = onBack
+            )
+        }
+        is AddBoardState.Loaded ->{
+            LaunchedEffect(Unit) {
+                onFinish()
+            }
+        }
+        is AddBoardState.Loading -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
+            }
+        }
+        is AddBoardState.Error -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Error: ${(uiState as AddBoardState.Error).message}")
+            }
+        }
+    }
+}
 @Composable
 fun AddSurfboardFlowScreen(
     modifier: Modifier = Modifier,
-    viewModel: AddBoardViewModel = AddBoardViewModel(),
-    onFinish: () -> Unit,
+    state: AddBoardState.Idle,
+    onEvent: (AddBoardEvent) -> Unit,
     onBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
     val pagerState = rememberPagerState(initialPage = 0)
     val scope = rememberCoroutineScope()
 
@@ -42,19 +87,19 @@ fun AddSurfboardFlowScreen(
         verticalArrangement = Arrangement.Top
     ) {
         HorizontalPager(
-            count = uiState.totalSteps,
+            count = state.data.totalSteps,
             state = pagerState,
             userScrollEnabled = false,
             modifier = Modifier.weight(1f),
         ) { page ->
             when (page) {
-                0 -> AddSurfboardStep1(uiState, viewModel::onEvent)
-                1 -> AddSurfboardStep2(uiState, viewModel::onEvent)
+                0 -> AddSurfboardStep1(state, onEvent)
+                1 -> AddSurfboardStep2(state, onEvent)
             }
         }
         WizardNavigationBar(
             currentStep = pagerState.currentPage + 1,
-            totalSteps = uiState.totalSteps,
+            totalSteps = state.data.totalSteps,
             onPreviousClicked = {
                 scope.launch {
                     pagerState.animateScrollToPage(pagerState.currentPage - 1)
@@ -66,8 +111,7 @@ fun AddSurfboardFlowScreen(
                 }
             },
             onFinishClicked = {
-                viewModel.onEvent(AddBoardEvent.SubmitClicked)
-                onFinish()
+                onEvent(AddBoardEvent.SubmitClicked)
             },
             onBack = onBack
         )
@@ -121,22 +165,6 @@ fun WizardNavigationBar(
             Text(
                 text = if (currentStep < totalSteps) "Next" else "Finish",
                 color = Color.White
-            )
-        }
-    }
-}
-@PreviewLightDark
-@Preview(name = "Tablet Landscape", device = Devices.TABLET, uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true, widthDp = 1280, heightDp = 800)
-@Preview(name = "Tablet Portrait", device = Devices.TABLET, uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true, widthDp = 800, heightDp = 1280)
-@Composable
-fun AddSurfboardFlowScreenComprehensivePreview() {
-    val previewViewModel = AddBoardViewModel()
-    QuiverSyncTheme {
-        Surface {
-            AddSurfboardFlowScreen(
-                viewModel = previewViewModel,
-                onFinish = {},
-                onBack = {}
             )
         }
     }

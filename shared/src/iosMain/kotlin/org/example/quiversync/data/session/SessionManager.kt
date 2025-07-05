@@ -11,6 +11,12 @@ actual class SessionManager actual constructor(context: Any?) {
         return defaults.boolForKey("has_seen_welcome")
     }
 
+    actual suspend fun clearUserData(){
+        defaults.removeObjectForKey("uid")
+        defaults.removeObjectForKey("latitude")
+        defaults.removeObjectForKey("longitude")
+    }
+
     actual suspend fun setWelcomeSeen() {
         defaults.setBool(true, forKey = "has_seen_welcome")
     }

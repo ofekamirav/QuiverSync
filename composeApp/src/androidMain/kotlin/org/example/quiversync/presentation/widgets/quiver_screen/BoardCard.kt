@@ -33,8 +33,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import org.example.quiversync.R
 import org.example.quiversync.domain.model.Surfboard
-import org.example.quiversync.presentation.screens.quiver.getDrawableIdByName
 import org.example.quiversync.presentation.theme.OceanPalette
 
 
@@ -44,8 +45,14 @@ fun BoardCard(
     onClick: () -> Unit,
     onPublishToggle: (Boolean) -> Unit
 ) {
-    val isPublished = board.isRentalPublished
-    val baseBackgroundColor = if (isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.White
+    val isPublished = board.isRentalPublished ?: false
+    val isDark = isSystemInDarkTheme()
+    val baseBackgroundColor = if (isDark) OceanPalette.DarkSurface else Color.White
+    val placeholderId = if (isDark) {
+        R.drawable.ic_board_placeholder_dark
+    } else {
+        R.drawable.ic_board_placeholder_light
+    }
     val animatedBackgroundColor by animateColorAsState(
         targetValue = baseBackgroundColor,
         animationSpec = tween(300)
@@ -60,12 +67,6 @@ fun BoardCard(
         targetValue = if (isPublished) 8.dp else 4.dp,
         animationSpec = tween(300)
     )
-
-    val context = LocalContext.current
-    val imageResId = remember(board.imageRes) {
-        getDrawableIdByName(context, board.imageRes)
-    }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,8 +84,9 @@ fun BoardCard(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = imageResId),
+            AsyncImage(
+                model = board.imageRes,
+                placeholder = painterResource(id = placeholderId),
                 contentDescription = "Surfboard Image",
                 modifier = Modifier
                     .size(80.dp)
@@ -110,7 +112,7 @@ fun BoardCard(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Switch(
-                    checked = board.isRentalPublished,
+                    checked = board.isRentalPublished ?: false,
                     onCheckedChange = onPublishToggle,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = OceanPalette.SandOrange,

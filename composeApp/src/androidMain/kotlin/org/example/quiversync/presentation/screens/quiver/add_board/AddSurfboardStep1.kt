@@ -12,41 +12,37 @@ import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.features.quiver.add_board.AddBoardEvent
 import org.example.quiversync.features.quiver.add_board.AddBoardState
 import org.example.quiversync.presentation.components.CustomTextField
+import org.example.quiversync.presentation.widgets.quiver_screen.FinsSetupDropdown
 import org.example.quiversync.presentation.widgets.quiver_screen.SelectableBoardTypeGrid
 
 @Composable
-fun AddSurfboardStep1(state: AddBoardState, onEvent: (AddBoardEvent) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+fun AddSurfboardStep1(state: AddBoardState.Idle, onEvent: (AddBoardEvent) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         CustomTextField(
-            value = state.model,
+            value = state.data.model,
             onValueChange = { onEvent(AddBoardEvent.ModelChanged(it)) },
             label = "Model Name",
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Next,
+            isError = state.data.modelError != null,
+            errorMessage = state.data.modelError
         )
         CustomTextField(
-            value = state.company,
+            value = state.data.company,
             onValueChange = { onEvent(AddBoardEvent.CompanyChanged(it)) },
             label = "Company / Shaper",
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
+            isError = state.data.companyError != null,
+            errorMessage = state.data.companyError
+        )
+        Text("Select fins ", style = MaterialTheme.typography.titleMedium)
+        FinsSetupDropdown(
+            selected = state.data.finSetup,
+            onSelected = { onEvent(AddBoardEvent.FinsSetupChanged(it)) }
         )
         Text("Select surfboard type", style = MaterialTheme.typography.titleMedium)
         SelectableBoardTypeGrid(
-            selectedType = state.boardType,
+            selectedType = state.data.boardType,
             onTypeSelected = { selected -> onEvent(AddBoardEvent.BoardTypeChanged(selected)) }
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AddSurfboardStep1Preview() {
-    // Create a sample AddBoardState for previewing
-    val sampleState = AddBoardState(
-        model = "Hypto Krypto",
-        company = "Haydenshapes",
-        boardType = SurfboardType.SHORTBOARD
-    )
-
-    // Call your Composable with the sample state and a no-op event handler
-    AddSurfboardStep1(state = sampleState, onEvent = {})
 }

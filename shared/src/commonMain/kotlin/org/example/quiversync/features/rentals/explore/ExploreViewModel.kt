@@ -4,7 +4,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.example.quiversync.domain.model.FinsSetup
 import org.example.quiversync.domain.model.Surfboard
+import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.features.BaseViewModel
 
@@ -28,7 +30,7 @@ class ExploreViewModel : BaseViewModel(){
                     ownerPic = owner.profilePicture.toString(),
                     surfboardPic = board.imageRes,
                     model = board.model,
-                    type = board.type,
+                    type = board.type.toString(),
                     height = board.height,
                     width = board.width,
                     volume = board.volume,
@@ -48,30 +50,19 @@ class ExploreViewModel : BaseViewModel(){
                 ownerId = "",
                 model = "Holly Grail",
                 company = "Hayden Shapes",
-                type = "Shortboard",
+                type = SurfboardType.SHORTBOARD,
                 imageRes = "hs_shortboard",
-                height = "6'2",
-                width = "19",
+                height = "6'2\"",
                 volume = "32L",
+                width = "19\"",
                 addedDate = "2024-05-01",
                 isRentalPublished = false,
                 isRentalAvailable = false,
+                finSetup = FinsSetup.FIVEFINS,
+                latitude = 32.355,
+                longitude = 32.355,
+                pricePerDay = 32.2,
             ),
-            Surfboard(
-                id = "2",
-                ownerId = "",
-                model = "",
-                company = "Slater Designs",
-                type = "Funboard",
-                imageRes = "hs_shortboard",
-                height = "5'8",
-                width = "20 1/4",
-                volume = "25L",
-                addedDate = "2024-04-15",
-                isRentalPublished = true,
-                isRentalAvailable = true,
-                pricePerDay = 10.0
-            )
         )
     }
 

@@ -28,6 +28,7 @@ import org.example.quiversync.presentation.screens.register.RegisterScreen
 import org.example.quiversync.presentation.screens.home.HomeScreen
 import org.example.quiversync.presentation.screens.quiver.QuiverScreen
 import org.example.quiversync.presentation.screens.quiver.add_board.AddSurfboardFlowScreen
+import org.example.quiversync.presentation.screens.quiver.add_board.AddSurfboardScreen
 import org.example.quiversync.presentation.screens.register.CompleteRegisterScreen
 import org.example.quiversync.presentation.screens.register.OnboardingScreen
 import org.example.quiversync.presentation.screens.rentals.RentalsHubScreen
@@ -43,7 +44,6 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     val navController = rememberNavController()
     var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
     var hasSeenWelcome by remember { mutableStateOf<Boolean?>(null) }
-    var isLogOut by remember { mutableStateOf<Boolean>(false) }
 
     LaunchedEffect(Unit) {
         val uid = sessionManager.getUid()
@@ -51,9 +51,6 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
         isLoggedIn = uid != null
         hasSeenWelcome = sessionManager.hasSeenWelcome()
         sessionManager.setWelcomeSeen()
-        if (isLogOut){
-            sessionManager.clearAll()
-        }
     }
 
     if (isLoggedIn == null || hasSeenWelcome == null) {
@@ -179,7 +176,6 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 LoginScreen(
                     onSignInClick = {
                         isLoggedIn = true
-                        isLogOut = false
                         navController.navigate(Screen.Home.route) {
                             popUpTo(0)
                         }
@@ -192,7 +188,6 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
             composable(Screen.Register.route) {
                 RegisterScreen(
                     onSignUpSuccess = {
-                        isLogOut = false
                         navController.navigate(Screen.CompleteRegister.route)
                     },
                     onLoginClick = {
@@ -226,7 +221,6 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                     modifier = Modifier.padding(innerPadding),
                     onLogout = {
                         isLoggedIn = false
-                        isLogOut = true
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0)
                         }
@@ -235,7 +229,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 )
             }
             composable(Screen.AddSurfboard.route) {
-                AddSurfboardFlowScreen(
+                AddSurfboardScreen(
                     modifier = Modifier.padding(innerPadding),
                     onFinish = {
                         navController.navigate(Screen.Quiver.route) {
@@ -245,7 +239,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                     },
                     onBack = {
                         navController.popBackStack()
-                    }
+                    },
                 )
             }
             composable(Screen.CompleteRegister.route) {

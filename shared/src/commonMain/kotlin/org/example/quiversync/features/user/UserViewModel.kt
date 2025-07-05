@@ -3,6 +3,9 @@ package org.example.quiversync.features.user
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.example.quiversync.data.local.Error
+import org.example.quiversync.data.local.Result
+import org.example.quiversync.domain.model.User
 import org.example.quiversync.features.BaseViewModel
 
 
@@ -21,17 +24,14 @@ class UserViewModel(
         scope.launch {
             _uiState.value = UserState.Loading
             val result = userUseCases.getUserProfileUseCase()
-            result
-                .onSuccess { user ->
-                    _uiState.emit(
-                        UserState.Loaded(user)
-                    )
+            when (result) {
+                is Result.Success -> {
+                    result.data?.let { _uiState.emit(UserState.Loaded(it)) }
                 }
-                .onFailure { e ->
-                    _uiState.emit(
-                        UserState.Error(e.message ?: "Unknown error")
-                    )
+                is Result.Failure -> {
+                    _uiState.emit(UserState.Error(result.error?.message ?: "Unknown error"))
                 }
+            }
         }
     }
 }
