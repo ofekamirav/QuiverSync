@@ -1,13 +1,16 @@
 package org.example.quiversync.data.repository
 
+import dev.gitlive.firebase.firestore.FirebaseFirestore
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.dao.FavSpotDao
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.domain.repository.FavSpotRepository
 
 class FavSpotRepositoryImpl(
-    private val dao: FavSpotDao
-) : FavSpotRepository {
+    private val dao: FavSpotDao,
+    private val firestore: FirebaseFirestore,
+
+    ) : FavSpotRepository {
 
     override suspend fun getAllFavSpots(): Result<List<FavoriteSpot>, TMDBError> {
         return try {
