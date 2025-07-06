@@ -1,4 +1,4 @@
-package org.example.quiversync.domain.usecase
+package org.example.quiversync.domain.usecase.forecast
 
 import org.example.quiversync.domain.model.forecast.WeeklyForecast
 import org.example.quiversync.domain.repository.ForecastRepository

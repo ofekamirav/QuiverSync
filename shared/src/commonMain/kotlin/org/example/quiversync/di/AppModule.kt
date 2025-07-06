@@ -37,8 +37,8 @@ import org.example.quiversync.domain.repository.AuthRepository
 import org.example.quiversync.domain.repository.ForecastRepository
 import org.example.quiversync.domain.repository.QuiverRepository
 import org.example.quiversync.domain.repository.UserRepository
-import org.example.quiversync.domain.usecase.GetWeeklyForecastByLocationUseCase
-import org.example.quiversync.domain.usecase.GetWeeklyForecastBySpotUseCase
+import org.example.quiversync.domain.usecase.forecast.GetWeeklyForecastByLocationUseCase
+import org.example.quiversync.domain.usecase.forecast.GetWeeklyForecastBySpotUseCase
 import org.example.quiversync.domain.usecase.register.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.UploadImageUseCase
@@ -68,6 +68,7 @@ import org.example.quiversync.features.quiver.add_board.AddBoardViewModel
 import org.example.quiversync.features.register.OnboardingViewModel
 import org.example.quiversync.features.register.RegisterUseCases
 import org.example.quiversync.features.register.RegisterViewModel
+import org.example.quiversync.features.spots.ForecastUseCases
 import org.example.quiversync.features.settings.SecurityAndPrivacyViewModel
 import org.example.quiversync.features.settings.SettingsViewModel
 import org.example.quiversync.features.user.UserUseCases
@@ -123,7 +124,7 @@ val commonModule= module {
    //---------------------------------------------------SqlDelight + Dao----------------------------------------
    single { QuiverSyncDatabase(get()) }
    single { get<QuiverSyncDatabase>().dailyForecastQueries }
-   single { get<QuiverSyncDatabase>().geminiMatchQueries }
+   single { get<QuiverSyncDatabase>().geminiPredictionQueries }
    single { get<QuiverSyncDatabase>().userProfileQueries }
    single { get<QuiverSyncDatabase>().surfboardQueries }
    single { UserDao(get()) }
@@ -187,6 +188,12 @@ val commonModule= module {
           addSurfboardUseCase = get(),
           publishSurfboardToRentalUseCase = get(),
           unpublishForRentalUseCase = get(),
+      )
+   }
+   single {
+      ForecastUseCases(
+            getWeeklyForecastByLocationUseCase = get(),
+            getWeeklyForecastBySpotUseCase = get()
       )
    }
 

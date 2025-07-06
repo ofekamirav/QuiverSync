@@ -20,13 +20,14 @@ class ForecastRepositoryImpl(
         latitude: Double,
         longitude: Double,
     ): Result<WeeklyForecast> {
-
+        val howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne()
         val lastLocation = sessionManager.getLastLocation()
+
         val isFar = lastLocation == null || isOutsideRadius(
             lastLocation.latitude, lastLocation.longitude, latitude, longitude
         )
 
-        if (isFar) {
+        if (isFar && howManyDaily < 7) {
             val weeklyResult = api.getFiveDayForecast(latitude, longitude)
 
             if (weeklyResult.isFailure) {
@@ -72,6 +73,14 @@ class ForecastRepositoryImpl(
         longitude: Double,
         date: String,
     ): Result<DailyForecast?> {
+        val howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne()
+        if( howManyDaily < 4) {
+            // If we have less than 4 days, we need to fetch the weekly forecast again
+            val weeklyResult = getWeeklyForecast(latitude, longitude)
+            if (weeklyResult.isFailure) {
+                return Result.failure(weeklyResult.exceptionOrNull() ?: Exception("Unknown error"))
+            }
+        }
         val local = queries.selectToday(date, latitude, longitude).executeAsOneOrNull()
         return Result.success(local?.toDailyForecast())    }
 

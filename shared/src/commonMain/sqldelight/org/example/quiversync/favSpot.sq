@@ -1,0 +1,26 @@
+CREATE TABLE FavSpotEntity (
+    name TEXT NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    UNIQUE(latitude, longitude)
+);
+
+selectAllFavSpots:
+SELECT * FROM FavSpotEntity;
+
+insertFavSpot:
+INSERT INTO FavSpotEntity( name, latitude, longitude)
+VALUES ( ?, ?, ?);
+
+deleteFavSpot:
+DELETE FROM FavSpotEntity
+WHERE latitude = ?
+AND longitude = ?;
+
+getFavSpotByLocation:
+SELECT * FROM FavSpotEntity
+WHERE latitude = ?
+AND longitude = ?;
+
+deleteAllFavSpots:
+DELETE FROM FavSpotEntity;

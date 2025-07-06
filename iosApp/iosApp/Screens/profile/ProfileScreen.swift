@@ -39,7 +39,7 @@ extension ProfileScreen{
         @Published var uiState: UserState
         
         init() {
-            self.viewModel = UserViewModel()
+            self.viewModel = KoinKt.userViewModel()
             self.uiState = viewModel.uiState.value
         }
         

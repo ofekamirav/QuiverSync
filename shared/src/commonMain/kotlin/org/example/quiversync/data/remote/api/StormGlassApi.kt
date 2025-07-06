@@ -14,6 +14,7 @@ import kotlinx.datetime.atTime
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import org.example.quiversync.BuildKonfig
 import org.example.quiversync.data.remote.dto.StormglassResponse
 import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.forecast.WeeklyForecast
@@ -28,7 +29,7 @@ class StormGlassApi(
 
         return try {
             val res = client.get("https://api.stormglass.io/v2/weather/point") {
-               // header(HttpHeaders.Authorization, apiKey)
+                header(HttpHeaders.Authorization, BuildKonfig.STORM_GLASS_API_KEY)
                 parameter("lat", lat)
                 parameter("lng", lng)
                 parameter("start", now.toString())

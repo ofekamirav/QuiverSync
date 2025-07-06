@@ -39,7 +39,7 @@ extension ForecastResults {
         @Published var uiState: FavSpotsState
         
         init(){
-            self.viewModel = FavSpotsViewModel()
+            self.viewModel = KoinKt.favSpotsViewModel()
             self.uiState = viewModel.uiState.value
         }
         

@@ -25,6 +25,10 @@ selectToday:
 SELECT * FROM DailyForecastEntity
 WHERE date = ? AND latitude = ? AND longitude = ? LIMIT 1;
 
+howManyBySpot:
+SELECT COUNT(*) FROM DailyForecastEntity
+WHERE latitude = ? AND longitude = ?;
+
 deleteBySpot:
 DELETE FROM DailyForecastEntity
 WHERE latitude = ? AND longitude = ?;

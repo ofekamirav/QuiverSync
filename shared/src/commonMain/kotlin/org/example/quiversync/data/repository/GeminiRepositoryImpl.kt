@@ -1,117 +1,92 @@
-//package org.example.quiversync.data.repository
-//
-//import org.example.quiversync.GeminiMatchQueries
-//import org.example.quiversync.data.remote.api.GeminiApi
-//import org.example.quiversync.data.session.SessionManager
-//import org.example.quiversync.domain.model.GeminiMatch
-//import org.example.quiversync.domain.model.Surfboard
-//import org.example.quiversync.domain.model.User
-//import org.example.quiversync.domain.model.forecast.DailyForecast
-//import org.example.quiversync.domain.model.forecast.WeeklyForecast
-//import org.example.quiversync.domain.repository.GeminiRepository
-//import org.example.quiversync.utils.extensions.toGeminiMatch
-//
-//class GeminiRepositoryImpl(
-//    private val geminiApi: GeminiApi,
-//    private val geminiQueries: GeminiMatchQueries,
-//) : GeminiRepository {
-//
-//    override suspend fun generateAndStoreBestBoardMatch(
-//        boards: List<Surfboard>,
-//        forecast: DailyForecast,
-//        user: User
-//    ): Result<GeminiMatch> {
-//
-//        val apiResult = geminiApi.getBoardMatches(boards, forecast, user)
-//        if (apiResult.isFailure) return Result.failure(apiResult.exceptionOrNull()!!)
-//
-//        val matches = apiResult.getOrThrow()
-//        val best = matches.maxByOrNull { it.score } ?: return Result.failure(Exception("No matches"))
-//
-//        geminiQueries.DELETE_BEST_MATCH_FOR_DATE(
-//            user.uid,
-//            forecast.date,
-//            forecast.latitude,
-//            forecast.longitude
-//        )
-//
-//        geminiQueries.INSERT_BEST_MATCH(
-//            boardId = best.surfboardId,
-//            userId = user.uid,
-//            forecastDate = forecast.date,
-//            forecastLatitude = forecast.latitude,
-//            forecastLongitude = forecast.longitude,
-//            score = best.score.toLong()
-//        )
-//
-//        return Result.success(
-//            GeminiMatch(
-//                boardId = best.surfboardId,
-//                userId = user.uid,
-//                forecastDate = forecast.date,
-//                forecastLatitude = forecast.latitude,
-//                forecastLongitude = forecast.longitude,
-//                score = best.score
-//            )
-//        )
-//    }
-//
-//
-//    override suspend fun generateAndStoreWeeklyBestMatches(
-//        boards: List<Surfboard>,
-//        weeklyForecast: WeeklyForecast,
-//        user: User
-//    ): Result<List<GeminiMatch>> {
-//
-//        val results = mutableListOf<GeminiMatch>()
-//
-//        weeklyForecast.list.forEach { dayForecast ->
-//            val apiResult = geminiApi.getBoardMatches(boards, dayForecast, user)
-//            if (apiResult.isFailure) return Result.failure(apiResult.exceptionOrNull()!!)
-//
-//            val matches = apiResult.getOrThrow()
-//            val best = matches.maxByOrNull { it.score } ?: return@forEach
-//
-//            geminiQueries.DELETE_BEST_MATCH_FOR_DATE(
-//                user.uid,
-//                dayForecast.date,
-//                dayForecast.latitude,
-//                dayForecast.longitude
-//            )
-//
-//            geminiQueries.INSERT_BEST_MATCH(
-//                boardId = best.surfboardId,
-//                userId = user.uid,
-//                forecastDate = dayForecast.date,
-//                forecastLatitude = dayForecast.latitude,
-//                forecastLongitude = dayForecast.longitude,
-//                score = best.score.toLong()
-//            )
-//
-//            results.add(
-//                GeminiMatch(
-//                    boardId = best.surfboardId,
-//                    userId = user.uid,
-//                    forecastDate = dayForecast.date,
-//                    forecastLatitude = dayForecast.latitude,
-//                    forecastLongitude = dayForecast.longitude,
-//                    score = best.score
-//                )
-//            )
-//        }
-//
-//        return Result.success(results)
-//    }
-//
-//    override suspend fun getBestBoardMatchForToday(
-//        userId: String,
-//        date: String,
-//        latitude: Double,
-//        longitude: Double
-//    ): GeminiMatch? {
-//        return geminiQueries.GET_TOP_MATCH_BY_USER_SPOT_AND_DATE(
-//            userId, date, latitude, longitude
-//        ).executeAsOneOrNull()?.toGeminiMatch()
-//    }
-//
-//}
+package org.example.quiversync.data.repository
+
+import org.example.quiversync.data.local.Result
+import org.example.quiversync.data.local.dao.GeminiPredictionDao
+import org.example.quiversync.data.remote.api.GeminiApi
+import org.example.quiversync.domain.model.FavoriteSpot
+import org.example.quiversync.domain.model.Prediction.GeminiPrediction
+import org.example.quiversync.domain.model.Surfboard
+import org.example.quiversync.domain.model.User
+import org.example.quiversync.domain.model.forecast.DailyForecast
+import org.example.quiversync.domain.repository.GeminiRepository
+
+class GeminiRepositoryImpl(
+    private val api: GeminiApi,
+    private val dao: GeminiPredictionDao
+) : GeminiRepository {
+
+    override suspend fun generateAndStoreBestBoardMatch(
+        surfboards: List<Surfboard>,
+        dailyForecast: DailyForecast,
+        user: User
+    ): Result<GeminiPrediction, TMDBError> {
+        return try {
+            when (val result = api.predictionForOneDay(surfboards, dailyForecast, user)) {
+                is Result.Failure -> Result.Failure(result.error)
+                is Result.Success -> {
+                    val prediction = result.data
+                    if (prediction != null) {
+                        dao.insert(prediction)
+                        Result.Success(prediction)
+                    } else {
+                        Result.Failure(TMDBError("Prediction returned null"))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun generateAndStoreWeeklyBestMatches(
+        surfboards: List<Surfboard>,
+        weeklyForecast: List<DailyForecast>,
+        user: User
+    ): Result<List<GeminiPrediction>, TMDBError> {
+        return try {
+            val predictions = mutableListOf<GeminiPrediction>()
+            for (forecast in weeklyForecast) {
+                when (val result = generateAndStoreBestBoardMatch(surfboards, forecast, user)) {
+                    is Result.Failure -> return Result.Failure(result.error)
+                    is Result.Success -> result.data?.let { predictions.add(it) }
+                }
+            }
+            Result.Success(predictions)
+        } catch (e: Exception) {
+            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun getBestBoardMatchForToday(
+        date: String,
+        latitude: Double,
+        longitude: Double
+    ): Result<GeminiPrediction, TMDBError> {
+        return try {
+            val match = dao.getMatch(date, latitude, longitude)
+            if (match != null) Result.Success(match)
+            else Result.Failure(TMDBError("No match found"))
+        } catch (e: Exception) {
+            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun getBestBoardMatchForWeek(
+        latitude: Double,
+        longitude: Double
+    ): Result<List<GeminiPrediction>, TMDBError> {
+        // Optional: You can implement logic to query matches by spot for the week
+        TODO("Implement weekly fetch using DAO if needed")
+    }
+
+    override suspend fun clearAllPredictions(
+        favoriteSpot: FavoriteSpot
+    ): Result<Unit, TMDBError> {
+        return try {
+            dao.deleteBySpot(favoriteSpot.spotLatitude, favoriteSpot.spotLongitude)
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+        }
+    }
+}

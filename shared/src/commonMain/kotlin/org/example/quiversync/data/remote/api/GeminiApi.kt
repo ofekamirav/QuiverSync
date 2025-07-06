@@ -2,18 +2,17 @@ package org.example.quiversync.data.remote.api
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.Json
-import org.example.quiversync.data.remote.dto.GeminiContent
+import org.example.quiversync.BuildKonfig
+import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.remote.dto.GeminiMatchResponse
-import org.example.quiversync.data.remote.dto.GeminiPart
-import org.example.quiversync.data.remote.dto.GeminiRequest
 import org.example.quiversync.data.remote.dto.GeminiResponse
+import org.example.quiversync.data.repository.TMDBError
+import org.example.quiversync.domain.model.Prediction.GeminiPrediction
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.domain.model.forecast.DailyForecast
@@ -42,11 +41,16 @@ class GeminiApi(
             - Surfing Level: ${user.surfLevel}
 
             Surf forecast:
+            - Date: ${forecast.date}
             - Wave Height: ${forecast.waveHeight} meters
             - Swell Period: ${forecast.swellPeriod} seconds
             - Swell Direction: ${forecast.swellDirection}°
             - Wind Speed: ${forecast.windSpeed} m/s
             - Wind Direction: ${forecast.windDirection}°
+            
+            its in the location of :
+            - Latitude: ${forecast.latitude}
+            - Longitude: ${forecast.longitude}
 
             They have the following boards:
 
@@ -69,16 +73,88 @@ class GeminiApi(
             - 90+ = ideal match, 70–89 = decent match, 50–69 = usable, below 50 = mismatch.
             - Explain **why**.
 
-            Respond with JSON array:
+            Respond with JSON Object for the board with the highest score from the board list:
             [
                 {
-                    "surfboardId": "<board ID>",
+                    "surfboardID": "<board ID>",
                     "score": 85,
-                    "reason": "Explanation..."
+                    "description": "Explanation..."
+                    "forecastLatitude" : "${forecast.latitude} 
+                    "forecastLongitude" : ${forecast.longitude}"
+                    "date" : "${forecast.date}"
                 }
             ]
         """.trimIndent()
     }
+
+    suspend fun predictionForOneDay(
+        boards: List<Surfboard>,
+        forecast: DailyForecast,
+        user: User
+    ): Result<GeminiPrediction, TMDBError> {
+        try {
+            val prompt = buildPrompt(boards, forecast, user)
+            val response = httpClient.get("geminiBaseUrl") {
+                header(
+                    HttpHeaders.Authorization,
+                    BuildKonfig.STORM_GLASS_API_KEY
+                ) // Will use Gemini API key
+                parameter("prompt", prompt)
+            }.body<GeminiResponse>()
+
+            val jsonText = response.candidates.first().content.parts.first().text
+            val matches: List<GeminiMatchResponse> = Json.decodeFromString(jsonText)
+            val bestMatch = matches.first()
+
+            return Result.Success(
+                GeminiPrediction(
+                    surfboardID = bestMatch.surfboardID,
+                    score = bestMatch.score,
+                    description = bestMatch.description,
+                    forecastLatitude = bestMatch.forecastLatitude,
+                    forecastLongitude = bestMatch.forecastLongitude,
+                    forecastDate = bestMatch.forecastDate
+                )
+            )
+
+        } catch (e: Exception) {
+            return Result.Failure(TMDBError(e.message ?: "Unknown error"))
+        }
+    }
+
+    suspend fun predictionForWeek(
+        boards: List<Surfboard>,
+        forecast: List<DailyForecast>,
+        user: User
+    ): Result<List<GeminiPrediction>, TMDBError> {
+        try {
+            val predictions = mutableListOf<GeminiPrediction>()
+            for (dayForecast in forecast) {
+                val result = predictionForOneDay(boards, dayForecast, user)
+                if (result is Result.Failure) {
+                    return Result.Failure(result.error)
+                }
+                val bestMatch = (result as Result.Success).data
+                if (bestMatch != null) {
+                    predictions.add(
+                        GeminiPrediction(
+                            surfboardID = bestMatch.surfboardID,
+                            score = bestMatch.score,
+                            description = bestMatch.description,
+                            forecastLatitude = bestMatch.forecastLatitude,
+                            forecastLongitude = bestMatch.forecastLongitude,
+                            forecastDate = bestMatch.forecastDate
+                        )
+                    )
+                }
+            }
+            return Result.Success(predictions)
+        } catch (e: Exception) {
+            return Result.Failure(TMDBError(e.message ?: "Unknown error"))
+        }
+    }
+}
+
 
 //    suspend fun getBoardMatches(
 //        boards: List<Surfboard>,
@@ -116,4 +192,4 @@ class GeminiApi(
 ////            return Result.failure(Exception("Gemini request failed: ${response.status}"))
 ////        }
 //    }
-}
+

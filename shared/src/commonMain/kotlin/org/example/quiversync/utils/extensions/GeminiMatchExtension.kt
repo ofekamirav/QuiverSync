@@ -1,12 +1,11 @@
 package org.example.quiversync.utils.extensions
 
-import org.example.quiversync.GeminiMatchEntity
-import org.example.quiversync.domain.model.GeminiMatch
+import org.example.quiversync.GeminiPredictionEntity
+import org.example.quiversync.domain.model.Prediction.GeminiPrediction
 
-fun GeminiMatchEntity.toGeminiMatch(): GeminiMatch {
-    return GeminiMatch(
-        boardId = boardId,
-        userId = userId,
+fun GeminiPredictionEntity.toGeminiMatch(): GeminiPrediction {
+    return GeminiPrediction(
+        surfboardID = surfboardID,
         forecastDate = forecastDate,
         forecastLatitude = forecastLatitude,
         forecastLongitude = forecastLongitude,

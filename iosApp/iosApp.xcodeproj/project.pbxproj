@@ -67,8 +67,6 @@
 		69EAE8252E05B683004E31CD /* ForecastResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EAE8242E05B678004E31CD /* ForecastResults.swift */; };
 		69EAE8272E05CA1E004E31CD /* FavSpotsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EAE8262E05CA13004E31CD /* FavSpotsView.swift */; };
 		69EAE8292E05CB39004E31CD /* SpotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EAE8282E05CB37004E31CD /* SpotCard.swift */; };
-		69EAE82D2E070D82004E31CD /* ExpendCardLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EAE82C2E070D7E004E31CD /* ExpendCardLoading.swift */; };
-		69EAE82F2E071524004E31CD /* ExpendCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EAE82E2E07151B004E31CD /* ExpendCard.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -128,8 +126,6 @@
 		69EAE8242E05B678004E31CD /* ForecastResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastResults.swift; sourceTree = "<group>"; };
 		69EAE8262E05CA13004E31CD /* FavSpotsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavSpotsView.swift; sourceTree = "<group>"; };
 		69EAE8282E05CB37004E31CD /* SpotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotCard.swift; sourceTree = "<group>"; };
-		69EAE82C2E070D7E004E31CD /* ExpendCardLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpendCardLoading.swift; sourceTree = "<group>"; };
-		69EAE82E2E07151B004E31CD /* ExpendCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpendCard.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* QuiverSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuiverSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -304,8 +300,6 @@
 				6904CA702E0BFB160039C9D9 /* WeeklyForecastPopup.swift */,
 				6904CA6E2E0BF0D70039C9D9 /* ExtendCard.swift */,
 				6904CA6B2E0BEF290039C9D9 /* addFavSpot */,
-				69EAE82E2E07151B004E31CD /* ExpendCard.swift */,
-				69EAE82C2E070D7E004E31CD /* ExpendCardLoading.swift */,
 				69EAE8282E05CB37004E31CD /* SpotCard.swift */,
 				69EAE8262E05CA13004E31CD /* FavSpotsView.swift */,
 				69EAE8242E05B678004E31CD /* ForecastResults.swift */,
@@ -511,7 +505,6 @@
 				69E55AC92E02DE9F00B530D3 /* RentalsSkeleton.swift in Sources */,
 				697E7CB32E0566560030392F /* ProfileView.swift in Sources */,
 				69E55AC12E02DE6100B530D3 /* HomeSkeleton.swift in Sources */,
-				69EAE82D2E070D82004E31CD /* ExpendCardLoading.swift in Sources */,
 				69C86FF72E12B4E500850490 /* RegisterView.swift in Sources */,
 				697E7CB12E0565D80030392F /* ErrorView.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
@@ -539,7 +532,6 @@
 				697E7CAD2E0561C00030392F /* ProfileScreen.swift in Sources */,
 				69E55ABF2E02DE5300B530D3 /* FavoriteSpotsSkeleton.swift in Sources */,
 				69E55ADE2E02EE7100B530D3 /* SocialLoginButton.swift in Sources */,
-				69EAE82F2E071524004E31CD /* ExpendCard.swift in Sources */,
 				692B517B2E16D98C0036FCD8 /* LoginWrapper.swift in Sources */,
 				697E7CBC2E05729B0030392F /* ProfileActions.swift in Sources */,
 				69EAE8292E05CB39004E31CD /* SpotCard.swift in Sources */,
