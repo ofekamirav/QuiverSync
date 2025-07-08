@@ -43,7 +43,7 @@ import org.example.quiversync.presentation.theme.OceanPalette
 fun BoardCard(
     board: Surfboard,
     onClick: () -> Unit,
-    onPublishToggle: (Boolean) -> Unit
+    onPublishToggle: (Surfboard, Boolean) -> Unit
 ) {
     val isPublished = board.isRentalPublished ?: false
     val isDark = isSystemInDarkTheme()
@@ -113,7 +113,9 @@ fun BoardCard(
                 )
                 Switch(
                     checked = board.isRentalPublished ?: false,
-                    onCheckedChange = onPublishToggle,
+                    onCheckedChange = { checked ->
+                        onPublishToggle(board, checked)
+                    },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = OceanPalette.SandOrange,
                         checkedTrackColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.6f),

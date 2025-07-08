@@ -7,22 +7,10 @@ actual class SessionManager actual constructor(context: Any?) {
 
     private val defaults = NSUserDefaults.standardUserDefaults
 
-    actual suspend fun hasSeenWelcome(): Boolean {
-        return defaults.boolForKey("has_seen_welcome")
-    }
-
     actual suspend fun clearUserData(){
         defaults.removeObjectForKey("uid")
         defaults.removeObjectForKey("latitude")
         defaults.removeObjectForKey("longitude")
-    }
-
-    actual suspend fun setWelcomeSeen() {
-        defaults.setBool(true, forKey = "has_seen_welcome")
-    }
-
-    actual suspend fun clearAll() {
-        defaults.removeObjectForKey("has_seen_welcome")
     }
 
     actual suspend fun getUid(): String? {

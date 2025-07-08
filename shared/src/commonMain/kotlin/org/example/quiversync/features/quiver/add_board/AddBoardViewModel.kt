@@ -10,12 +10,14 @@ import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.data.local.Result
+import org.example.quiversync.features.quiver.BoardEventBus
 
 class AddBoardViewModel(
     private val addBoardUseCase: AddBoardUseCase,
-    private val uploadSurfboardImageUseCase: UploadImageUseCase
+    private val uploadSurfboardImageUseCase: UploadImageUseCase,
+    private val boardEventBus: BoardEventBus,
 
-): BaseViewModel() {
+    ): BaseViewModel() {
     private val _uiState = MutableStateFlow<AddBoardState>(AddBoardState.Idle(AddBoardFormData()))
     val uiState: StateFlow<AddBoardState> get() = _uiState
 
@@ -82,6 +84,7 @@ class AddBoardViewModel(
                         when(result){
                             is Result.Success -> {
                                 result.data?.let { _uiState.emit(AddBoardState.Loaded) }
+                                boardEventBus.emitBoardAdded()
                                 platformLogger("AddBoardViewModel", "Surfboard added successfully")
                             }
                             is Result.Failure -> {

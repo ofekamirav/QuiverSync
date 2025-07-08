@@ -37,19 +37,18 @@ getSurfboardsByOwnerId:
 SELECT * FROM SurfboardEntity WHERE ownerId = ?;
 
 publishSurfboardForRental:
-UPDATE SurfboardEntity SET isRentalPublished = 1, isRentalAvailable = 1
+UPDATE SurfboardEntity SET isRentalPublished = 1, isRentalAvailable = 1, longitude = ?, latitude = ?, pricePerDay = ?
 WHERE id = ?;
 
 unpublishSurfboardForRental:
-UPDATE SurfboardEntity SET isRentalPublished = 0, isRentalAvailable = 0
+UPDATE SurfboardEntity SET isRentalPublished = 0, isRentalAvailable = 0, longitude = NULL, latitude = NULL, pricePerDay = NULL
 WHERE id = ?;
 
-updateSurfboardRentalDetails:
-UPDATE SurfboardEntity SET
-    longitude = ?,
-    latitude = ?,
-    isRentalPublished = ?,
-    isRentalAvailable = ?,
-    pricePerDay = ?
+setSurfboardAsUnavailableForRental:
+UPDATE SurfboardEntity SET isRentalAvailable = 0
+WHERE id = ?;
+
+setSurfboardAsAvailableForRental:
+UPDATE SurfboardEntity SET isRentalAvailable = 1
 WHERE id = ?;
 

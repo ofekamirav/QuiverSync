@@ -55,9 +55,17 @@ class QuiverDao(
         }
     }
 
-    fun publishForRental(surfboardId: String): Boolean {
+    fun publishForRental(
+        surfboardId: String,
+        rentalsDetails: RentalPublishDetails
+    ): Boolean {
         try {
-            queries.publishSurfboardForRental(surfboardId)
+            queries.publishSurfboardForRental(
+                id = surfboardId,
+                pricePerDay = rentalsDetails.pricePerDay,
+                latitude = rentalsDetails.latitude,
+                longitude = rentalsDetails.longitude
+            )
             return true
         } catch (e: Exception) {
             platformLogger("QuiverDao", "Error publishing surfboard for rental: ${e.message}")
@@ -83,24 +91,27 @@ class QuiverDao(
             return null
         }
     }
-
-    fun updateSurfboardRentalDetails(
-        surfboardId: String,
-        rentalsDetails: RentalPublishDetails
-    ): Boolean {
+    fun setSurfboardAsUnavailableForRental(surfboardId: String){
         try {
-            queries.updateSurfboardRentalDetails(
-                id = surfboardId,
-                isRentalPublished = rentalsDetails.isRentalPublished?.toLong(),
-                isRentalAvailable = rentalsDetails.isRentalAvailable?.toLong(),
-                pricePerDay = rentalsDetails.pricePerDay,
-                latitude = rentalsDetails.latitude,
-                longitude = rentalsDetails.longitude
-            )
-            return true
+            queries.setSurfboardAsUnavailableForRental(surfboardId)
         } catch (e: Exception) {
-            platformLogger("QuiverDao", "Error updating surfboard rental details: ${e.message}")
-            return false
+            platformLogger("QuiverDao", "Error setting surfboard as unavailable for rental: ${e.message}")
+        }
+    }
+    fun setSurfboardAsAvailableForRental(surfboardId: String){
+        try {
+            queries.setSurfboardAsAvailableForRental(surfboardId)
+        } catch (e: Exception) {
+            platformLogger("QuiverDao", "Error setting surfboard as available for rental: ${e.message}")
+        }
+    }
+
+    fun getBoardsNumber(userId: String): Int {
+        return try {
+            queries.getSurfboardsByOwnerId(userId).executeAsList().size
+        } catch (e: Exception) {
+            platformLogger("QuiverDao", "Error fetching boards number: ${e.message}")
+            0
         }
     }
 

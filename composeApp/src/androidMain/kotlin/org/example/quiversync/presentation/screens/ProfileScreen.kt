@@ -48,7 +48,7 @@ fun ProfileScreen(
         is UserState.Loaded -> {
             ProfileScreenContent(
                 modifier = modifier,
-                user = uiState.user,
+                userState = uiState,
                 onLogout = {
                     viewModel.onLogout()
                     onLogout()
@@ -68,11 +68,12 @@ fun ProfileScreen(
 @Composable
 fun ProfileScreenContent(
     modifier: Modifier = Modifier,
-    user: User,
+    userState: UserState,
     onLogout: () -> Unit,
     onEdit: () -> Unit
 ) {
     val windowInfo = LocalWindowInfo.current
+    val user = (userState as UserState.Loaded).user
 
     when (windowInfo.widthSize) {
         WindowWidthSize.COMPACT -> {
@@ -84,7 +85,7 @@ fun ProfileScreenContent(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                ProfileHeader(user)
+                ProfileHeader(userState)
                 UserDetailsSection(user)
                 Spacer(modifier = Modifier.weight(1f))
                 ProfileActionButtons(onLogout = onLogout, onEdit = onEdit)
@@ -102,7 +103,7 @@ fun ProfileScreenContent(
                     modifier = Modifier.weight(0.4f),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    ProfileHeader(user)
+                    ProfileHeader(userState)
                     Spacer(modifier = Modifier.weight(1f))
                     ProfileActionButtons(onLogout = onLogout, onEdit = onEdit)
                 }

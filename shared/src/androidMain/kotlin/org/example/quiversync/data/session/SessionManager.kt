@@ -12,14 +12,9 @@ actual class SessionManager actual constructor(context: Any?) {
 
     private val context = context as Context
     private val uidKey = stringPreferencesKey("uid")
-    private val welcomeKey = booleanPreferencesKey("has_seen_welcome")
     private val latitudeKey = doublePreferencesKey("latitude")
     private val longitudeKey = doublePreferencesKey("longitude")
 
-
-    actual suspend fun clearAll() {
-        context.dataStore.edit { it.clear() }
-    }
 
     actual suspend fun clearUserData() {
         context.dataStore.edit { preferences ->
@@ -27,15 +22,6 @@ actual class SessionManager actual constructor(context: Any?) {
             preferences.remove(latitudeKey)
             preferences.remove(longitudeKey)
         }
-    }
-
-
-    actual suspend fun hasSeenWelcome(): Boolean {
-        return context.dataStore.data.first()[welcomeKey] ?: false
-    }
-
-    actual suspend fun setWelcomeSeen() {
-        context.dataStore.edit { it[welcomeKey] = true }
     }
 
     actual suspend fun getUid(): String? {

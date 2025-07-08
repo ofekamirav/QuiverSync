@@ -42,56 +42,86 @@
             }
         }
 
-        override suspend fun deleteSurfboardRemote(surfboardId: String): Boolean {
+        override suspend fun deleteSurfboardRemote(surfboardId: String): Result<Boolean, Error> {
             return try {
                 firebase.collection("surfboards").document(surfboardId).delete()
-                platformLogger("QuiverRemoteDataSourceService", "Surfboard deleted successfully")
-                true
+                platformLogger("QuiverRemoteDataSourceService", "Surfboard deleted successfully with ID: $surfboardId")
+                Result.Success(true)
             } catch (e: Exception) {
                 platformLogger("QuiverRemoteDataSourceService", "Error deleting surfboard: ${e.message}")
-                false
+                Result.Failure(SurfboardError(e.message ?: "Unknown error"))
             }
         }
 
-        override suspend fun publishForRentalRemote(surfboardId: String): Boolean {
-            return try {
-                firebase.collection("surfboards").document(surfboardId).update("isAvailable", true)
-                platformLogger("QuiverRemoteDataSourceService", "Surfboard published for rental successfully")
-                true
-            } catch (e: Exception) {
-                platformLogger("QuiverRemoteDataSourceService", "Error publishing surfboard for rental: ${e.message}")
-                false
-            }
-        }
-
-        override suspend fun unpublishForRentalRemote(surfboardId: String): Boolean {
-            return try {
-                firebase.collection("surfboards").document(surfboardId).update("isAvailable", false)
-                platformLogger("QuiverRemoteDataSourceService", "Surfboard unpublished for rental successfully")
-                true
-            } catch (e: Exception) {
-                platformLogger("QuiverRemoteDataSourceService", "Error unpublishing surfboard for rental: ${e.message}")
-                false
-            }
-        }
-
-        override suspend fun updateSurfboardRentalDetailsRemote(
-            surfboardId: String,
-            rentalsDetails: RentalPublishDetails,
-        ): Boolean {
+        override suspend fun publishForRentalRemote(surfboardId: String,rentalsDetails: RentalPublishDetails): Result<Boolean, Error> {
             return try {
                 firebase.collection("surfboards").document(surfboardId).update(
                     "latitude" to rentalsDetails.latitude,
                     "longitude" to rentalsDetails.longitude,
-                    "isRentalPublished" to rentalsDetails.isRentalPublished,
-                    "isRentalAvailable" to rentalsDetails.isRentalAvailable,
-                    "pricePerDay" to rentalsDetails.pricePerDay
+                    "isRentalPublished" to true,
+                    "isRentalAvailable" to true,
+                    "pricePerDay" to rentalsDetails.pricePerDay,
                 )
-                platformLogger("QuiverRemoteDataSourceService", "Surfboard rental details updated successfully")
-                true
+                platformLogger("QuiverRemoteDataSourceService", "Surfboard published for rental successfully")
+                Result.Success(true)
             } catch (e: Exception) {
-                platformLogger("QuiverRemoteDataSourceService", "Error updating surfboard rental details: ${e.message}")
-                false
+                platformLogger("QuiverRemoteDataSourceService", "Error publishing surfboard for rental: ${e.message}")
+                Result.Failure(SurfboardError(e.message ?: "Unknown error"))
+            }
+        }
+
+        override suspend fun unpublishForRentalRemote(surfboardId: String): Result<Boolean, Error> {
+            return try {
+                firebase.collection("surfboards").document(surfboardId).update(
+                    "isRentalPublished" to false,
+                    "isRentalAvailable" to false,
+                    "pricePerDay" to null,
+                    "latitude" to null,
+                    "longitude" to null
+                )
+                platformLogger("QuiverRemoteDataSourceService", "Surfboard unpublished for rental successfully")
+                Result.Success(true)
+            } catch (e: Exception) {
+                platformLogger("QuiverRemoteDataSourceService", "Error unpublishing surfboard for rental: ${e.message}")
+                Result.Failure(SurfboardError(e.message ?: "Unknown error"))
+            }
+        }
+
+        override suspend fun setSurfboardAsRentalAvailableRemote(surfboardId: String): Result<Boolean, Error> {
+            return try {
+                firebase.collection("surfboards").document(surfboardId).update(
+                    "isRentalAvailable" to true
+                )
+                platformLogger(
+                    "QuiverRemoteDataSourceService",
+                    "Surfboard set as rental available successfully"
+                )
+                Result.Success(true)
+            } catch (e: Exception) {
+                platformLogger(
+                    "QuiverRemoteDataSourceService",
+                    "Error setting surfboard as rental available: ${e.message}"
+                )
+                Result.Failure(SurfboardError(e.message ?: "Unknown error"))
+            }
+        }
+
+        override suspend fun setSurfboardAsRentalUnavailableRemote(surfboardId: String): Result<Boolean, Error> {
+            return try {
+                firebase.collection("surfboards").document(surfboardId).update(
+                    "isRentalAvailable" to false
+                )
+                platformLogger(
+                    "QuiverRemoteDataSourceService",
+                    "Surfboard set as rental unavailable successfully"
+                )
+                Result.Success(true)
+            } catch (e: Exception) {
+                platformLogger(
+                    "QuiverRemoteDataSourceService",
+                    "Error setting surfboard as rental unavailable: ${e.message}"
+                )
+                Result.Failure(SurfboardError(e.message ?: "Unknown error"))
             }
         }
     }

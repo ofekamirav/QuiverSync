@@ -9,7 +9,8 @@ interface QuiverRepository {
     suspend fun getMyQuiver(): Result<List<Surfboard>, Error>
     suspend fun addSurfboard(surfboard: Surfboard): Result<Boolean, Error>
     suspend fun deleteSurfboard(surfboardId: String): Result<Boolean, Error>
-    suspend fun publishForRental(surfboardId: String): Result<Boolean, Error>
+    suspend fun publishForRental(surfboardId: String, rentalsDetails: RentalPublishDetails): Result<Boolean, Error>
     suspend fun unpublishForRental(surfboardId: String): Result<Boolean, Error>
-    suspend fun updateSurfboardRentalDetails(surfboardId: String, rentalsDetails: RentalPublishDetails): Result<Boolean, Error>
+    suspend fun setSurfboardAsRentalAvailable(surfboardId: String): Result<Boolean, Error>
+    suspend fun setSurfboardAsRentalUnavailable(surfboardId: String): Result<Boolean, Error>
 }

@@ -46,7 +46,7 @@ fun SurfboardDetailDialog(
     board: Surfboard,
     visible: Boolean,
     onDismiss: () -> Unit,
-    onDelete: (Surfboard) -> Unit = {}
+    onDelete: @Composable (Surfboard) -> Unit = {}
 ) {
     val isDark = isSystemInDarkTheme()
     val placeholderId = if (isDark) {

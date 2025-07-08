@@ -1,5 +1,6 @@
 package org.example.quiversync.data.repository
 
+import androidx.compose.ui.geometry.Rect
 import dev.gitlive.firebase.firestore.FirebaseFirestoreException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -16,7 +17,6 @@ import org.example.quiversync.domain.repository.QuiverRepository
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.utils.extensions.toDomain
 import org.example.quiversync.utils.extensions.toDto
-import org.example.quiversync.utils.extensions.toEntity
 
 
 
@@ -93,26 +93,42 @@ class QuiverRepositoryImpl(
     override suspend fun deleteSurfboard(surfboardId: String): Result<Boolean, Error> {
         return try {
             val result = remoteDataSource.deleteSurfboardRemote(surfboardId)
-            if (result) {
-                localDataSource.deleteSurfboard(surfboardId)
-                platformLogger("QuiverRepositoryImpl", "Surfboard deleted successfully: $surfboardId")
-                Result.Success(true)
-            } else {
-                Result.Failure(SurfboardError("Failed to delete surfboard remotely"))
+            when (result) {
+                is Result.Success -> {
+                    localDataSource.deleteSurfboard(surfboardId)
+                    platformLogger("QuiverRepositoryImpl", "Surfboard deleted successfully: $surfboardId")
+                    Result.Success(true)
+                }
+                is Result.Failure -> {
+                    platformLogger("QuiverRepositoryImpl", "Failed to delete surfboard remotely: ${result.error?.message}")
+                    Result.Failure(SurfboardError(result.error?.message ?: "Failed to delete surfboard remotely"))
+                }
             }
         } catch (e: Exception) {
             Result.Failure(SurfboardError(e.message ?: "An error occurred while deleting the surfboard"))
         }
     }
 
-    override suspend fun publishForRental(surfboardId: String): Result<Boolean, Error> {
+    override suspend fun publishForRental(
+        surfboardId: String,
+        rentalsDetails: RentalPublishDetails
+        ): Result<Boolean, Error> {
         return try {
-            val result = remoteDataSource.publishForRentalRemote(surfboardId)
-            if (result) {
-                localDataSource.publishForRental(surfboardId)
-                Result.Success(true)
-            } else {
-                Result.Failure(SurfboardError("Failed to publish surfboard for rental remotely"))
+            val result = remoteDataSource.publishForRentalRemote(surfboardId, rentalsDetails)
+            when(result) {
+                is Result.Failure -> {
+                    platformLogger("QuiverRepositoryImpl", "Failed to publish surfboard for rental remotely: ${result.error?.message}")
+                    return Result.Failure(SurfboardError(result.error?.message ?: "Failed to publish surfboard for rental remotely"))
+                }
+                is Result.Success -> {
+                    platformLogger(
+                        "QuiverRepositoryImpl",
+                        "Surfboard published for rental remotely: $surfboardId"
+                    )
+                    localDataSource.publishForRental(surfboardId, rentalsDetails)
+                    Result.Success(true)
+
+                }
             }
         } catch (e: Exception) {
             Result.Failure(SurfboardError(e.message ?: "An error occurred while publishing the surfboard for rental"))
@@ -122,31 +138,58 @@ class QuiverRepositoryImpl(
     override suspend fun unpublishForRental(surfboardId: String): Result<Boolean, Error> {
         return try {
             val result = remoteDataSource.unpublishForRentalRemote(surfboardId)
-            if (result) {
-                localDataSource.unpublishForRental(surfboardId)
-                Result.Success(true)
-            } else {
-                Result.Failure(SurfboardError("Failed to unpublish surfboard for rental remotely"))
+            when (result) {
+                is Result.Success -> {
+                    localDataSource.unpublishForRental(surfboardId)
+                    platformLogger("QuiverRepositoryImpl", "Surfboard unpublished from rental successfully: $surfboardId")
+                    Result.Success(true)
+                }
+                is Result.Failure -> {
+                    platformLogger("QuiverRepositoryImpl", "Failed to unpublish surfboard from rental remotely: ${result.error?.message}")
+                    Result.Failure(SurfboardError(result.error?.message ?: "Failed to unpublish surfboard from rental remotely"))
+                }
             }
         } catch (e: Exception) {
             Result.Failure(SurfboardError(e.message ?: "An error occurred while unpublishing the surfboard for rental"))
         }
     }
 
-    override suspend fun updateSurfboardRentalDetails(
-        surfboardId: String,
-        rentalsDetails: RentalPublishDetails,
-    ): Result<Boolean, Error> {
+    override suspend fun setSurfboardAsRentalAvailable(surfboardId: String): Result<Boolean, Error> {
         return try {
-            val result = remoteDataSource.updateSurfboardRentalDetailsRemote(surfboardId, rentalsDetails)
-            if (result) {
-                localDataSource.updateSurfboardRentalDetails(surfboardId, rentalsDetails)
-                Result.Success(true)
-            } else {
-                Result.Failure(SurfboardError("Failed to update surfboard rental details remotely"))
+            val result = remoteDataSource.setSurfboardAsRentalAvailableRemote(surfboardId)
+            when (result) {
+                is Result.Success -> {
+                    localDataSource.setSurfboardAsAvailableForRental(surfboardId)
+                    platformLogger("QuiverRepositoryImpl", "Surfboard set as available for rental successfully: $surfboardId")
+                    Result.Success(true)
+                }
+                is Result.Failure -> {
+                    platformLogger("QuiverRepositoryImpl", "Failed to set surfboard as available for rental remotely: ${result.error?.message}")
+                    Result.Failure(SurfboardError(result.error?.message ?: "Failed to set surfboard as available for rental remotely"))
+                }
             }
         } catch (e: Exception) {
-            Result.Failure(SurfboardError(e.message ?: "An error occurred while updating the surfboard rental details"))
+            Result.Failure(SurfboardError(e.message ?: "An error occurred while setting the surfboard as available for rental"))
         }
     }
+
+    override suspend fun setSurfboardAsRentalUnavailable(surfboardId: String): Result<Boolean, Error> {
+        return try {
+            val result = remoteDataSource.setSurfboardAsRentalUnavailableRemote(surfboardId)
+            when (result) {
+                is Result.Success -> {
+                    localDataSource.setSurfboardAsUnavailableForRental(surfboardId)
+                    platformLogger("QuiverRepositoryImpl", "Surfboard set as unavailable for rental successfully: $surfboardId")
+                    Result.Success(true)
+                }
+                is Result.Failure -> {
+                    platformLogger("QuiverRepositoryImpl", "Failed to set surfboard as unavailable for rental remotely: ${result.error?.message}")
+                    Result.Failure(SurfboardError(result.error?.message ?: "Failed to set surfboard as unavailable for rental remotely"))
+                }
+            }
+        } catch (e: Exception) {
+            Result.Failure(SurfboardError(e.message ?: "An error occurred while setting the surfboard as unavailable for rental"))
+        }
+    }
+
 }

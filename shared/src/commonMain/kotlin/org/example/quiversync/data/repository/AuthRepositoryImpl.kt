@@ -102,7 +102,6 @@ class AuthRepositoryImpl(
     override suspend fun logout() {
         auth.signOut()
         sessionManager.clearUserData()
-        sessionManager.hasSeenWelcome()
     }
 
     override suspend fun updateUserProfile(user: User): Result<Unit, AuthError> {

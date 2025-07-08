@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.presentation.components.LoadingAnimation
@@ -44,16 +45,15 @@ import org.koin.compose.koinInject
 fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     val navController = rememberNavController()
     var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
-    var hasSeenWelcome by remember { mutableStateOf<Boolean?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         val uid = sessionManager.getUid()
         Log.d("AppNavigation","User ID from SessionManager: $uid")
         isLoggedIn = uid != null
-        hasSeenWelcome = sessionManager.hasSeenWelcome()
     }
 
-    if (isLoggedIn == null || hasSeenWelcome == null) {
+    if (isLoggedIn == null) {
         Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ){
@@ -174,9 +174,12 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
             composable(Screen.Login.route) {
                 LoginScreen(
                     onSignInSuccess = {
-                        isLoggedIn = true
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(0)
+                        coroutineScope.launch {
+                            val uid = sessionManager.getUid()
+                            isLoggedIn = uid != null
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(0)
+                            }
                         }
                     },
                     onRegisterClick = {
@@ -196,7 +199,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
             }
             composable(Screen.Home.route) {
                 HomeScreen(
-                    showWelcomeBottomSheetOnStart = hasSeenWelcome == false,
+                    showWelcomeBottomSheetOnStart = navController.previousBackStackEntry?.destination?.route == Screen.CompleteRegister.route,
                     modifier = Modifier.padding(innerPadding)
                 )
             }
