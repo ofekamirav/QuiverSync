@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +29,8 @@ import org.example.quiversync.features.quiver.add_board.AddBoardState
 import org.example.quiversync.features.register.OnboardingEvent
 import org.example.quiversync.features.register.OnboardingState
 import org.example.quiversync.presentation.components.LoadingAnimation
+import org.example.quiversync.utils.LocalWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -70,6 +73,8 @@ fun AddSurfboardScreen(
         }
     }
 }
+
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun AddSurfboardFlowScreen(
     modifier: Modifier = Modifier,
@@ -77,43 +82,80 @@ fun AddSurfboardFlowScreen(
     onEvent: (AddBoardEvent) -> Unit,
     onBack: () -> Unit
 ) {
+    val windowInfo = LocalWindowInfo.current
     val pagerState = rememberPagerState(initialPage = 0)
-    val scope = rememberCoroutineScope()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top
+    LaunchedEffect(state.data.currentStep) {
+        pagerState.animateScrollToPage(state.data.currentStep - 1)
+    }
+
+    LaunchedEffect(state.data.currentStep) {
+        if (windowInfo.widthSize == WindowWidthSize.COMPACT) {
+            pagerState.animateScrollToPage(state.data.currentStep - 1)
+        }
+    }
+
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
-        HorizontalPager(
-            count = state.data.totalSteps,
-            state = pagerState,
-            userScrollEnabled = false,
-            modifier = Modifier.weight(1f),
-        ) { page ->
-            when (page) {
-                0 -> AddSurfboardStep1(state, onEvent)
-                1 -> AddSurfboardStep2(state, onEvent)
+        when (windowInfo.widthSize) {
+            WindowWidthSize.COMPACT -> {
+                HorizontalPager(
+                    count = state.data.totalSteps,
+                    state = pagerState,
+                    userScrollEnabled = false,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 80.dp),
+                ) { page ->
+                    when (page) {
+                        0 -> AddSurfboardStep1(state, onEvent)
+                        1 -> AddSurfboardStep2(state, onEvent)
+                    }
+                }
+            }
+            else -> { // (Medium & Expanded)
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 80.dp),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .widthIn(max = 400.dp)
+                    ) {
+                        AddSurfboardStep1(state, onEvent)
+                    }
+                    Spacer(modifier = Modifier.width(32.dp))
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .widthIn(max = 400.dp)
+                    ) {
+                        AddSurfboardStep2(state, onEvent)
+                    }
+                }
             }
         }
+
+        // Floating transparent navigation bar
         WizardNavigationBar(
-            currentStep = pagerState.currentPage + 1,
+            currentStep = state.data.currentStep,
             totalSteps = state.data.totalSteps,
-            onPreviousClicked = {
-                scope.launch {
-                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                }
-            },
-            onNextClicked = {
-                scope.launch {
-                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                }
-            },
-            onFinishClicked = {
-                onEvent(AddBoardEvent.SubmitClicked)
-            },
-            onBack = onBack
+            onPreviousClicked = { onEvent(AddBoardEvent.PreviousStepClicked) },
+            onNextClicked = { onEvent(AddBoardEvent.NextStepClicked) },
+            onFinishClicked = { onEvent(AddBoardEvent.SubmitClicked) },
+            onBack = onBack,
+            isTabletLayout = windowInfo.widthSize != WindowWidthSize.COMPACT,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
         )
     }
 }
@@ -124,13 +166,13 @@ fun WizardNavigationBar(
     totalSteps: Int,
     onPreviousClicked: () -> Unit,
     onBack: () -> Unit,
+    isTabletLayout: Boolean = false,
     onNextClicked: () -> Unit,
     onFinishClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -139,6 +181,7 @@ fun WizardNavigationBar(
                 onClick = onPreviousClicked,
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
             ) {
@@ -149,6 +192,7 @@ fun WizardNavigationBar(
                 onClick = onBack,
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
             ) {

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,8 +21,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -31,6 +34,7 @@ import org.example.quiversync.R
 import org.example.quiversync.features.quiver.add_board.AddBoardEvent
 import org.example.quiversync.features.quiver.add_board.AddBoardState
 import org.example.quiversync.features.register.OnboardingEvent
+import org.example.quiversync.presentation.components.BoardImagePicker
 import org.example.quiversync.presentation.components.CustomTextField
 import org.example.quiversync.presentation.components.ImageSourceSelectorSheet
 import org.example.quiversync.presentation.widgets.register.ImagePickerSection
@@ -78,36 +82,52 @@ fun AddSurfboardStep2(
         }
     }
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text("Details", style = MaterialTheme.typography.titleMedium)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("Details", style = MaterialTheme.typography.titleLarge)
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             CustomTextField(
                 modifier = Modifier.weight(1f),
                 value = state.data.height,
                 onValueChange = { onEvent(AddBoardEvent.HeightChanged(it)) },
-                label = "Height",
+                label = "Height (In)",
+                keyboardType = KeyboardType.Decimal,
+                imeAction = ImeAction.Next
             )
             CustomTextField(
                 modifier = Modifier.weight(1f),
                 value = state.data.width,
                 onValueChange = { onEvent(AddBoardEvent.WidthChanged(it)) },
-                label = "Width",
+                label = "Width (In)",
+                keyboardType = KeyboardType.Decimal,
+                imeAction = ImeAction.Next
             )
         }
         CustomTextField(
             value = state.data.volume,
             onValueChange = { onEvent(AddBoardEvent.VolumeChanged(it)) },
-            label = "Volume",
-            keyboardType = KeyboardType.Decimal
+            label = "Volume (L)",
+            keyboardType = KeyboardType.Decimal,
+            imeAction = ImeAction.Done
         )
         Spacer(modifier = Modifier.height(16.dp))
-        ImagePickerSection(
-            imageUrl = state.data.imageUrl,
-            isUploading = state.data.isUploadingImage,
-            onChangePhotoClick = { showImageOptions = true },
-            placeholderRes = R.drawable.placeholder_dark,
-            errorMessage = state.data.surfboardImageError
-        )
+        Column(
+            modifier = Modifier
+                .height(160.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            BoardImagePicker(
+                imageUrl = state.data.imageUrl,
+                isUploading = state.data.isUploadingImage,
+                onClick = { showImageOptions = true },
+                errorMessage = state.data.imageUploadError,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 
     if (showImageOptions) {

@@ -42,13 +42,21 @@ import org.example.quiversync.domain.usecase.GetWeeklyForecastBySpotUseCase
 import org.example.quiversync.domain.usecase.register.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.UploadImageUseCase
+import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
 import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
+import org.example.quiversync.domain.usecase.quiver.DeleteSurfboardUseCase
 import org.example.quiversync.domain.usecase.quiver.GetMyQuiverUseCase
+import org.example.quiversync.domain.usecase.quiver.PublishSurfboardToRentalUseCase
+import org.example.quiversync.domain.usecase.quiver.SetSurfboardAsAvailableForRental
+import org.example.quiversync.domain.usecase.quiver.SetSurfboardAsUnavailableUseCase
+import org.example.quiversync.domain.usecase.quiver.UnpublishSurfboardFromRentalUseCase
+import org.example.quiversync.domain.usecase.user.GetBoardsNumberUseCase
 import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
 import org.example.quiversync.domain.usecase.user.LogoutUseCase
 import org.example.quiversync.features.home.HomeUseCases
+import org.example.quiversync.features.quiver.BoardEventBus
 import org.example.quiversync.features.quiver.QuiverUseCases
 import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.features.quiver.add_board.AddBoardViewModel
@@ -88,17 +96,20 @@ val commonModule= module {
 
    single<SessionManager> { SessionManager(get()) }
 
+   // SharedFlow / Event Bus
+   single { BoardEventBus }
 
-   //Repositories
+
+   //-----------------------------------------------------Repositories---------------------------------------------
    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
    single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get()) }
    single<UserRepository> { UserRepositoryImpl(get(), get(),get()) }
    single<QuiverRepository> { QuiverRepositoryImpl(get(), get(), get()) }
 
-   // Firebase- Remote Data Source
+   //----------------------------------------------------- Firebase- Remote Data Source----------------------------------
    single<QuiverRemoteDataSource>{ QuiverRemoteDataSourceService(get()) }
 
-   //SqlDelight + Dao
+   //---------------------------------------------------SqlDelight + Dao----------------------------------------
    single { QuiverSyncDatabase(get()) }
    single { get<QuiverSyncDatabase>().dailyForecastQueries }
    single { get<QuiverSyncDatabase>().geminiMatchQueries }
@@ -108,7 +119,7 @@ val commonModule= module {
    single { QuiverDao(get()) }
 
 
-   //UseCases
+   //---------------------------------------------------UseCases--------------------------------------------
    single { RegisterUserUseCase(get()) }
    single { UpdateUserProfileUseCase(get()) }
    single { UploadImageUseCase(get()) }
@@ -116,8 +127,17 @@ val commonModule= module {
    single { GetWeeklyForecastBySpotUseCase(get()) }
    single { GetUserProfileUseCase(get()) }
    single { LogoutUseCase(get()) }
+   single { LoginUserUseCase(get()) }
+   //Quiver UseCases
    single { AddBoardUseCase(get()) }
    single { GetMyQuiverUseCase(get()) }
+   single { SetSurfboardAsAvailableForRental(get()) }
+   single { SetSurfboardAsUnavailableUseCase(get()) }
+   single { PublishSurfboardToRentalUseCase(get(), get()) }
+   single { DeleteSurfboardUseCase(get()) }
+   single { UnpublishSurfboardFromRentalUseCase(get()) }
+   single { GetBoardsNumberUseCase(get()) }
+   //Data Classes for UseCases
    single{
       HomeUseCases(
           getWeeklyForecastByLocationUseCase = get()
@@ -133,25 +153,30 @@ val commonModule= module {
       UserUseCases(
             getUserProfileUseCase = get(),
             updateUserProfileUseCase = get(),
-            logoutUseCase = get()
+            logoutUseCase = get(),
+            getBoardsNumberUseCase = get()
       )
    }
    single {
       QuiverUseCases(
-         getMyQuiverUseCase = get()
+          getMyQuiverUseCase = get(),
+          deleteSurfboardUseCase = get(),
+          addSurfboardUseCase = get(),
+          publishSurfboardToRentalUseCase = get(),
+          unpublishForRentalUseCase = get(),
       )
    }
 
 
-   // ViewModels
+   // --------------------------------------------ViewModels--------------------------------------------------
    single { RegisterViewModel(get()) }
    single { OnboardingViewModel(get(), get()) }
-   single { UserViewModel(get()) }
+   single { UserViewModel(get(), get()) }
    single { HomeViewModel(get()) }
    single { LoginViewModel(get()) }
    single { OnboardingViewModel(get(), get()) }
-   single { QuiverViewModel(get()) }
-   single { AddBoardViewModel(get(), get()) }
+   single { QuiverViewModel(get(),get()) }
+   single { AddBoardViewModel(get(), get(), get()) }
 
 
 }

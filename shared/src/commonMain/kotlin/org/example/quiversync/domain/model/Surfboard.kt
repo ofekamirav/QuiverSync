@@ -35,10 +35,5 @@ enum class FinsSetup(val serverName: String) {
     TWIN("Twin"),
     THRUSTER("Thruster"),
     QUAD("Quad"),
-    FIVEFINS("Five_Fins")
+    FIVEFINS("Five Fins")
 }
-
-@Serializable
-data class SurfboardError(
-    override val message: String
-): Error

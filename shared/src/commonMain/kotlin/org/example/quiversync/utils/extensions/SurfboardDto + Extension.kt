@@ -29,7 +29,6 @@ fun SurfboardEntity.toDomain(): Surfboard {
 
 fun Surfboard.toDto(): SurfboardDto {
     return SurfboardDto(
-        id = this.id,
         ownerId = this.ownerId,
         model = this.model,
         company = this.company,
@@ -47,9 +46,9 @@ fun Surfboard.toDto(): SurfboardDto {
         pricePerDay = this.pricePerDay
     )
 }
-fun SurfboardDto.toDomain(): Surfboard {
+fun SurfboardDto.toDomain(id: String): Surfboard {
     return Surfboard(
-        id = this.id.toString(),
+        id = id,
         ownerId = this.ownerId.toString(),
         model = this.model.toString(),
         company = this.company.toString(),
@@ -68,9 +67,9 @@ fun SurfboardDto.toDomain(): Surfboard {
     )
 }
 
-fun SurfboardDto.toEntity(): SurfboardEntity {
+fun SurfboardDto.toEntity(id: String): SurfboardEntity {
     return SurfboardEntity(
-        id = this.id.toString(),
+        id = id ,
         ownerId = this.ownerId.toString(),
         model = this.model.toString(),
         company = this.company.toString(),
@@ -112,7 +111,7 @@ fun Surfboard.toEntity(): SurfboardEntity {
 
 fun FinsSetup.toEntity(): String {
     return when (this) {
-        FinsSetup.FIVEFINS -> "Five_Fins"
+        FinsSetup.FIVEFINS -> "Five Fins"
         FinsSetup.THRUSTER -> "Thruster"
         FinsSetup.QUAD -> "Quad"
         FinsSetup.TWIN -> "Twin"
@@ -122,7 +121,7 @@ fun FinsSetup.toEntity(): String {
 
 fun String.toFinsSetup(): FinsSetup {
     return when (this) {
-        "Five_Fins" -> FinsSetup.FIVEFINS
+        "Five Fins" -> FinsSetup.FIVEFINS
         "Thruster" -> FinsSetup.THRUSTER
         "Quad" -> FinsSetup.QUAD
         "Twin" -> FinsSetup.TWIN

@@ -8,17 +8,16 @@ import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.usecase.UploadImageUseCase
 import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
 import org.example.quiversync.features.BaseViewModel
-import org.example.quiversync.features.register.OnboardingState
-import org.example.quiversync.features.user.UserState
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.data.local.Result
-import org.example.quiversync.data.local.Error
+import org.example.quiversync.features.quiver.BoardEventBus
 
 class AddBoardViewModel(
     private val addBoardUseCase: AddBoardUseCase,
-    private val uploadSurfboardImageUseCase: UploadImageUseCase
+    private val uploadSurfboardImageUseCase: UploadImageUseCase,
+    private val boardEventBus: BoardEventBus,
 
-): BaseViewModel() {
+    ): BaseViewModel() {
     private val _uiState = MutableStateFlow<AddBoardState>(AddBoardState.Idle(AddBoardFormData()))
     val uiState: StateFlow<AddBoardState> get() = _uiState
 
@@ -33,29 +32,32 @@ class AddBoardViewModel(
             is AddBoardEvent.FinsSetupChanged -> updateState { it.copy(data = it.data.copy(finSetup = event.value)) }
             is AddBoardEvent.surfboardImageSelected -> onSurfboardImageSelected(event.bytes)
             AddBoardEvent.NextStepClicked -> {
-                if (!validateCurrentStep()) {
-                    return
+                if ((_uiState.value as? AddBoardState.Idle)?.data?.currentStep == 1) {
+                    if (!validateStep1()) {
+                        return
+                    }
                 }
-                val currentState = _uiState.value
-                if (currentState is AddBoardState.Idle) {
+                updateState { currentState ->
                     if (currentState.data.currentStep < currentState.data.totalSteps) {
-                        _uiState.update {
-                            currentState.copy(data = currentState.data.copy(currentStep = currentState.data.currentStep + 1))
-                        }
+                        currentState.copy(data = currentState.data.copy(currentStep = currentState.data.currentStep + 1))
+                    } else {
+                        currentState
                     }
                 }
+            }
 
-            }
             AddBoardEvent.PreviousStepClicked -> {
-                val currentState = _uiState.value
-                if (currentState is AddBoardState.Idle) {
+                updateState { currentState ->
                     if (currentState.data.currentStep > 1) {
-                        currentState.copy(currentState.data.copy(currentStep = currentState.data.currentStep - 1))
+                        currentState.copy(data = currentState.data.copy(currentStep = currentState.data.currentStep - 1))
+                    } else {
+                        currentState
                     }
                 }
             }
+
             AddBoardEvent.SubmitClicked -> {
-                if (!validateCurrentStep()) {
+                if (!validateAllSteps()) {
                     return
                 }
                 val formData = (_uiState.value as? AddBoardState.Idle)?.data ?: return
@@ -82,6 +84,7 @@ class AddBoardViewModel(
                         when(result){
                             is Result.Success -> {
                                 result.data?.let { _uiState.emit(AddBoardState.Loaded) }
+                                boardEventBus.emitBoardAdded()
                                 platformLogger("AddBoardViewModel", "Surfboard added successfully")
                             }
                             is Result.Failure -> {
@@ -124,6 +127,7 @@ class AddBoardViewModel(
                     _uiState.value = updatedIdleState.copy(data = updatedIdleState.data.copy(
                         isUploadingImage = false,
                         surfboardImageError = null,
+                        imageUrl = imageUrl
                     ))
                     platformLogger("AddBoardViewModel","Success: $imageUrl")
                 }.onFailure { error ->
@@ -144,7 +148,7 @@ class AddBoardViewModel(
         }
     }
 
-    private fun validateCurrentStep(): Boolean {
+    private fun validateStep1(): Boolean {
         val currentState = _uiState.value as? AddBoardState.Idle ?: return false
         val data = currentState.data
         var isValid = true
@@ -159,7 +163,34 @@ class AddBoardViewModel(
             "Company is required"
         } else null
 
-        val heightError = if (data.height.isBlank() || data.height.toDouble() > 14.0 || data.height.toDouble() < 0.0) {
+        updateState {
+            it.copy(
+                data = it.data.copy(
+                    modelError = modelError,
+                    companyError = companyError
+                )
+            )
+        }
+
+        return isValid
+    }
+
+    private fun validateAllSteps(): Boolean {
+        val currentState = _uiState.value as? AddBoardState.Idle ?: return false
+        val data = currentState.data
+        var isValid = true
+
+        val modelError = if (data.model.isBlank()) {
+            isValid = false
+            "Model is required"
+        } else null
+
+        val companyError = if (data.company.isBlank()) {
+            isValid = false
+            "Company is required"
+        } else null
+
+        val heightError = if (data.height.isBlank() || data.height.toDoubleOrNull()?.let { it > 14.0 || it < 0.0 } == true) {
             isValid = false
             "Valid height is required"
         } else null
@@ -189,9 +220,7 @@ class AddBoardViewModel(
         return isValid
     }
 
-
-
     fun resetStateToIdle() {
-        _uiState.value = AddBoardState.Idle()
+        _uiState.value = AddBoardState.Idle(AddBoardFormData())
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -34,15 +35,19 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import org.example.quiversync.R
+import org.example.quiversync.data.remote.dto.RentalPublishDetails
 import org.example.quiversync.features.quiver.QuiverState
 import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.domain.model.Surfboard
+import org.example.quiversync.features.quiver.QuiverEvent
+import org.example.quiversync.presentation.components.CustomDialog
 import org.example.quiversync.presentation.components.ErrorContent
 import org.example.quiversync.presentation.screens.skeletons.QuiverScreenSkeleton
 import org.example.quiversync.presentation.screens.skeletons.BoardCardSkeleton
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.presentation.widgets.quiver_screen.BoardCard
+import org.example.quiversync.presentation.widgets.quiver_screen.PublishSurfboardDialog
 import org.example.quiversync.presentation.widgets.quiver_screen.SurfboardDetailDialog
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
@@ -55,15 +60,18 @@ fun QuiverScreen(
     onAddClick: () -> Unit = {}
 ) {
     val uiState = viewModel.uiState.collectAsState().value
+    val boardToPublish by viewModel.boardToPublish.collectAsState()
     when (uiState) {
         is QuiverState.Error -> ErrorContent((uiState).message)
         is QuiverState.Loading -> { QuiverScreenSkeleton(modifier) }
-        is QuiverState.Loaded -> QuiverContent(uiState.boards, onAddClick, modifier)
+        is QuiverState.Loaded -> QuiverContent(uiState.boards, viewModel::onEvent, onAddClick ,modifier, boardToPublish)
     }
 }
 @Composable
-fun QuiverContent(boards: List<Surfboard>, onAddClick: () -> Unit = {}, modifier: Modifier) {
+fun QuiverContent(boards: List<Surfboard>, onEvent: (QuiverEvent) -> Unit = {}, onAddClick: () -> Unit = {}, modifier: Modifier, boardToPublish: Surfboard?) {
     var selectedBoard by remember { mutableStateOf<Surfboard?>(null) }
+    var toggledSurfboard by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
+
 
     Box(
         modifier = modifier
@@ -88,7 +96,8 @@ fun QuiverContent(boards: List<Surfboard>, onAddClick: () -> Unit = {}, modifier
             Text(
                 text = "Add your first surfboard by clicking the button below.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
@@ -98,11 +107,18 @@ fun QuiverContent(boards: List<Surfboard>, onAddClick: () -> Unit = {}, modifier
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(boards.size) { index ->
+        items(boards, key = { it.id }) { board ->
             BoardCard(
-                board = boards[index],
-                onClick = { selectedBoard = boards[index] },
-                onPublishToggle = { /* Handle Publish Toggle */ }
+                board = board,
+                onClick = { selectedBoard = board },
+                onPublishToggle = { toggledBoard, isChecked ->
+                    if (isChecked && !(toggledBoard.isRentalPublished ?: false)) {
+                        onEvent(QuiverEvent.ShowPublishDialog(toggledBoard.id))
+                    }
+                    else if (!isChecked && (toggledBoard.isRentalPublished ?: false)) {
+                        onEvent(QuiverEvent.UnpublishSurfboard(toggledBoard.id))
+                    }
+                }
             )
         }
     }
@@ -130,7 +146,33 @@ fun QuiverContent(boards: List<Surfboard>, onAddClick: () -> Unit = {}, modifier
             board = it,
             visible = true,
             onDismiss = { selectedBoard = null },
-            onDelete = { /* Handle Delete */ }
+            onDelete = {
+                CustomDialog(
+                    title = "Delete Surfboard",
+                    message = "Are you sure you want to delete this surfboard?",
+                    onConfirm = { onEvent(QuiverEvent.onDeleteClick(it.id)) },
+                    onDismiss = { selectedBoard = null }
+                )
+            },
         )
     }
+
+    boardToPublish?.let { surfboard ->
+        PublishSurfboardDialog(
+            surfboard = surfboard,
+            onConfirm = { pricePerDay ->
+                onEvent(
+                    QuiverEvent.ConfirmPublish(
+                        surfboard.id,
+                        pricePerDay
+                    )
+                )
+            },
+            onDismiss = {
+                onEvent(QuiverEvent.DismissPublishDialog)
+            },
+            visible = true,
+        )
+    }
+
 }

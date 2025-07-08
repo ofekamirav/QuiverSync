@@ -35,10 +35,13 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import org.example.quiversync.R
 import org.example.quiversync.domain.model.User
+import org.example.quiversync.features.user.UserState
 import org.example.quiversync.presentation.theme.OceanPalette
 
 @Composable
-fun ProfileHeader(user: User){
+fun ProfileHeader(userState: UserState){
+    val user = (userState as UserState.Loaded).user
+    val boards = (userState as UserState.Loaded).boards
     // Avatar & Name
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         Box {
@@ -88,9 +91,9 @@ fun ProfileHeader(user: User){
             .background(MaterialTheme.colorScheme.surface)
             .padding(vertical = 16.dp)
     ) {
-        StatItem("Rentals", "8")
+        StatItem("Rentals", "5")
         VerticalDivider()
-        StatItem("Boards", "9" )
+        StatItem("Boards", boards.toString())
         VerticalDivider()
         StatItem("Spots", "10")
     }

@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.navigation
 
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -19,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.presentation.components.LoadingAnimation
@@ -43,17 +45,15 @@ import org.koin.compose.koinInject
 fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     val navController = rememberNavController()
     var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
-    var hasSeenWelcome by remember { mutableStateOf<Boolean?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         val uid = sessionManager.getUid()
-        println( "AppNavigation: User ID from SessionManager: $uid")
+        Log.d("AppNavigation","User ID from SessionManager: $uid")
         isLoggedIn = uid != null
-        hasSeenWelcome = sessionManager.hasSeenWelcome()
-        sessionManager.setWelcomeSeen()
     }
 
-    if (isLoggedIn == null || hasSeenWelcome == null) {
+    if (isLoggedIn == null) {
         Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ){
@@ -165,7 +165,6 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 }
             }
         },
-        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -174,10 +173,13 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
         ) {
             composable(Screen.Login.route) {
                 LoginScreen(
-                    onSignInClick = {
-                        isLoggedIn = true
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(0)
+                    onSignInSuccess = {
+                        coroutineScope.launch {
+                            val uid = sessionManager.getUid()
+                            isLoggedIn = uid != null
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(0)
+                            }
                         }
                     },
                     onRegisterClick = {
@@ -197,10 +199,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
             }
             composable(Screen.Home.route) {
                 HomeScreen(
-                    showWelcomeBottomSheetOnStart =  if (hasSeenWelcome == false) {
-                        hasSeenWelcome = true
-                        true
-                    } else false,
+                    showWelcomeBottomSheetOnStart = navController.previousBackStackEntry?.destination?.route == Screen.CompleteRegister.route,
                     modifier = Modifier.padding(innerPadding)
                 )
             }
