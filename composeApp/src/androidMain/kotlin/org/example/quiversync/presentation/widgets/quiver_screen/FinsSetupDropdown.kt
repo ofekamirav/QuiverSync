@@ -67,7 +67,8 @@ fun FinsSetupDropdown(
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            containerColor = colors.surface,
         ) {
             FinsSetup.entries.forEach { option ->
                 DropdownMenuItem(

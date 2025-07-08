@@ -42,6 +42,7 @@ import org.example.quiversync.domain.usecase.GetWeeklyForecastBySpotUseCase
 import org.example.quiversync.domain.usecase.register.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.UploadImageUseCase
+import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
 import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
 import org.example.quiversync.domain.usecase.quiver.GetMyQuiverUseCase
 import org.example.quiversync.features.home.HomeViewModel
@@ -116,6 +117,7 @@ val commonModule= module {
    single { GetWeeklyForecastBySpotUseCase(get()) }
    single { GetUserProfileUseCase(get()) }
    single { LogoutUseCase(get()) }
+   single { LoginUserUseCase(get()) }
    single { AddBoardUseCase(get()) }
    single { GetMyQuiverUseCase(get()) }
    single{

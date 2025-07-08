@@ -38,8 +38,6 @@ class MainActivity : ComponentActivity() {
                 else -> WindowWidthSize.COMPACT
             }
             val windowInfo = AppWindowInfo(widthSize = widthSize)
-            //Firebase
-            Firebase.initialize(this)
             ProvideWindowInfo(windowInfo = windowInfo) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     QuiverSyncTheme {

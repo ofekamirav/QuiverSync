@@ -2,16 +2,21 @@ package org.example.quiversync.data.repository
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
+import dev.gitlive.firebase.auth.FirebaseAuthException
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.FirebaseFirestoreException
 import dev.gitlive.firebase.firestore.firestore
 import org.example.quiversync.data.remote.dto.UserDto
 import org.example.quiversync.data.session.SessionManager
+import org.example.quiversync.domain.model.AuthError
 import org.example.quiversync.utils.extensions.toDto
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.domain.repository.AuthRepository
-import org.example.quiversync.utils.Location
 import org.example.quiversync.utils.extensions.toDomain
+import org.example.quiversync.data.local.Result
+import org.example.quiversync.data.local.Error
+import org.example.quiversync.utils.extensions.platformLogger
 
 class AuthRepositoryImpl(
     private val sessionManager: SessionManager,
@@ -23,35 +28,46 @@ class AuthRepositoryImpl(
         name: String,
         email: String,
         password: String,
-    ): Result<Unit> {
+    ): Result<Unit,AuthError> {
         return try {
             val userCredential = auth.createUserWithEmailAndPassword(email, password)
+            platformLogger("AuthRepositoryImpl", "User registered: ${userCredential.user?.email}")
             val uid = userCredential.user?.uid
 
             if (uid != null) {
+                platformLogger("AuthRepositoryImpl", "User UID: $uid")
                 val userDto = UserDto(email = email, name = name)
                 firestore.collection("users").document(uid).set(userDto)
-                // Set the user's UID in the session manager
                 sessionManager.setUid(uid)
-                Result.success(Unit)
+                Result.Success(Unit)
             } else {
-                Result.failure(Exception("Failed to create user: UID is null"))
+                Result.Failure(AuthError("Failed to create user: UID is null after registration."))
             }
+        } catch (e: FirebaseAuthException) {
+            Result.Failure(AuthError("Registration failed: ${e.message}"))
+        } catch (e: FirebaseFirestoreException) {
+            Result.Failure(AuthError("Failed to save user data after registration: ${e.message}"))
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Failure(AuthError("An unexpected error occurred during registration: ${e.message}"))
         }
     }
 
     override suspend fun getCurrentUser(): User?  {
         val firebaseUser = auth.currentUser
         return if (firebaseUser != null) {
-            val snapshot = firestore
-                .collection("users")
-                .document(firebaseUser.uid)
-                .get()
+            try {
+                val snapshot = firestore
+                    .collection("users")
+                    .document(firebaseUser.uid)
+                    .get()
 
-            val userDto = snapshot.data<UserDto>()
-            userDto.toDomain(firebaseUser.uid)
+                val userDto = snapshot.data<UserDto>()
+                platformLogger("AuthRepositoryImpl", "Fetched user data for UID: ${firebaseUser.uid}")
+                userDto.toDomain(firebaseUser.uid)
+            } catch (e: Exception) {
+                platformLogger("AuthRepositoryImpl", "Failed to fetch user data: ${e.message}")
+                null
+            }
         } else {
             null
         }
@@ -61,35 +77,41 @@ class AuthRepositoryImpl(
     override suspend fun login(
         email: String,
         password: String,
-    ): Result<Unit> {
+    ): Result<Unit, AuthError> {
         return try {
+            platformLogger("AuthRepositoryImpl", "Attempting to log in user with email: $email")
             val userCredential = auth.signInWithEmailAndPassword(email, password)
+            platformLogger("AuthRepositoryImpl", "User logged in: ${userCredential.user?.email}")
             val uid = userCredential.user?.uid
             if (uid != null) {
-                getCurrentUser()
+                platformLogger("AuthRepositoryImpl", "User UID: $uid")
                 sessionManager.setUid(uid)
-                Result.success(Unit)
+                Result.Success(Unit)
             } else {
-                Result.failure(Exception("Failed to login: UID is null"))
+                platformLogger("AuthRepositoryImpl", "Login failed: UID is null after authentication.")
+                Result.Failure(AuthError("Failed to login: UID is null after authentication."))
             }
-            Result.success(Unit)
+        } catch (e: FirebaseAuthException) {
+            platformLogger("AuthRepositoryImpl", "Login failed: ${e.message}")
+            Result.Failure(AuthError("Login failed: ${e.message}"))
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Failure(AuthError("An unexpected error occurred during login: ${e.message}"))
         }
     }
 
     override suspend fun logout() {
         auth.signOut()
         sessionManager.clearUserData()
+        sessionManager.hasSeenWelcome()
     }
 
-    override suspend fun updateUserProfile(user: User): Result<Unit> {
+    override suspend fun updateUserProfile(user: User): Result<Unit, AuthError> {
         return try {
             val userDto = user.toDto()
             firestore.collection("users").document(user.uid).set(userDto, merge = true)
-            Result.success(Unit)
+            Result.Success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Failure(AuthError("Failed to update user profile: ${e.message}"))
         }
     }
 }

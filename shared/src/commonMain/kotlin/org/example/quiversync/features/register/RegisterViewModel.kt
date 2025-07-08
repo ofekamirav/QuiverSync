@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.example.quiversync.features.BaseViewModel
+import org.example.quiversync.data.local.Result
 
 class RegisterViewModel(
     private val registerUseCases: RegisterUseCases
@@ -56,11 +57,13 @@ class RegisterViewModel(
                 email = currentState.data.email,
                 password = currentState.data.password
             )
-
-            result.onSuccess {
-                _registerState.value = RegisterState.Loaded
-            }.onFailure { exception ->
-                _registerState.value = RegisterState.Error(exception.message ?: "Registration failed")
+            when(result) {
+                is Result.Success -> {
+                    _registerState.value = RegisterState.Loaded
+                }
+                is Result.Failure -> {
+                    _registerState.value = RegisterState.Error(result.error.toString())
+                }
             }
         }
     }

@@ -2,6 +2,8 @@ package org.example.quiversync.base
 
 import android.app.Application
 import com.cloudinary.android.MediaManager
+import com.google.firebase.Firebase
+import com.google.firebase.initialize
 import org.example.quiversync.di.initKoin
 import org.example.quiversync.utils.AppConfig
 import org.koin.android.ext.koin.androidContext
@@ -14,7 +16,7 @@ class MyApplication: Application() {
             androidLogger()
             androidContext(this@MyApplication)
         }
-
+        Firebase.initialize(this)
         //Cloudinary
         val config = mapOf(
             "cloud_name" to AppConfig.cloudName

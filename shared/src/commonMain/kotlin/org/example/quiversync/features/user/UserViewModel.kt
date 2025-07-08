@@ -34,4 +34,12 @@ class UserViewModel(
             }
         }
     }
+
+    fun onLogout() {
+        scope.launch {
+            _uiState.value = UserState.Loading
+            userUseCases.logoutUseCase()
+        }
+    }
+
 }

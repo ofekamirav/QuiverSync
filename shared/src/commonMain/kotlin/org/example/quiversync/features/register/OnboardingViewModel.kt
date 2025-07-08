@@ -9,6 +9,7 @@ import org.example.quiversync.domain.model.SurfLevel
 import org.example.quiversync.domain.usecase.UploadImageUseCase
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.utils.extensions.platformLogger
+import org.example.quiversync.data.local.Result
 
 class OnboardingViewModel(
     private val registerUseCases: RegisterUseCases,
@@ -127,10 +128,23 @@ class OnboardingViewModel(
             )
 
             val result = registerUseCases.updateUserProfile(details)
-            result.onSuccess {
-                _onboardingState.value = OnboardingState.Success
-            }.onFailure { exception ->
-                _onboardingState.value = OnboardingState.Error(exception.message ?: "An unknown error occurred.")
+            when (result) {
+                is Result.Success -> {
+                    platformLogger(
+                        "OnboardingViewModel",
+                        "Profile updated successfully: ${details.profilePicture}"
+                    )
+                    _onboardingState.value = OnboardingState.Success
+                }
+
+                is Result.Failure -> {
+                    platformLogger(
+                        "OnboardingViewModel",
+                        "Error updating profile: ${result.error?.message}"
+                    )
+                    _onboardingState.value =
+                        OnboardingState.Error(result.error?.message ?: "Unknown error")
+                }
             }
         }
     }

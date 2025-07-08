@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.screens
 
+import android.widget.Toast
 import org.example.quiversync.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -24,23 +26,75 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.example.quiversync.features.login.LoginData
+import org.example.quiversync.features.login.LoginEvent
+import org.example.quiversync.features.login.LoginState
+import org.example.quiversync.features.login.LoginViewModel
+import org.example.quiversync.features.register.RegisterEvent
+import org.example.quiversync.features.register.RegisterState
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.presentation.components.CustomTextField
 import org.example.quiversync.presentation.components.GradientButton
+import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.components.SocialLoginButton
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
+import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun LoginScreen(
+    viewModel: LoginViewModel = koinViewModel(),
     onRegisterClick: () -> Unit = {},
-    onSignInClick: () -> Unit = {}
+    onSignInSuccess: () -> Unit = {}
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val uiState by viewModel.loginState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    val isDark = isSystemInDarkTheme()
+    when (val currentState = uiState) {
+        is LoginState.Loading -> {
+            LoginScreenContent(currentState = LoginState.Idle(LoginData()), isLoading = true, onRegisterClick = {}, onEvent = viewModel::onEvent)
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
+            }
+        }
+        is LoginState.Error -> {
+            LaunchedEffect(currentState) {
+                Toast.makeText(context, currentState.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
+        }
+        is LoginState.Loaded -> {
+            LaunchedEffect(Unit) {
+                onSignInSuccess()
+                Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
+                viewModel.resetState()
+            }
+        }
+        is LoginState.Idle -> {
+            LoginScreenContent(
+                onRegisterClick = onRegisterClick,
+                onEvent = viewModel::onEvent,
+                currentState = currentState,
+            )
+        }
+    }
+}
+
+
+@Composable
+fun LoginScreenContent(
+    currentState: LoginState.Idle,
+    onRegisterClick: () -> Unit = {},
+    onEvent: (LoginEvent) -> Unit = {},
+    isLoading: Boolean = false
+) {
+     val isDark = isSystemInDarkTheme()
 
     val backgroundBrush = Brush.verticalGradient(
         if (isDark) OceanPalette.LoginGradientDark else OceanPalette.LoginGradientLight
@@ -92,9 +146,11 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             CustomTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = currentState.data.email,
+                onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
                 label = "Email",
+                isError = currentState.data.emailError != null,
+                errorMessage = currentState.data.emailError,
                 leadingIcon = Icons.Default.MailOutline,
                 imeAction = ImeAction.Next,
                 keyboardType = KeyboardType.Email
@@ -103,10 +159,12 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             CustomTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = currentState.data.password,
+                onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
                 label = "Password",
                 leadingIcon = Icons.Default.Lock,
+                isError = currentState.data.passwordError != null,
+                errorMessage = currentState.data.passwordError,
                 isPassword = true,
                 imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Password
@@ -129,8 +187,8 @@ fun LoginScreen(
 
             GradientButton(
                 text = "Sign In",
-                onClick = { onSignInClick() },
-                modifier = Modifier.clickable { onSignInClick() },
+                onClick = { onEvent(LoginEvent.SignInClicked) },
+                enabled = !isLoading,
                 shape = RoundedCornerShape(16.dp)
             )
 

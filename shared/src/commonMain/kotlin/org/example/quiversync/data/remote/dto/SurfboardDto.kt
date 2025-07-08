@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SurfboardDto(
-    val id: String? = null,
     val ownerId: String? = null,
     val model: String? = null,
     val company: String? = null,

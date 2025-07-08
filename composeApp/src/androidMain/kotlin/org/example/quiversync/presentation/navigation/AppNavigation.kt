@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.navigation
 
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -47,10 +48,9 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
 
     LaunchedEffect(Unit) {
         val uid = sessionManager.getUid()
-        println( "AppNavigation: User ID from SessionManager: $uid")
+        Log.d("AppNavigation","User ID from SessionManager: $uid")
         isLoggedIn = uid != null
         hasSeenWelcome = sessionManager.hasSeenWelcome()
-        sessionManager.setWelcomeSeen()
     }
 
     if (isLoggedIn == null || hasSeenWelcome == null) {
@@ -165,7 +165,6 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 }
             }
         },
-        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -174,7 +173,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
         ) {
             composable(Screen.Login.route) {
                 LoginScreen(
-                    onSignInClick = {
+                    onSignInSuccess = {
                         isLoggedIn = true
                         navController.navigate(Screen.Home.route) {
                             popUpTo(0)
@@ -197,10 +196,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
             }
             composable(Screen.Home.route) {
                 HomeScreen(
-                    showWelcomeBottomSheetOnStart =  if (hasSeenWelcome == false) {
-                        hasSeenWelcome = true
-                        true
-                    } else false,
+                    showWelcomeBottomSheetOnStart = hasSeenWelcome == false,
                     modifier = Modifier.padding(innerPadding)
                 )
             }

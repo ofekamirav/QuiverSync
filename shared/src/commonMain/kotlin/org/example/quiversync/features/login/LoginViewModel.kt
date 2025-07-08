@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
 import org.example.quiversync.features.BaseViewModel
+import org.example.quiversync.data.local.Result
+import org.example.quiversync.utils.extensions.platformLogger
+
 
 class LoginViewModel (
     private val  loginUseCase : LoginUserUseCase
@@ -20,9 +23,8 @@ class LoginViewModel (
             }
             is LoginEvent.PasswordChanged -> {
                 updateState{it.copy(password = event.value, passwordError = null)}
-
             }
-            LoginEvent.SignUpClicked -> {
+            LoginEvent.SignInClicked -> {
                 validateAndLogin()
             }
         }
@@ -31,8 +33,8 @@ class LoginViewModel (
     private fun validateAndLogin(){
         val currentState = _loginState.value as? LoginState.Idle ?: return
 
-        val emailError = if (currentState.data.email.isBlank() && currentState.data.email =="") "Email is required" else null
-        val passwordError = if (currentState.data.password.isBlank() && currentState.data.password =="") "Password is required" else null
+        val emailError = if (!isEmailValid(currentState.data.email)) "Invalid email address" else null
+        val passwordError = validatePasswordStrength(currentState.data.password)
 
         val hasErrors = listOf( emailError, passwordError).any { it != null }
 
@@ -46,14 +48,18 @@ class LoginViewModel (
 
         scope.launch {
             _loginState.value = LoginState.Loading
+            platformLogger("LoginViewModel", "Logging in user with email: ${currentState.data.email}")
             val result = loginUseCase(
                 email = currentState.data.email,
                 password = currentState.data.password
             )
-            result.onSuccess {
-                _loginState.value = LoginState.Loaded
-            }.onFailure { error ->
-                _loginState.value = LoginState.Error(error.message ?: "Unknown error")
+            when(result){
+                is Result.Success -> {
+                    _loginState.emit(LoginState.Loaded)
+                }
+                is Result.Failure -> {
+                    val errorMessage = result.error?.message ?: "An unknown error occurred during login."
+                    _loginState.emit(LoginState.Error(errorMessage))                }
             }
         }
 
@@ -66,5 +72,21 @@ class LoginViewModel (
                 LoginState.Idle(update(currentState.data))
             }
         }
+    }
+
+    private fun isEmailValid(email: String): Boolean {
+        val regex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
+        return Regex(regex).matches(email)
+    }
+
+    private fun validatePasswordStrength(password: String): String? {
+        if (password.length < 6) return "Password must be at least 6 characters"
+        if (!password.any { it.isUpperCase() }) return "Password must contain at least one uppercase letter"
+        return null
+    }
+
+
+    fun resetState() {
+        _loginState.value = LoginState.Idle(LoginData())
     }
 }

@@ -88,7 +88,8 @@ fun QuiverContent(boards: List<Surfboard>, onAddClick: () -> Unit = {}, modifier
             Text(
                 text = "Add your first surfboard by clicking the button below.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }

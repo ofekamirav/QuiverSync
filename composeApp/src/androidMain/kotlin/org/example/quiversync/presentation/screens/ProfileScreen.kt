@@ -49,7 +49,10 @@ fun ProfileScreen(
             ProfileScreenContent(
                 modifier = modifier,
                 user = uiState.user,
-                onLogout = onLogout,
+                onLogout = {
+                    viewModel.onLogout()
+                    onLogout()
+                } ,
                 onEdit = onEdit
             )
         }
