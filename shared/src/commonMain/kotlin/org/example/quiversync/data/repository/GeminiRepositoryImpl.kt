@@ -1,10 +1,11 @@
 package org.example.quiversync.data.repository
 
+import kotlinx.datetime.toLocalDateTime
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.dao.GeminiPredictionDao
 import org.example.quiversync.data.remote.api.GeminiApi
 import org.example.quiversync.domain.model.FavoriteSpot
-import org.example.quiversync.domain.model.Prediction.GeminiPrediction
+import org.example.quiversync.domain.model.prediction.GeminiPrediction
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.domain.model.forecast.DailyForecast
@@ -15,7 +16,7 @@ class GeminiRepositoryImpl(
     private val dao: GeminiPredictionDao
 ) : GeminiRepository {
 
-    override suspend fun generateAndStoreBestBoardMatch(
+    override suspend fun generateSingleDayMatch(
         surfboards: List<Surfboard>,
         dailyForecast: DailyForecast,
         user: User
@@ -46,7 +47,7 @@ class GeminiRepositoryImpl(
         return try {
             val predictions = mutableListOf<GeminiPrediction>()
             for (forecast in weeklyForecast) {
-                when (val result = generateAndStoreBestBoardMatch(surfboards, forecast, user)) {
+                when (val result = generateSingleDayMatch(surfboards, forecast, user)) {
                     is Result.Failure -> return Result.Failure(result.error)
                     is Result.Success -> result.data?.let { predictions.add(it) }
                 }
@@ -71,6 +72,16 @@ class GeminiRepositoryImpl(
         }
     }
 
+    override suspend fun getBestBoardMatchForToday(spot: FavoriteSpot): Result<GeminiPrediction, TMDBError> {
+            val currentDate = kotlinx.datetime.Clock.System.now()
+                .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+                .date
+                .toString()
+            val match = dao.getTopMatch(currentDate, spot.spotLatitude, spot.spotLongitude)
+                ?: return Result.Failure(TMDBError("No match found for today at this spot"))
+            return Result.Success(match)
+    }
+
     override suspend fun getBestBoardMatchForWeek(
         latitude: Double,
         longitude: Double
@@ -80,11 +91,26 @@ class GeminiRepositoryImpl(
     }
 
     override suspend fun clearAllPredictions(
-        favoriteSpot: FavoriteSpot
+        latitude: Double,
+        longitude: Double
     ): Result<Unit, TMDBError> {
         return try {
-            dao.deleteBySpot(favoriteSpot.spotLatitude, favoriteSpot.spotLongitude)
+            dao.deleteBySpot(latitude, latitude)
             Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun getPredictionsForToday(): Result<List<GeminiPrediction>, TMDBError> {
+        return try {
+            val currentDate = kotlinx.datetime.Clock.System.now()
+                .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+                .date
+                .toString()
+            val predictions = dao.getPredictionsForToday(currentDate)
+            if (predictions.isNotEmpty()) Result.Success(predictions)
+            else Result.Failure(TMDBError("No predictions found for today"))
         } catch (e: Exception) {
             Result.Failure(TMDBError(e.message ?: "Unknown error"))
         }

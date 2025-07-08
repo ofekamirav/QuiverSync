@@ -12,7 +12,7 @@ import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.remote.dto.GeminiMatchResponse
 import org.example.quiversync.data.remote.dto.GeminiResponse
 import org.example.quiversync.data.repository.TMDBError
-import org.example.quiversync.domain.model.Prediction.GeminiPrediction
+import org.example.quiversync.domain.model.prediction.GeminiPrediction
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.domain.model.forecast.DailyForecast

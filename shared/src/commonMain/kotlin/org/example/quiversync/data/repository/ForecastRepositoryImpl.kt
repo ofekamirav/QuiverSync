@@ -1,25 +1,29 @@
 package org.example.quiversync.data.repository
 
+import kotlinx.datetime.toLocalDateTime
 import org.example.quiversync.QuiverSyncDatabase
 import org.example.quiversync.data.remote.api.StormGlassApi
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.domain.model.forecast.DailyForecast
-import org.example.quiversync.domain.model.forecast.WeeklyForecast
 import org.example.quiversync.domain.repository.ForecastRepository
 import org.example.quiversync.utils.Location
 import org.example.quiversync.utils.extensions.isOutsideRadius
 import org.example.quiversync.utils.extensions.toDailyForecast
+import org.example.quiversync.data.local.Result
+import org.example.quiversync.data.local.dao.GeminiPredictionDao
 
 class ForecastRepositoryImpl(
     private val api: StormGlassApi,
     private val database: QuiverSyncDatabase,
     private val sessionManager: SessionManager,
+    private val geminiPredictionDao: GeminiPredictionDao,
+
 ): ForecastRepository {
     private val queries = database.dailyForecastQueries
     override suspend fun getWeeklyForecast(
         latitude: Double,
         longitude: Double,
-    ): Result<WeeklyForecast> {
+    ): Result<List<DailyForecast>,TMDBError> {
         val howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne()
         val lastLocation = sessionManager.getLastLocation()
 
@@ -28,17 +32,19 @@ class ForecastRepositoryImpl(
         )
 
         if (isFar && howManyDaily < 7) {
+            queries.deleteBySpot(latitude, longitude)
+            geminiPredictionDao.deleteBySpot(latitude, longitude)
             val weeklyResult = api.getFiveDayForecast(latitude, longitude)
 
             if (weeklyResult.isFailure) {
-                return Result.failure(weeklyResult.exceptionOrNull() ?: Exception("Unknown error"))
+                return Result.Failure(TMDBError(weeklyResult.exceptionOrNull()?.message ?: "Unknown error"))
             }
 
             val weekly = weeklyResult.getOrNull()
-                ?: return Result.failure(Exception("No forecast returned"))
+                ?: return Result.Failure(TMDBError("Weekly forecast is null"))
 
             if (weekly.list.isEmpty()) {
-                return Result.failure(Exception("Empty forecast list"))
+                return Result.Failure(TMDBError("Empty forecast list"))
             }
 
             queries.deleteBySpot(latitude, longitude)
@@ -62,26 +68,44 @@ class ForecastRepositoryImpl(
         val localList = queries.selectAll().executeAsList().map { it.toDailyForecast() }
 
         return if (localList.isNotEmpty()) {
-            Result.success(WeeklyForecast(localList))
+            Result.Success(localList)
         } else {
-            Result.failure(Exception("No local forecast found"))
+            Result.Failure(TMDBError("No local forecast found"))
         }
     }
 
     override suspend fun getDailyForecastByDateAndSpot(
         latitude: Double,
-        longitude: Double,
-        date: String,
-    ): Result<DailyForecast?> {
+        longitude: Double
+    ): Result<DailyForecast, TMDBError> {
+        val date = kotlinx.datetime.Clock.System.now()
+            .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+            .date
+            .toString()
         val howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne()
-        if( howManyDaily < 4) {
+        if(howManyDaily < 4) {
             // If we have less than 4 days, we need to fetch the weekly forecast again
             val weeklyResult = getWeeklyForecast(latitude, longitude)
-            if (weeklyResult.isFailure) {
-                return Result.failure(weeklyResult.exceptionOrNull() ?: Exception("Unknown error"))
+            if (weeklyResult is Result.Failure) {
+                return Result.Failure(TMDBError("Unknown error"))
             }
         }
         val local = queries.selectToday(date, latitude, longitude).executeAsOneOrNull()
-        return Result.success(local?.toDailyForecast())    }
+        return Result.Success(local?.toDailyForecast())
+    }
+
+    override suspend fun deleteOutDateForecast(): Result<Unit, TMDBError> {
+        try {
+            val currentDate = kotlinx.datetime.Clock.System.now()
+                .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+                .date
+                .toString()
+            queries.deleteForecastsOlderThan(currentDate)
+            return Result.Success(Unit)
+        } catch (e: Exception) {
+            return Result.Failure(TMDBError("Error updating forecast: ${e.message ?: "Unknown error"}"))
+        }
+    }
+
 
 }

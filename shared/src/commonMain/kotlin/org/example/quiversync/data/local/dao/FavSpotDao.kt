@@ -42,6 +42,8 @@ data class FavSpotDao(private val db: QuiverSyncDatabase) {
         queries.deleteAllFavSpots()
     }
 
+    fun
+
 
 
 }

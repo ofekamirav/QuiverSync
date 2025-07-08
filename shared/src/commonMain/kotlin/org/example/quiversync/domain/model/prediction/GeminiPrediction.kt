@@ -1,10 +1,10 @@
-package org.example.quiversync.domain.model.Prediction
+package org.example.quiversync.domain.model.prediction
 
 data class GeminiPrediction(
     val forecastLatitude: Double,//forecast id && spotID
     val forecastLongitude: Double,//forecast id
-    val forecastDate: String,
+    val date: String,
     val surfboardID: String,
-    val score: Long,
+    val score: Int,
     val description: String
 )

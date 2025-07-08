@@ -15,7 +15,7 @@ WHERE forecastDate = ?
   AND forecastLongitude = ?;
 
 INSERT_BEST_MATCH:
-INSERT INTO GeminiPredictionEntity(
+INSERT OR REPLACE INTO GeminiPredictionEntity(
     surfboardID, forecastDate, forecastLatitude, forecastLongitude, score , description
 ) VALUES (  ?, ?, ?,?,? ,?);
 
@@ -25,6 +25,10 @@ WHERE forecastDate = ?
   AND forecastLatitude = ?
   AND forecastLongitude = ?
 LIMIT 1;
+
+GET_PREDICTIONS_BY_DATE:
+SELECT * FROM GeminiPredictionEntity
+WHERE forecastDate = ?;
 
 deleteMatchesBySpot:
 DELETE FROM GeminiPredictionEntity

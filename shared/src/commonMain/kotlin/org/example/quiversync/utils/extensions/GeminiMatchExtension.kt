@@ -1,7 +1,7 @@
 package org.example.quiversync.utils.extensions
 
 import org.example.quiversync.GeminiPredictionEntity
-import org.example.quiversync.domain.model.Prediction.GeminiPrediction
+import org.example.quiversync.domain.model.prediction.GeminiPrediction
 
 fun GeminiPredictionEntity.toGeminiMatch(): GeminiPrediction {
     return GeminiPrediction(

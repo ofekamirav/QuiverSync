@@ -9,7 +9,7 @@
 import SwiftUI
 import Shared
 
-public struct ForecastResults: View {
+public struct FavSpotsScreen: View {
     
     @ObservedObject private(set) var viewModel = FavSpotsViewModelWrapper()
     
@@ -32,23 +32,4 @@ public struct ForecastResults: View {
 
 
 
-extension ForecastResults {
-    @MainActor
-    class FavSpotsViewModelWrapper : ObservableObject{
-        let viewModel: FavSpotsViewModel
-        @Published var uiState: FavSpotsState
-        
-        init(){
-            self.viewModel = KoinKt.favSpotsViewModel()
-            self.uiState = viewModel.uiState.value
-        }
-        
-        func startObserving(){
-            Task{
-                for await state in viewModel.uiState{
-                    self.uiState = state
-                }
-            }
-        }
-    }
-}
+

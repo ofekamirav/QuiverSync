@@ -19,8 +19,8 @@
 //import org.example.quiversync.domain.model.FavoriteSpot
 //import org.example.quiversync.domain.model.FavoriteSpots
 //import org.example.quiversync.features.quiver.QuiverState
-//import org.example.quiversync.features.spots.FavSpotsState
-//import org.example.quiversync.features.spots.FavSpotsViewModel
+//import org.example.quiversync.features.spots.FavSpotMainPage.FavSpotsState
+//import org.example.quiversync.features.spots.FavSpotMainPage.FavSpotsViewModel
 //import org.example.quiversync.presentation.components.ErrorContent
 //import org.example.quiversync.presentation.screens.quiver.QuiverContent
 //import org.example.quiversync.presentation.screens.skeletons.FavoriteSpotsScreenSkeleton

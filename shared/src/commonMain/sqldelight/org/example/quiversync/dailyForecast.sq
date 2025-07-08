@@ -13,6 +13,10 @@ CREATE TABLE DailyForecastEntity (
 selectAll:
 SELECT * FROM DailyForecastEntity;
 
+deleteForecastsOlderThan:
+DELETE FROM DailyForecastEntity
+WHERE date < ?;
+
 insertOrReplace:
 INSERT OR REPLACE INTO DailyForecastEntity(
     date, latitude, longitude, waveHeight, windSpeed, windDirection, swellPeriod, swellDirection
