@@ -50,21 +50,27 @@ import org.example.quiversync.domain.usecase.quiver.PublishSurfboardToRentalUseC
 import org.example.quiversync.domain.usecase.quiver.SetSurfboardAsAvailableForRental
 import org.example.quiversync.domain.usecase.quiver.SetSurfboardAsUnavailableUseCase
 import org.example.quiversync.domain.usecase.quiver.UnpublishSurfboardFromRentalUseCase
+import org.example.quiversync.domain.usecase.user.CheckUserAuthMethodUseCase
 import org.example.quiversync.domain.usecase.user.GetBoardsNumberUseCase
 import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
 import org.example.quiversync.domain.usecase.user.LogoutUseCase
+import org.example.quiversync.domain.usecase.user.UpdatePasswordUseCase
+import org.example.quiversync.domain.usecase.user.UpdateProfileDetailsUseCase
 import org.example.quiversync.features.home.HomeUseCases
-import org.example.quiversync.features.quiver.BoardEventBus
 import org.example.quiversync.features.quiver.QuiverUseCases
 import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.features.quiver.add_board.AddBoardViewModel
 import org.example.quiversync.features.register.OnboardingViewModel
 import org.example.quiversync.features.register.RegisterUseCases
 import org.example.quiversync.features.register.RegisterViewModel
+import org.example.quiversync.features.settings.SecurityAndPrivacyViewModel
+import org.example.quiversync.features.settings.SettingsViewModel
 import org.example.quiversync.features.user.UserUseCases
 import org.example.quiversync.features.user.UserViewModel
+import org.example.quiversync.features.user.edit_user.EditProfileDetailsViewModel
+import org.example.quiversync.utils.event.EventBus
 import org.koin.core.module.dsl.viewModelOf
 
 
@@ -94,10 +100,12 @@ val commonModule= module {
    single{ GeminiApi(get()) }
    single{ StormGlassApi(get()) }
 
+
    single<SessionManager> { SessionManager(get()) }
 
    // SharedFlow / Event Bus
-   single { BoardEventBus }
+   single { EventBus }
+
 
 
    //-----------------------------------------------------Repositories---------------------------------------------
@@ -120,14 +128,19 @@ val commonModule= module {
 
 
    //---------------------------------------------------UseCases--------------------------------------------
+   //User UseCases
    single { RegisterUserUseCase(get()) }
    single { UpdateUserProfileUseCase(get()) }
    single { UploadImageUseCase(get()) }
+    single { UpdateProfileDetailsUseCase(get()) }
    single { GetWeeklyForecastByLocationUseCase(get(), get()) }
    single { GetWeeklyForecastBySpotUseCase(get()) }
    single { GetUserProfileUseCase(get()) }
    single { LogoutUseCase(get()) }
    single { LoginUserUseCase(get()) }
+   single { CheckUserAuthMethodUseCase(get()) }
+   single { UpdatePasswordUseCase(get()) }
+
    //Quiver UseCases
    single { AddBoardUseCase(get()) }
    single { GetMyQuiverUseCase(get()) }
@@ -151,10 +164,14 @@ val commonModule= module {
    }
    single{
       UserUseCases(
-            getUserProfileUseCase = get(),
-            updateUserProfileUseCase = get(),
-            logoutUseCase = get(),
-            getBoardsNumberUseCase = get()
+          getUserProfileUseCase = get(),
+          updateUserProfileUseCase = get(),
+          logoutUseCase = get(),
+          getBoardsNumberUseCase = get(),
+          uploadImageUseCase = get(),
+          updateProfileDetailsUseCase = get(),
+          checkUserAuthMethod = get(),
+          updatePasswordUseCase = get()
       )
    }
    single {
@@ -175,8 +192,12 @@ val commonModule= module {
    single { HomeViewModel(get()) }
    single { LoginViewModel(get()) }
    single { OnboardingViewModel(get(), get()) }
-   single { QuiverViewModel(get(),get()) }
-   single { AddBoardViewModel(get(), get(), get()) }
+   single { QuiverViewModel(get()) }
+   single { AddBoardViewModel(get(), get()) }
+   single { SettingsViewModel(get()) }
+   single { EditProfileDetailsViewModel(get()) }
+   single { SecurityAndPrivacyViewModel(get()) }
+
 
 
 }

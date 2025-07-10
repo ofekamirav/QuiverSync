@@ -70,7 +70,7 @@ fun QuiverScreen(
 @Composable
 fun QuiverContent(boards: List<Surfboard>, onEvent: (QuiverEvent) -> Unit = {}, onAddClick: () -> Unit = {}, modifier: Modifier, boardToPublish: Surfboard?) {
     var selectedBoard by remember { mutableStateOf<Surfboard?>(null) }
-    var toggledSurfboard by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
+    var boardToDelete by remember { mutableStateOf<Surfboard?>(null) }
 
 
     Box(
@@ -145,15 +145,22 @@ fun QuiverContent(boards: List<Surfboard>, onEvent: (QuiverEvent) -> Unit = {}, 
         SurfboardDetailDialog(
             board = it,
             visible = true,
+            onDelete = { surfboardToDelete -> boardToDelete = surfboardToDelete },
             onDismiss = { selectedBoard = null },
-            onDelete = {
-                CustomDialog(
-                    title = "Delete Surfboard",
-                    message = "Are you sure you want to delete this surfboard?",
-                    onConfirm = { onEvent(QuiverEvent.onDeleteClick(it.id)) },
-                    onDismiss = { selectedBoard = null }
-                )
+        )
+    }
+    boardToDelete?.let { surfboard ->
+        CustomDialog(
+            title = "Delete Surfboard",
+            message = "Are you sure you want to delete the surfboard: '${surfboard.model}'?",
+            onDismiss = { boardToDelete = null },
+            onConfirm = {
+                onEvent(QuiverEvent.onDeleteClick(surfboard.id))
+                selectedBoard = null
+                boardToDelete = null
             },
+            confirmText = "Delete",
+            cancelText = "Cancel",
         )
     }
 

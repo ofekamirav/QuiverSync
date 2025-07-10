@@ -2,17 +2,19 @@ package org.example.quiversync.features.quiver
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.remote.dto.RentalPublishDetails
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.features.BaseViewModel
+import org.example.quiversync.utils.event.AppEvent
+import org.example.quiversync.utils.event.EventBus
 import org.example.quiversync.utils.extensions.platformLogger
 
 
 class QuiverViewModel(
-    private val quiverUseCases: QuiverUseCases,
-    private val boardEventBus: BoardEventBus
+    private val quiverUseCases: QuiverUseCases
 ): BaseViewModel() {
     private val _uiState = MutableStateFlow<QuiverState>(QuiverState.Loading)
     val uiState: StateFlow<QuiverState> get() = _uiState
@@ -23,12 +25,13 @@ class QuiverViewModel(
     init {
         fetchQuiver()
         scope.launch {
-            boardEventBus.events.collect { event ->
-                when (event) {
-                    BoardAddedEvent -> {
-                        platformLogger("QuiverViewModel", "BoardAddedEvent received, refetching quiver.")
-                        fetchQuiver()
-                    }
+            EventBus.events.collect { event ->
+                if (event is AppEvent.BoardAdded) {
+                    platformLogger(
+                        "QuiverViewModel",
+                        "Received BoardAdded event, refreshing quiver."
+                    )
+                    fetchQuiver() // Refresh the quiver when a board is added
                 }
             }
         }

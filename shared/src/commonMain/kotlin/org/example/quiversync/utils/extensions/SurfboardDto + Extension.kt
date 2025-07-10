@@ -3,6 +3,7 @@ package org.example.quiversync.utils.extensions
 import org.example.quiversync.SurfboardEntity
 import org.example.quiversync.data.remote.dto.SurfboardDto
 import org.example.quiversync.domain.model.FinsSetup
+import org.example.quiversync.domain.model.SurfLevel
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.SurfboardType
 
@@ -147,6 +148,15 @@ fun String.toSurfboardType(): SurfboardType {
         "Funboard" -> SurfboardType.FUNBOARD
         "Softboard" -> SurfboardType.SOFTBOARD
         else -> throw IllegalArgumentException("Unknown surfboard type: $this")
+    }
+}
+
+fun String.toSurfLevel(): SurfLevel {
+    return when (this) {
+        "Beginner" -> SurfLevel.BEGINNER
+        "Intermediate" -> SurfLevel.INTERMEDIATE
+        "Pro" -> SurfLevel.PRO
+        else -> throw IllegalArgumentException("Unknown surf level: $this")
     }
 }
 

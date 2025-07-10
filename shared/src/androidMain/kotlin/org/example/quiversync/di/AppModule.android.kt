@@ -23,9 +23,4 @@ actual val platformModule: Module = module {
     single { SessionManager(androidContext()) }
     single<SqlDriver> { DatabaseDriverFactory(androidContext()).createDriver() }
 
-    //GPS Sensor maybe also here
-    //Dao and ROOM here
-
-    //add all the viewmodels
-    //viewModelOf(::QuiverViewModel)
 }

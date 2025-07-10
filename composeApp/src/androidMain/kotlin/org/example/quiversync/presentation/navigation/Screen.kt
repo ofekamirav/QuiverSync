@@ -16,6 +16,10 @@ sealed class Screen(
     object Rentals : Screen("rentals_screen", "Rentals", true)
     object Quiver : Screen("quiver_screen", "My Quiver", true)
     object Profile : Screen("profile_screen", "Profile", true)
+    object Settings: Screen("settings_screen", "Settings")
+    object EditProfile : Screen("edit_profile_screen", "Edit Profile")
+    object SecurityAndPrivacy : Screen("security_and_privacy_screen", "Security & Privacy")
+
 
     object AddSpot : Screen("add_spot_screen", "Add Spot")
     object AddSurfboard : Screen("add_surfboard_screen", "Add Surfboard")

@@ -52,18 +52,22 @@ class OnboardingViewModel(
 
                 val updatedIdleState = _onboardingState.value as? OnboardingState.Idle ?: return@launch
 
-                result.onSuccess { imageUrl ->
-                    _onboardingState.value = updatedIdleState.copy(
-                        isUploadingImage = false,
-                        profileImageUrl = imageUrl
-                    )
-                    platformLogger("OnboardingViewModel","Success: $imageUrl")
-                }.onFailure { error ->
-                    _onboardingState.value = updatedIdleState.copy(
-                        isUploadingImage = false,
-                        imageUploadError = "Upload failed: ${error.message}"
-                    )
-                    platformLogger("OnboardingViewModel","Error: ${error.message}")
+                when (result) {
+                    is Result.Success -> {
+                        _onboardingState.value = updatedIdleState.copy(
+                            isUploadingImage = false,
+                            profileImageUrl = result.data,
+                        )
+                        platformLogger("OnboardingViewModel", "Image uploaded successfully: ${result.data}")
+                    }
+                    is Result.Failure -> {
+                        platformLogger("OnboardingViewModel", "Image upload failed: ${result.error?.message}")
+                        _onboardingState.value = updatedIdleState.copy(
+                            isUploadingImage = false,
+                            imageUploadError = "Upload failed: ${result.error?.message}"
+                        )
+                        return@launch
+                    }
                 }
 
             } catch (e: Exception) {
@@ -134,7 +138,7 @@ class OnboardingViewModel(
                         "OnboardingViewModel",
                         "Profile updated successfully: ${details.profilePicture}"
                     )
-                    _onboardingState.value = OnboardingState.Success
+                    _onboardingState.emit(OnboardingState.Success)
                 }
 
                 is Result.Failure -> {
@@ -142,8 +146,7 @@ class OnboardingViewModel(
                         "OnboardingViewModel",
                         "Error updating profile: ${result.error?.message}"
                     )
-                    _onboardingState.value =
-                        OnboardingState.Error(result.error?.message ?: "Unknown error")
+                    _onboardingState.emit(OnboardingState.Error(result.error?.message ?: "Unknown error"))
                 }
             }
         }

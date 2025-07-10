@@ -39,7 +39,9 @@ import org.example.quiversync.features.user.UserState
 import org.example.quiversync.presentation.theme.OceanPalette
 
 @Composable
-fun ProfileHeader(userState: UserState){
+fun ProfileHeader(
+    userState: UserState
+){
     val user = (userState as UserState.Loaded).user
     val boards = (userState as UserState.Loaded).boards
     // Avatar & Name
@@ -54,22 +56,6 @@ fun ProfileHeader(userState: UserState){
                     .size(110.dp)
                     .clip(CircleShape)
             )
-            IconButton(
-                onClick = { /* change photo */ },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset(x = 4.dp, y = 4.dp)
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Change Photo",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))

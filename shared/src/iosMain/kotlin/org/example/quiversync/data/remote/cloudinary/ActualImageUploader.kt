@@ -9,7 +9,10 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import org.example.quiversync.BuildKonfig
+import org.example.quiversync.data.local.Error
 import org.example.quiversync.utils.extensions.platformLogger
+import org.example.quiversync.data.local.Result
+import org.example.quiversync.domain.model.CloudinaryError
 
 class ActualImageUploader(private val client: HttpClient) : ImageUploader {
 
@@ -17,7 +20,7 @@ class ActualImageUploader(private val client: HttpClient) : ImageUploader {
         bytes: ByteArray,
         fileName: String,
         folder: String
-    ): Result<String> {
+    ): Result<String, Error> {
         val cloudName = BuildKonfig.CLOUD_NAME
         val uploadPreset = BuildKonfig.UPLOAD_PRESET
         val url = "https://api.cloudinary.com/v1_1/$cloudName/image/upload"
@@ -41,15 +44,15 @@ class ActualImageUploader(private val client: HttpClient) : ImageUploader {
             if (response.status.isSuccess()) {
                 val responseBody = response.body<CloudinaryUploadResponse>()
                 platformLogger("ActualImageUploader(iOS)", "Image uploaded successfully: ${responseBody.secureUrl}")
-                Result.success(responseBody.secureUrl)
+                Result.Success(responseBody.secureUrl)
             } else {
                 val errorBody = response.body<String>()
                 platformLogger("ActualImageUploader(iOS)", "Image upload failed: ${response.status} - $errorBody")
-                Result.failure(Exception("Ktor/Darwin upload failed: ${response.status} - $errorBody"))
+                Result.Failure(CloudinaryError("Ktor/Darwin upload failed: ${response.status} - $errorBody"))
             }
         } catch (e: Exception) {
             platformLogger("ActualImageUploader(iOS)", "Image upload failed: ${e.message}")
-            Result.failure(e)
+            Result.Failure(CloudinaryError("Ktor/Darwin upload failed: ${e.message ?: "Unknown error"}"))
         }
     }
 }

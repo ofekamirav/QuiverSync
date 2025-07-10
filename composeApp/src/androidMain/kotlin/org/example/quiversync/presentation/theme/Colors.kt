@@ -11,6 +11,7 @@ object OceanPalette {
     val background = Color(0xFFF5F5F5)
     val SandOrange = Color(0xFFFFA726)
     val TextDark = Color(0xFF263238)
+    val LightShimmerText = Color(0xFFE0E0E0)
     val BorderGray = Color(0xFFE0E0E0)
     val error = Color(0xFFD35C5C)
 

@@ -233,11 +233,13 @@ fun CompleteRegisterScreen(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                SurfLevelSelector(
-                    selectedLevel = state.selectedSurfLevel,
-                    onLevelSelected = { onEvent(OnboardingEvent.SurfLevelChanged(it)) },
-                    errorMessage = state.surfLevelError
-                )
+                state.selectedSurfLevel?.let {
+                    SurfLevelSelector(
+                        selectedLevel = it,
+                        onLevelSelected = { onEvent(OnboardingEvent.SurfLevelChanged(it)) },
+                        errorMessage = state.surfLevelError
+                    )
+                }
                 Spacer(modifier = Modifier.height(12.dp))
                 ImagePickerSection(
                     imageUrl = state.profileImageUrl,

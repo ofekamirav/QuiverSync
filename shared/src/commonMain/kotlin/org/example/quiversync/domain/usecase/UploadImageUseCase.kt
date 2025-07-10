@@ -1,10 +1,12 @@
 package org.example.quiversync.domain.usecase
 
 import kotlinx.datetime.Clock
+import org.example.quiversync.data.local.Error
+import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.remote.cloudinary.ImageUploader
 
 class UploadImageUseCase( private val imageUploader: ImageUploader) {
-    suspend operator fun invoke(bytes: ByteArray, folder: Folder): Result<String> {
+    suspend operator fun invoke(bytes: ByteArray, folder: Folder): Result<String, Error> {
         val timestamp = Clock.System.now().toEpochMilliseconds()
         val uniqueFileName = "${folder.folderName}_${timestamp}.jpg"
         return imageUploader.uploadImage(

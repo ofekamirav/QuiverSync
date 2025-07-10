@@ -1,5 +1,6 @@
 package org.example.quiversync.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import org.example.quiversync.data.local.Error
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.data.local.Result
