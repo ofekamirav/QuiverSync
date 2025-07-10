@@ -10,13 +10,12 @@ import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.data.local.Result
-import org.example.quiversync.features.quiver.BoardEventBus
+import org.example.quiversync.utils.event.AppEvent
+import org.example.quiversync.utils.event.EventBus
 
 class AddBoardViewModel(
     private val addBoardUseCase: AddBoardUseCase,
     private val uploadSurfboardImageUseCase: UploadImageUseCase,
-    private val boardEventBus: BoardEventBus,
-
     ): BaseViewModel() {
     private val _uiState = MutableStateFlow<AddBoardState>(AddBoardState.Idle(AddBoardFormData()))
     val uiState: StateFlow<AddBoardState> get() = _uiState
@@ -84,7 +83,7 @@ class AddBoardViewModel(
                         when(result){
                             is Result.Success -> {
                                 result.data?.let { _uiState.emit(AddBoardState.Loaded) }
-                                boardEventBus.emitBoardAdded()
+                                EventBus.postEvent(AppEvent.BoardAdded)
                                 platformLogger("AddBoardViewModel", "Surfboard added successfully")
                             }
                             is Result.Failure -> {
@@ -123,20 +122,23 @@ class AddBoardViewModel(
 
                 val updatedIdleState = _uiState.value as? AddBoardState.Idle ?: return@launch
 
-                result.onSuccess { imageUrl ->
-                    _uiState.value = updatedIdleState.copy(data = updatedIdleState.data.copy(
-                        isUploadingImage = false,
-                        surfboardImageError = null,
-                        imageUrl = imageUrl
-                    ))
-                    platformLogger("AddBoardViewModel","Success: $imageUrl")
-                }.onFailure { error ->
-                    _uiState.value = updatedIdleState.copy(data = updatedIdleState.data.copy(
-                        isUploadingImage = false,
-                        imageUploadError = "Upload failed: ${error.message}"
-                    ))
-                    platformLogger("AddBoardViewModel","Error: ${error.message}")
-                }
+               when(result){
+                    is Result.Success -> {
+                        _uiState.value = updatedIdleState.copy(data = updatedIdleState.data.copy(
+                            imageUrl = result.data,
+                            imageUploadError = null,
+                            isUploadingImage = false
+                        ))
+                        platformLogger("AddBoardViewModel", "Image uploaded successfully: ${result.data}")
+                    }
+                    is Result.Failure -> {
+                        platformLogger("AddBoardViewModel", "Image upload failed: ${result.error?.message}")
+                        _uiState.value = updatedIdleState.copy(data = updatedIdleState.data.copy(
+                            imageUploadError = "Upload failed: ${result.error?.message}",
+                            isUploadingImage = false
+                        ))
+                    }
+               }
 
             } catch (e: Exception) {
                 val fallbackIdle = _uiState.value as? AddBoardState.Idle ?: return@launch

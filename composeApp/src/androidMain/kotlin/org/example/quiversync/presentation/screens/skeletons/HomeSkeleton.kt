@@ -108,10 +108,10 @@ fun HomeSkeleton(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true, name = "Skeleton - Dark Mode", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true,)
 @Composable
-fun HomeScreenSkeletonPreviewDark() {
-    QuiverSyncTheme(darkTheme = true) {
+fun HomeScreenSkeletonPreview() {
+    QuiverSyncTheme() {
         HomeSkeleton()
     }
 }

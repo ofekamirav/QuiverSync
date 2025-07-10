@@ -25,7 +25,7 @@ import org.example.quiversync.presentation.theme.OceanPalette
 
 @Composable
 fun SurfLevelSelector(
-    selectedLevel: SurfLevel?,
+    selectedLevel: SurfLevel,
     onLevelSelected: (SurfLevel) -> Unit,
     errorMessage: String? = null
 ) {
@@ -42,7 +42,7 @@ fun SurfLevelSelector(
             modifier = Modifier.fillMaxWidth()
         ) {
             SurfLevel.entries.forEach { level ->
-                val isSelected = level == selectedLevel
+                val isSelected = (level == selectedLevel)
                 ElevatedAssistChip(
                     onClick = { onLevelSelected(level) },
                     label = {

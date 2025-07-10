@@ -25,7 +25,7 @@ fun UserDetailsSection(user: User){
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(cardColor)
-            .padding(vertical = 12.dp)
+            .padding(vertical = 8.dp)
     ) {
         UserDetailItem(R.drawable.ic_mail, "Email", user.email)
         Divider(color = Color(0xFFE0E0E0), thickness = 0.5.dp)

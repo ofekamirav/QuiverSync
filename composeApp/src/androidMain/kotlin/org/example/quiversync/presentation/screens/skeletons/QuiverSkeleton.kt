@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,8 +25,7 @@ import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.ShimmerBrush
 
 @Composable
-fun BoardCardSkeleton() {
-    val shimmerBrush = ShimmerBrush(baseColor = Color(0xFFE0E0E0))
+fun BoardCardSkeleton(shimmerBrush: Brush) {
 
     Card(
         modifier = Modifier
@@ -73,6 +73,9 @@ fun BoardCardSkeleton() {
 }
 @Composable
 fun QuiverScreenSkeleton(modifier: Modifier = Modifier) {
+    val isDark = isSystemInDarkTheme()
+    val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
+    val brush = ShimmerBrush(baseColor = baseShimmerColor)
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -85,7 +88,7 @@ fun QuiverScreenSkeleton(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(6) {
-                BoardCardSkeleton()
+                BoardCardSkeleton(brush)
             }
         }
     }

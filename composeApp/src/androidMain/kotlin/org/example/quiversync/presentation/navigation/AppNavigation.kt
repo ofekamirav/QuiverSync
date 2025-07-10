@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,15 +29,16 @@ import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.screens.LoginScreen
-import org.example.quiversync.presentation.screens.ProfileScreen
+import org.example.quiversync.presentation.screens.profile.ProfileScreen
 import org.example.quiversync.presentation.screens.register.RegisterScreen
 import org.example.quiversync.presentation.screens.home.HomeScreen
 import org.example.quiversync.presentation.screens.quiver.QuiverScreen
-import org.example.quiversync.presentation.screens.quiver.add_board.AddSurfboardFlowScreen
 import org.example.quiversync.presentation.screens.quiver.add_board.AddSurfboardScreen
-import org.example.quiversync.presentation.screens.register.CompleteRegisterScreen
 import org.example.quiversync.presentation.screens.register.OnboardingScreen
 import org.example.quiversync.presentation.screens.rentals.RentalsHubScreen
+import org.example.quiversync.presentation.screens.settings.EditProfileDetailsScreen
+import org.example.quiversync.presentation.screens.settings.SecurityAndPrivacyScreen
+import org.example.quiversync.presentation.screens.settings.SettingsScreen
 import org.example.quiversync.presentation.screens.spots.FavoriteSpotsScreen
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.utils.LocalWindowInfo
@@ -101,6 +106,8 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val hideTopBarRoutes = listOf(Screen.Login.route, Screen.Register.route, Screen.CompleteRegister.route)
+    val navigationIconRoutes = listOf(Screen.AddSurfboard.route, Screen.Settings.route, Screen.AddSpot.route, Screen.EditProfile.route, Screen.SecurityAndPrivacy.route)
+    val showNavigationIcon = currentRoute in navigationIconRoutes
     val showTopBar = currentRoute !in hideTopBarRoutes
     val currentScreen = Screen::class.sealedSubclasses
         .mapNotNull { it.objectInstance }
@@ -127,7 +134,34 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                         titleContentColor = MaterialTheme.colorScheme.primary,
                         navigationIconContentColor = MaterialTheme.colorScheme.primary
                     ),
-                    modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+                    modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
+                    actions = {
+                        if (currentRoute == Screen.Profile.route) {
+                            IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Settings",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    },
+                    navigationIcon = {
+                        if (showNavigationIcon) {
+                            IconButton(
+                                onClick = {
+                                    navController.popBackStack()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                    }
                 )
             } else null
         },
@@ -217,14 +251,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    onLogout = {
-                        isLoggedIn = false
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0)
-                        }
-
-                    }
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
             composable(Screen.AddSurfboard.route) {
@@ -247,6 +274,44 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                         navController.navigate(Screen.Home.route) {
                             popUpTo(0)
                         }
+                    }
+                )
+            }
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    onEditProfile = {
+                        navController.navigate(Screen.EditProfile.route)
+                    },
+                    onSecuritySettings = {
+                        navController.navigate(Screen.SecurityAndPrivacy.route)
+                    },
+                    onNotificationsSettings = {
+                        //navController.navigate(Screen.NotificationsSettings.route)
+                    },
+                    onHelpSupport = {},
+                    onLogout = {
+                        isLoggedIn = false
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0)
+                        }
+                    },
+                )
+            }
+
+            composable(Screen.EditProfile.route) {
+                EditProfileDetailsScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    onSave = {
+                        navController.popBackStack()
+                    },
+                )
+            }
+            composable(Screen.SecurityAndPrivacy.route) {
+                SecurityAndPrivacyScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    onSuccess = {
+                        navController.popBackStack()
                     }
                 )
             }

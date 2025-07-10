@@ -2,12 +2,15 @@ package org.example.quiversync.features.user
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.example.quiversync.data.local.Error
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.features.BaseViewModel
+import org.example.quiversync.utils.event.AppEvent
+import org.example.quiversync.utils.event.EventBus
 
 
 class UserViewModel(
@@ -20,6 +23,7 @@ class UserViewModel(
 
     init {
         fetchUser()
+        listenForProfileUpdates()
     }
 
     fun fetchUser() {
@@ -41,10 +45,13 @@ class UserViewModel(
         }
     }
 
-    fun onLogout() {
+    private fun listenForProfileUpdates() {
         scope.launch {
-            _uiState.value = UserState.Loading
-            userUseCases.logoutUseCase()
+            EventBus.events.collect { event ->
+                if (event is AppEvent.ProfileUpdated) {
+                    fetchUser()
+                }
+            }
         }
     }
 

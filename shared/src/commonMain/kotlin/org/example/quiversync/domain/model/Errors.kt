@@ -19,3 +19,8 @@ data class SurfboardError(
 data class UserError(
     override val message: String
 ): Error
+
+@Serializable
+data class CloudinaryError(
+    override val message: String
+): Error

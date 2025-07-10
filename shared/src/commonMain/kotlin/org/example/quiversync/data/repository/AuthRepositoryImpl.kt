@@ -1,8 +1,10 @@
 package org.example.quiversync.data.repository
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.EmailAuthProvider
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseAuthException
+import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.FirebaseFirestoreException
@@ -111,6 +113,51 @@ class AuthRepositoryImpl(
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Failure(AuthError("Failed to update user profile: ${e.message}"))
+        }
+    }
+
+    override suspend fun isUserSignedInWithPassword(): Boolean {
+        return try {
+            val user = auth.currentUser
+            if (user != null) {
+                // Check if the user is signed in with email/password
+                val providerData = user.providerData
+                providerData.any { it.providerId == "password" }
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            platformLogger("AuthRepositoryImpl", "Error checking user sign-in method: ${e.message}")
+            false
+        }
+    }
+
+    override suspend fun reauthenticate(password: String): Result<Unit, Error> {
+        val user = auth.currentUser
+        val email = user?.email
+
+        if (user == null || email.isNullOrEmpty()) {
+            return Result.Failure(AuthError("User not logged in."))
+        }
+
+        return try {
+            val credential = EmailAuthProvider.credential(email, password)
+            user.reauthenticate(credential)
+            Result.Success(Unit)
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            Result.Failure(AuthError("The password you entered is incorrect."))
+        } catch (e: Exception) {
+            Result.Failure(AuthError("Re-authentication failed: ${e.message}"))
+        }
+    }
+    override suspend fun updatePassword(newPassword: String): Result<Unit, Error> {
+        val user = auth.currentUser ?: return Result.Failure(AuthError("User not logged in."))
+
+        return try {
+            user.updatePassword(newPassword)
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Failure(AuthError("Failed to update password: ${e.message}"))
         }
     }
 }

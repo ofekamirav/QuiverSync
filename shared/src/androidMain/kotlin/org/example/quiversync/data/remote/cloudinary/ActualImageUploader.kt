@@ -6,13 +6,16 @@ import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.example.quiversync.BuildKonfig
+import org.example.quiversync.data.local.Error
+import org.example.quiversync.data.local.Result
+import org.example.quiversync.domain.model.CloudinaryError
 import org.example.quiversync.utils.extensions.platformLogger
 import java.io.File
 import kotlin.coroutines.resume
 
 class ActualImageUploader(private val context: Context) : ImageUploader {
 
-    override suspend fun uploadImage(bytes: ByteArray, fileName: String, folder: String): Result<String> {
+    override suspend fun uploadImage(bytes: ByteArray, fileName: String, folder: String): Result<String, Error> {
         val tempFile = File(context.cacheDir, fileName).apply {
             writeBytes(bytes)
         }
@@ -27,17 +30,17 @@ class ActualImageUploader(private val context: Context) : ImageUploader {
                         if (url != null) {
                             tempFile.delete()
                             platformLogger("ActualImageUploader-android", "Image uploaded successfully: $url")
-                            continuation.resume(Result.success(url))
+                            continuation.resume(Result.Success(url))
                         } else {
                             tempFile.delete()
                             platformLogger("ActualImageUploader-android", "Cloudinary upload failed: URL is null")
-                            continuation.resume(Result.failure(Exception("Cloudinary upload failed: URL is null")))
+                            continuation.resume(Result.Failure(CloudinaryError("Cloudinary upload failed: URL is null")))
                         }
                     }
 
                     override fun onError(requestId: String?, error: ErrorInfo?) {
                         tempFile.delete()
-                        continuation.resume(Result.failure(Exception("Cloudinary error: ${error?.description}")))
+                        continuation.resume(Result.Failure(CloudinaryError("Cloudinary error: ${error?.description}")))
                     }
 
                     override fun onReschedule(requestId: String?, error: ErrorInfo?) {}

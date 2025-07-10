@@ -1,13 +1,18 @@
 package org.example.quiversync.data.local.dao
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToOneOrNull
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.example.quiversync.UserProfileQueries
 import org.example.quiversync.domain.model.User
 
 class UserDao(
-    private val quiries: UserProfileQueries
+    private val queries: UserProfileQueries,
 ) {
     fun getUserProfile(uid: String): User? {
-        return quiries.getUserProfile(uid).executeAsOneOrNull()?.let { userEntity ->
+        return queries.getUserProfile(uid).executeAsOneOrNull()?.let { userEntity ->
             User(
                 uid = userEntity.uid,
                 name = userEntity.name,
@@ -23,7 +28,7 @@ class UserDao(
     }
 
     fun insertOrReplaceProfile(user: User) {
-        quiries.insertOrReplaceProfile(
+        queries.insertOrReplaceProfile(
             uid = user.uid,
             name = user.name,
             email = user.email,
@@ -36,6 +41,6 @@ class UserDao(
     }
 
     fun deleteProfile(uid: String) {
-        quiries.deleteProfile(uid)
+        queries.deleteProfile(uid)
     }
 }

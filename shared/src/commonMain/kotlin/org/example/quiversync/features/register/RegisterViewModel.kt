@@ -59,10 +59,10 @@ class RegisterViewModel(
             )
             when(result) {
                 is Result.Success -> {
-                    _registerState.value = RegisterState.Loaded
+                   _registerState.emit(RegisterState.Loaded)
                 }
                 is Result.Failure -> {
-                    _registerState.value = RegisterState.Error(result.error.toString())
+                    _registerState.emit(RegisterState.Error(result.error?.message ?: "Unknown error"))
                 }
             }
         }

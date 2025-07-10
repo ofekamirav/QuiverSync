@@ -94,6 +94,10 @@ private fun RentalRequestSkeletonCard(brush: Brush) {
 
 @Composable
 fun ExploreTabSkeleton(modifier: Modifier = Modifier) {
+    val isDark = isSystemInDarkTheme()
+    val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
+    val brush = ShimmerBrush(baseColor = baseShimmerColor)
+
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 320.dp),
         contentPadding = PaddingValues(16.dp),
@@ -102,54 +106,7 @@ fun ExploreTabSkeleton(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxSize()
     ) {
         items(6) {
-            BoardCardSkeleton()
-        }
-    }
-}
-
-@Composable
-private fun BoardCardSkeleton(brush: Brush) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(230.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-                    .background(brush = brush)
-            )
-            Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .height(18.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .height(16.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.6f)
-                        .height(16.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-            }
+            BoardCardSkeleton(shimmerBrush = brush)
         }
     }
 }
