@@ -1,6 +1,8 @@
 package org.example.quiversync.presentation.screens.login
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import org.example.quiversync.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import org.example.quiversync.features.login.LoginData
 import org.example.quiversync.features.login.LoginEvent
 import org.example.quiversync.features.login.LoginState
@@ -47,14 +52,16 @@ fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel(),
     onRegisterClick: () -> Unit = {},
     onSignInSuccess: () -> Unit = {},
-    onForgotPasswordClick: () -> Unit = {}
-) {
+    onForgotPasswordClick: () -> Unit = {},
+    onNavigateToOnboarding: () -> Unit = {}
+    ) {
     val uiState by viewModel.loginState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     when (val currentState = uiState) {
         is LoginState.Loading -> {
-            LoginScreenContent(currentState = LoginState.Idle(LoginData()), isLoading = true, onRegisterClick = {}, onEvent = viewModel::onEvent)
+            LoginScreenContent(currentState = LoginState.Idle(LoginData()), isLoading = true, onRegisterClick = {}, onEvent = viewModel::onEvent,
+                onForgotPasswordClick = onForgotPasswordClick, onGoogleSignInResult = viewModel::onGoogleSignInResult)
             Box(
                 modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
                 contentAlignment = Alignment.Center
@@ -81,8 +88,13 @@ fun LoginScreen(
                 onEvent = viewModel::onEvent,
                 currentState = currentState,
                 onForgotPasswordClick = onForgotPasswordClick,
+                onGoogleSignInResult = viewModel::onGoogleSignInResult
             )
         }
+        is LoginState.NavigateToOnboarding -> {
+            LaunchedEffect(Unit) { onNavigateToOnboarding() }
+        }
+
     }
 }
 
@@ -93,9 +105,11 @@ fun LoginScreenContent(
     onRegisterClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {},
     onEvent: (LoginEvent) -> Unit = {},
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    onGoogleSignInResult: (String?) -> Unit
 ) {
      val isDark = isSystemInDarkTheme()
+     val context = LocalContext.current
 
     val backgroundBrush = Brush.verticalGradient(
         if (isDark) OceanPalette.LoginGradientDark else OceanPalette.LoginGradientLight
@@ -103,6 +117,26 @@ fun LoginScreenContent(
     val cardColor = if (isDark) OceanPalette.DarkCard else Color.White
     val textColor = MaterialTheme.colorScheme.onSurface
     val windowInfo = LocalWindowInfo.current
+
+    val gso = remember {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(context.getString(R.string.default_web_client_id)) // חשוב! לקחת מ-google-services.json
+            .requestEmail()
+            .build()
+    }
+    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            onGoogleSignInResult(account?.idToken)
+        } catch (e: ApiException) {
+            onGoogleSignInResult(null)
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -211,8 +245,9 @@ fun LoginScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                SocialLoginButton(windowInfo = windowInfo,text = "Google", logo = R.drawable.google_logo)
-                SocialLoginButton(windowInfo = windowInfo,text = "Apple", logo = R.drawable.apple_logo)
+                SocialLoginButton(windowInfo = windowInfo,text = "Google", logo = R.drawable.google_logo,
+                    onClick = { launcher.launch(googleSignInClient.signInIntent) }
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))

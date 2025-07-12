@@ -54,6 +54,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.example.quiversync.R
 import org.example.quiversync.domain.model.SurfLevel
 import org.example.quiversync.features.register.OnboardingEvent
+import org.example.quiversync.features.register.OnboardingFormData
 import org.example.quiversync.presentation.components.ImageSourceSelectorSheet
 import org.example.quiversync.presentation.widgets.register.ImagePickerSection
 import org.example.quiversync.utils.extentions.toCompressedByteArray
@@ -70,7 +71,7 @@ fun OnboardingScreen(
     when (val currentState = uiState) {
         is OnboardingState.Idle -> {
             CompleteRegisterScreen(
-                state = currentState,
+                formData = currentState.data,
                 onEvent = viewModel::onEvent,
             )
         }
@@ -91,7 +92,15 @@ fun OnboardingScreen(
         }
         is OnboardingState.Error -> {
             val errorMessage = (uiState as OnboardingState.Error).message
-            Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+            }
+
         }
     }
 }
@@ -99,7 +108,7 @@ fun OnboardingScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun CompleteRegisterScreen(
-    state: OnboardingState.Idle,
+    formData: OnboardingFormData,
     onEvent: (OnboardingEvent) -> Unit
 ) {
     val isDark = isSystemInDarkTheme()
@@ -201,29 +210,29 @@ fun CompleteRegisterScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 DateOfBirthPicker(
-                    selectedDate = state.dateOfBirth,
+                    selectedDate = formData.dateOfBirth,
                     onDateSelected = { onEvent(OnboardingEvent.DateOfBirthChanged(it)) },
-                    errorMessage = state.dateOfBirthError
+                    errorMessage = formData.dateOfBirthError
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 CustomTextField(
-                    value = state.heightCm,
+                    value = formData.heightCm,
                     onValueChange = { onEvent(OnboardingEvent.HeightChanged(it)) },
                     label = "Height (cm)",
-                    isError = state.heightError != null,
-                    errorMessage = state.heightError,
+                    isError = formData.heightError != null,
+                    errorMessage = formData.heightError,
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 CustomTextField(
-                    value = state.weightKg,
+                    value = formData.weightKg,
                     onValueChange = { onEvent(OnboardingEvent.WeightChanged(it)) },
                     label = "Weight (kg)",
-                    isError = state.weightError != null,
-                    errorMessage = state.weightError,
+                    isError = formData.weightError != null,
+                    errorMessage = formData.weightError,
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
                 )
@@ -233,20 +242,20 @@ fun CompleteRegisterScreen(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                state.selectedSurfLevel?.let {
+                formData.selectedSurfLevel?.let {
                     SurfLevelSelector(
                         selectedLevel = it,
                         onLevelSelected = { onEvent(OnboardingEvent.SurfLevelChanged(it)) },
-                        errorMessage = state.surfLevelError
+                        errorMessage = formData.surfLevelError
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 ImagePickerSection(
-                    imageUrl = state.profileImageUrl,
-                    isUploading = state.isUploadingImage,
+                    imageUrl = formData.profileImageUrl,
+                    isUploading = formData.isUploadingImage,
                     onChangePhotoClick = { showImageOptions = true },
                     placeholderRes = placeholderRes,
-                    errorMessage = state.profileImageError
+                    errorMessage = formData.profileImageError
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))

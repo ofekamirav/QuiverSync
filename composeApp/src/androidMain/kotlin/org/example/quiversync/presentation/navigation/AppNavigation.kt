@@ -221,6 +221,11 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                     },
                     onForgotPasswordClick = {
                         navController.navigate(Screen.ForgotPassword.route)
+                    },
+                    onNavigateToOnboarding = {
+                        navController.navigate(Screen.CompleteRegister.route) {
+                            popUpTo(0)
+                        }
                     }
                 )
             }

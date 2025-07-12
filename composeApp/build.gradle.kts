@@ -103,7 +103,8 @@ dependencies {
     implementation(libs.accompanist.permissions)
     //Cloudinary
     implementation(libs.cloudinary.android)
-
+    //Google Sign-In
+    implementation(libs.google.play.services.auth)
 
 
 

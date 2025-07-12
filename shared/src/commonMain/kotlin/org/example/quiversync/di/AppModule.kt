@@ -43,6 +43,7 @@ import org.example.quiversync.domain.usecase.register.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.UploadImageUseCase
 import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
+import org.example.quiversync.domain.usecase.loginUseCases.SignInWithGoogleUseCase
 import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
 import org.example.quiversync.domain.usecase.quiver.DeleteSurfboardUseCase
 import org.example.quiversync.domain.usecase.quiver.GetMyQuiverUseCase
@@ -143,6 +144,7 @@ val commonModule= module {
    single { CheckUserAuthMethodUseCase(get()) }
    single { UpdatePasswordUseCase(get()) }
    single { SendPasswordResetEmailUseCase(get()) }
+   single { SignInWithGoogleUseCase(get()) }
 
    //Quiver UseCases
    single { AddBoardUseCase(get()) }
@@ -191,11 +193,10 @@ val commonModule= module {
 
    // --------------------------------------------ViewModels--------------------------------------------------
    single { RegisterViewModel(get()) }
-   single { OnboardingViewModel(get(), get()) }
    single { UserViewModel(get(), get()) }
    single { HomeViewModel(get()) }
-   single { LoginViewModel(get()) }
-   single { OnboardingViewModel(get(), get()) }
+   single { LoginViewModel(get(), get()) }
+   single { OnboardingViewModel(get(), get(), get()) }
    single { QuiverViewModel(get()) }
    single { AddBoardViewModel(get(), get()) }
    single { SettingsViewModel(get()) }
