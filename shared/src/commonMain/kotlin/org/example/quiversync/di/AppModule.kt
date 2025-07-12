@@ -43,6 +43,7 @@ import org.example.quiversync.domain.usecase.register.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.UploadImageUseCase
 import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
+import org.example.quiversync.domain.usecase.loginUseCases.SignInWithGoogleUseCase
 import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
 import org.example.quiversync.domain.usecase.quiver.DeleteSurfboardUseCase
 import org.example.quiversync.domain.usecase.quiver.GetMyQuiverUseCase
@@ -56,9 +57,11 @@ import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
 import org.example.quiversync.domain.usecase.user.LogoutUseCase
+import org.example.quiversync.domain.usecase.user.SendPasswordResetEmailUseCase
 import org.example.quiversync.domain.usecase.user.UpdatePasswordUseCase
 import org.example.quiversync.domain.usecase.user.UpdateProfileDetailsUseCase
 import org.example.quiversync.features.home.HomeUseCases
+import org.example.quiversync.features.login.forgot_password.ForgotPasswordViewModel
 import org.example.quiversync.features.quiver.QuiverUseCases
 import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.features.quiver.add_board.AddBoardViewModel
@@ -140,6 +143,8 @@ val commonModule= module {
    single { LoginUserUseCase(get()) }
    single { CheckUserAuthMethodUseCase(get()) }
    single { UpdatePasswordUseCase(get()) }
+   single { SendPasswordResetEmailUseCase(get()) }
+   single { SignInWithGoogleUseCase(get()) }
 
    //Quiver UseCases
    single { AddBoardUseCase(get()) }
@@ -171,7 +176,8 @@ val commonModule= module {
           uploadImageUseCase = get(),
           updateProfileDetailsUseCase = get(),
           checkUserAuthMethod = get(),
-          updatePasswordUseCase = get()
+          updatePasswordUseCase = get(),
+          sendPasswordResetEmailUseCase = get(),
       )
    }
    single {
@@ -187,16 +193,16 @@ val commonModule= module {
 
    // --------------------------------------------ViewModels--------------------------------------------------
    single { RegisterViewModel(get()) }
-   single { OnboardingViewModel(get(), get()) }
    single { UserViewModel(get(), get()) }
    single { HomeViewModel(get()) }
-   single { LoginViewModel(get()) }
-   single { OnboardingViewModel(get(), get()) }
+   single { LoginViewModel(get(), get()) }
+   single { OnboardingViewModel(get(), get(), get()) }
    single { QuiverViewModel(get()) }
    single { AddBoardViewModel(get(), get()) }
    single { SettingsViewModel(get()) }
    single { EditProfileDetailsViewModel(get()) }
    single { SecurityAndPrivacyViewModel(get()) }
+   single { ForgotPasswordViewModel(get()) }
 
 
 

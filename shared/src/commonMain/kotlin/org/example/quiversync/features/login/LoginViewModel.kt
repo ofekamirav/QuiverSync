@@ -7,23 +7,28 @@ import kotlinx.coroutines.launch
 import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.data.local.Result
+import org.example.quiversync.domain.usecase.loginUseCases.SignInWithGoogleUseCase
 import org.example.quiversync.utils.extensions.platformLogger
 
 
 class LoginViewModel (
-    private val  loginUseCase : LoginUserUseCase
+    private val  loginUseCase : LoginUserUseCase,
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase
 ): BaseViewModel() {
+
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle(LoginData()))
     val loginState: StateFlow<LoginState> = _loginState
 
-    fun onEvent(event: LoginEvent){
-        when(event){
-            is LoginEvent.EmailChanged ->{
-                updateState { it.copy(email = event.value , emailError = null) }
+    fun onEvent(event: LoginEvent) {
+        when (event) {
+            is LoginEvent.EmailChanged -> {
+                updateState { it.copy(email = event.value, emailError = null) }
             }
+
             is LoginEvent.PasswordChanged -> {
-                updateState{it.copy(password = event.value, passwordError = null)}
+                updateState { it.copy(password = event.value, passwordError = null) }
             }
+
             LoginEvent.SignInClicked -> {
                 validateAndLogin()
             }
@@ -83,6 +88,40 @@ class LoginViewModel (
         if (password.length < 6) return "Password must be at least 6 characters"
         if (!password.any { it.isUpperCase() }) return "Password must contain at least one uppercase letter"
         return null
+    }
+
+    fun onGoogleSignInResult(idToken: String?) {
+        if (idToken == null) {
+            _loginState.value = LoginState.Error("Google Sign-In failed.")
+            return
+        }
+
+        scope.launch {
+            _loginState.value = LoginState.Loading
+            when (val result = signInWithGoogleUseCase(idToken)) {
+                is Result.Success -> {
+                    result.data?.let {
+                        if (it.isNewUser) {
+                            _loginState.value = LoginState.NavigateToOnboarding
+                            platformLogger(
+                                "LoginViewModel",
+                                "New user signed in with Google, navigating to onboarding."
+                            )
+                        } else {
+                            _loginState.value = LoginState.Loaded
+                            platformLogger(
+                                "LoginViewModel",
+                                "Existing user signed in with Google, loading main screen."
+                            )
+                        }
+                    }
+                }
+
+                is Result.Failure -> {
+                    _loginState.value = LoginState.Error(result.error?.message ?: "Unknown error")
+                }
+            }
+        }
     }
 
 

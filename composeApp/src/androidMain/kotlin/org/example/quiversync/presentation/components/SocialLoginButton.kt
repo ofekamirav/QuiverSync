@@ -2,6 +2,7 @@ package org.example.quiversync.presentation.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,7 +29,6 @@ fun SocialLoginButton(
     windowInfo: AppWindowInfo,
     onClick: () -> Unit = {}
 ) {
-    val buttonWidth = if (windowInfo.widthSize == WindowWidthSize.COMPACT) 140.dp else 200.dp
     val buttonHeight = if (windowInfo.widthSize == WindowWidthSize.COMPACT) 48.dp else 56.dp
     Button(
         onClick = onClick,
@@ -42,7 +42,7 @@ fun SocialLoginButton(
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .height(buttonHeight)
-            .width(buttonWidth)
+            .fillMaxWidth()
     ) {
         Icon(
             painter = painterResource(id = logo),

@@ -6,6 +6,7 @@ import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.user.CheckUserAuthMethodUseCase
 import org.example.quiversync.domain.usecase.user.GetBoardsNumberUseCase
 import org.example.quiversync.domain.usecase.user.LogoutUseCase
+import org.example.quiversync.domain.usecase.user.SendPasswordResetEmailUseCase
 import org.example.quiversync.domain.usecase.user.UpdatePasswordUseCase
 import org.example.quiversync.domain.usecase.user.UpdateProfileDetailsUseCase
 
@@ -17,5 +18,6 @@ data class UserUseCases(
     val uploadImageUseCase: UploadImageUseCase,
     val updateProfileDetailsUseCase: UpdateProfileDetailsUseCase,
     val checkUserAuthMethod: CheckUserAuthMethodUseCase,
-    val updatePasswordUseCase: UpdatePasswordUseCase
+    val updatePasswordUseCase: UpdatePasswordUseCase,
+    val sendPasswordResetEmailUseCase: SendPasswordResetEmailUseCase,
 )

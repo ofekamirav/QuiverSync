@@ -5,6 +5,7 @@ import dev.gitlive.firebase.auth.EmailAuthProvider
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseAuthException
 import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
+import dev.gitlive.firebase.auth.GoogleAuthProvider
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.FirebaseFirestoreException
@@ -18,6 +19,7 @@ import org.example.quiversync.domain.repository.AuthRepository
 import org.example.quiversync.utils.extensions.toDomain
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.Error
+import org.example.quiversync.data.remote.dto.AuthResult
 import org.example.quiversync.utils.extensions.platformLogger
 
 class AuthRepositoryImpl(
@@ -158,6 +160,56 @@ class AuthRepositoryImpl(
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Failure(AuthError("Failed to update password: ${e.message}"))
+        }
+    }
+    override suspend fun sendPasswordResetEmail(email: String): Result<Unit, Error> {
+        return try {
+            auth.sendPasswordResetEmail(email)
+            Result.Success(Unit)
+        } catch (e: FirebaseAuthException) {
+            val message = e.message ?: ""
+            val errorMessage = when {
+                message.contains("USER_NOT_FOUND", ignoreCase = true) ->
+                    "No account was found with this email address."
+
+                message.contains("OPERATION_NOT_ALLOWED", ignoreCase = true) ->
+                    "Password reset is not enabled for this account. Please sign in with Google or Apple."
+
+                else -> message
+            }
+            Result.Failure(AuthError(errorMessage))
+        } catch (e: Exception) {
+            Result.Failure(AuthError("An unexpected error occurred. Please check your network connection."))
+        }
+    }
+
+    override suspend fun signInWithGoogle(idToken: String): Result<AuthResult, Error> {
+        return try {
+            val credential = GoogleAuthProvider.credential(idToken, null)
+            val authResult = auth.signInWithCredential(credential)
+            val firebaseUser = authResult.user
+            if (firebaseUser == null) {
+                return Result.Failure(AuthError("Failed to get user info after sign-in."))
+            }
+
+            sessionManager.setUid(firebaseUser.uid)
+            val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
+            if (isNewUser) {
+                val newUserProfile = User(
+                    uid = firebaseUser.uid,
+                    email = firebaseUser.email ?: "",
+                    name = firebaseUser.displayName ?: "",
+                    profilePicture = firebaseUser.photoURL,
+                    heightCm = null,
+                    weightKg = null,
+                    surfLevel = null,
+                    dateOfBirth = null
+                )
+                updateUserProfile(newUserProfile)
+            }
+            Result.Success(AuthResult(isNewUser = isNewUser))
+        } catch (e: Exception) {
+            Result.Failure(AuthError("Google Sign-In failed: ${e.message}"))
         }
     }
 }

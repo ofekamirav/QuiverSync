@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -28,10 +27,11 @@ import kotlinx.coroutines.launch
 import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.presentation.components.LoadingAnimation
-import org.example.quiversync.presentation.screens.LoginScreen
+import org.example.quiversync.presentation.screens.login.LoginScreen
 import org.example.quiversync.presentation.screens.profile.ProfileScreen
 import org.example.quiversync.presentation.screens.register.RegisterScreen
 import org.example.quiversync.presentation.screens.home.HomeScreen
+import org.example.quiversync.presentation.screens.login.ForgotPasswordScreen
 import org.example.quiversync.presentation.screens.quiver.QuiverScreen
 import org.example.quiversync.presentation.screens.quiver.add_board.AddSurfboardScreen
 import org.example.quiversync.presentation.screens.register.OnboardingScreen
@@ -105,7 +105,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     val startDestination = if (isLoggedIn == true) Screen.Home.route else Screen.Login.route
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val hideTopBarRoutes = listOf(Screen.Login.route, Screen.Register.route, Screen.CompleteRegister.route)
+    val hideTopBarRoutes = listOf(Screen.Login.route, Screen.Register.route, Screen.CompleteRegister.route, Screen.ForgotPassword.route)
     val navigationIconRoutes = listOf(Screen.AddSurfboard.route, Screen.Settings.route, Screen.AddSpot.route, Screen.EditProfile.route, Screen.SecurityAndPrivacy.route)
     val showNavigationIcon = currentRoute in navigationIconRoutes
     val showTopBar = currentRoute !in hideTopBarRoutes
@@ -218,6 +218,14 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                     },
                     onRegisterClick = {
                         navController.navigate(Screen.Register.route)
+                    },
+                    onForgotPasswordClick = {
+                        navController.navigate(Screen.ForgotPassword.route)
+                    },
+                    onNavigateToOnboarding = {
+                        navController.navigate(Screen.CompleteRegister.route) {
+                            popUpTo(0)
+                        }
                     }
                 )
             }
@@ -314,6 +322,17 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                         navController.popBackStack()
                     }
                 )
+            }
+
+            composable(Screen.ForgotPassword.route) {
+                 ForgotPasswordScreen(
+                     onLoginClick = {
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                     }
+                 )
             }
         }
     }

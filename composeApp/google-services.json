@@ -12,7 +12,20 @@
           "package_name": "org.example.quiversync"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "709464682274-ptv3rbtvgpsdg8hdraovo03aegqd6rs0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.example.quiversync",
+            "certificate_hash": "dac6f9fa290b9ab46728b59604b0117ea415f2a5"
+          }
+        },
+        {
+          "client_id": "709464682274-35ul8qlan93pv2e6kgimd8lm804gs76p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAcdEw5mrGrdxgmTnUKxtyRuBfW6hh1YYE"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "709464682274-35ul8qlan93pv2e6kgimd8lm804gs76p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "709464682274-7gmgthrm90hqtrjc68195ta1d4bhfqf5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.example.quiversync.QuiverSync"
+              }
+            }
+          ]
         }
       }
     }
