@@ -45,7 +45,7 @@ class UserDao(
     }
 
     fun getAllProfiles(): List<User> {
-        return quiries.getAllProfiles().executeAsList().map { userEntity ->
+        return queries.getAllProfiles().executeAsList().map { userEntity ->
             User(
                 uid = userEntity.uid,
                 name = userEntity.name,

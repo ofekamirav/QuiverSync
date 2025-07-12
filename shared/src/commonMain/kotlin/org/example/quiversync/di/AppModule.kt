@@ -88,7 +88,6 @@ import org.example.quiversync.features.quiver.add_board.AddBoardViewModel
 import org.example.quiversync.features.register.OnboardingViewModel
 import org.example.quiversync.features.register.RegisterUseCases
 import org.example.quiversync.features.register.RegisterViewModel
-import org.example.quiversync.features.spots.ForecastUseCases
 import org.example.quiversync.features.settings.SecurityAndPrivacyViewModel
 import org.example.quiversync.features.settings.SettingsViewModel
 import org.example.quiversync.features.spots.AddFavSpot.AddFavSpotViewModel
@@ -99,7 +98,6 @@ import org.example.quiversync.features.user.UserUseCases
 import org.example.quiversync.features.user.UserViewModel
 import org.example.quiversync.features.user.edit_user.EditProfileDetailsViewModel
 import org.example.quiversync.utils.event.EventBus
-import org.koin.core.module.dsl.viewModelOf
 
 
 fun initKoin(config: KoinAppDeclaration? = null) {
@@ -133,13 +131,11 @@ val commonModule= module {
 
    // SharedFlow / Event Bus
    single { EventBus }
-
-   single { BoardEventBus }
    single { SpotEventBus }
 
 
    //-----------------------------------------------------Repositories---------------------------------------------
-   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(),get()) }
+   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
    single<FavSpotRepository>{FavSpotRepositoryImpl(get(), get(), get())}
    single<GeminiRepository>{GeminiRepositoryImpl(get(), get(), get() , get())}
    single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get() , get()) }
@@ -276,7 +272,7 @@ val commonModule= module {
 
    // --------------------------------------------ViewModels--------------------------------------------------
    single { RegisterViewModel(get()) }
-   single { OnboardingViewModel(get(), get()) }
+   single { OnboardingViewModel(get(), get(),get()) }
    single { UserViewModel(get(), get()) }
    single { HomeViewModel(get()) }
    single { LoginViewModel(get(), get()) }
