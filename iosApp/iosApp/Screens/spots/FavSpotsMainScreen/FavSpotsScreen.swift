@@ -20,7 +20,10 @@ public struct FavSpotsScreen: View {
             case .loading:
                 LoadingView(colorName: "background")
             case .loaded(let loaded):
-                FavSpotsView(favSpots: loaded.spots)
+                FavSpotsView(
+                    favSpots: loaded.favSpotsData,
+                    favSpotsViewModel: viewModel.viewModel,
+                )
             case .error(let error): ErrorView(messege: error.message)
             }
         }

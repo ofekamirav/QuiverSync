@@ -18,10 +18,11 @@ struct AppEntryView: View {
         NavigationStack(path: $path) {
             Group {
                 if isLoggedIn {
-                    MainTabView()
+                    MainTabView(isLoggedIn : $isLoggedIn)
                 } else {
                     LoginScreen(
                         onRegisterClick: { path.append(AppRoute.register) },
+                        isLoggedIn: $isLoggedIn,
 //                        onSignInClick: {
 //                            isLoggedIn = true
 //                            path.removeLast(path.count) // Clear to main
@@ -30,23 +31,31 @@ struct AppEntryView: View {
                     )
                 }
             }
+            .onAppear{
+                Task{
+                    do{
+                        let sessionManager = SessionManager(context: nil)
+                        let uid = try await sessionManager.getUid()
+                        if uid != nil {
+                            isLoggedIn = true
+                        }
+                    }
+                }
+            }
             .navigationDestination(for: AppRoute.self) { route in
                 switch route {
                 case .register:
                     RegisterScreen(
-//                        onReturnToMain : {
-//                            path.removeLast(path.count) // Clear to main
-//                        }
                         onBackBtn: {
-//                            isLoggedIn = true
                             path.removeLast(path.count) // Clear to main
                         },
                         onSuccess: {
                                 isLoggedIn = true
                         },
+                        isLoggedIn: $isLoggedIn,
                     )
                 case .main:
-                    MainTabView()
+                    MainTabView(isLoggedIn : $isLoggedIn)
                 case .welcomeSheet:
                     WelcomeBottomSheetScreen(
                         onDismiss: { path = .init() },

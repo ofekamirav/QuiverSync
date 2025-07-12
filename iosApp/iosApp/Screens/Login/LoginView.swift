@@ -120,7 +120,7 @@ struct LoginView: View {
                     GradientButton(text: "Sign In"){
                         print("this is the state now \(loginData)")
                         loginViewModel.onEvent(event:
-                                                LoginEventSignUpClicked())
+                                                LoginEventSignInClicked())
                         print("this is the state after the event \(loginData)")
 
                                                 

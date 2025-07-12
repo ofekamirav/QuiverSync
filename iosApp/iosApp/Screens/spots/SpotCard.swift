@@ -3,27 +3,42 @@ import Shared
 
 public struct SpotCard: View {
     let favSpot: FavoriteSpot
+    let favSpotsData: FavSpotsData
+    let favSpotsViewModel: FavSpotsViewModel
     @Binding var selectedSpot: FavoriteSpot?
+    let onRequestDelete: () -> Void
+
     @State private var isExpanded = false
-    @State private var isShowingPopup = false  
+    @State private var isShowingPopup = false
 
     public var body: some View {
-        ZStack {
-            //  Base Card UI
-            VStack(spacing: 16) {
-                HStack {
-                    VStack(alignment: .leading) {
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 12) {
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(favSpot.name)
-                            .font(.headline)
+                            .font(.system(.headline, design: .rounded))
                             .foregroundColor(AppColors.deepBlue)
 
-                        Text(favSpot.location)
+                        Text(favSpot.name)
                             .font(.caption)
                             .foregroundColor(.gray)
+                            .lineLimit(2)
                     }
+
                     Spacer()
+
                     Button(action: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        onRequestDelete()
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.red)
+                            .font(.system(size: 18, weight: .bold))
+                            .padding(.trailing, 4)
+                    }
+
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.25)) {
                             isExpanded.toggle()
                         }
                     }) {
@@ -31,20 +46,30 @@ public struct SpotCard: View {
                             .foregroundColor(.gray)
                     }
                 }
-                .padding(.vertical, 8)
+                .padding(.top, 12)
                 .padding(.horizontal)
 
                 if isExpanded {
-                    ExtendCard(favSpot: favSpot, showPopup: {
-                        withAnimation {
-                            isShowingPopup = true
-                        }
-                    } , selectedSpot: $selectedSpot)
+                    Divider()
+                    ExtendCard(
+                        favSpot: favSpot,
+                        favSpotData: favSpotsData,
+                        favSpotsViewModel: favSpotsViewModel,
+                        showPopup: {
+                            withAnimation {
+                                isShowingPopup = true
+                            }
+                        },
+                        selectedSpot: $selectedSpot
+                    )
+                    .transition(.opacity.combined(with: .slide))
+                    .padding(.horizontal)
+                    .padding(.bottom, 20) // prevent content under bottom bar
                 }
             }
+
         }
         .padding()
         .blur(radius: selectedSpot != nil ? 6 : 0)
-        
     }
 }

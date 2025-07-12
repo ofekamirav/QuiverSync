@@ -23,6 +23,7 @@ class UserRepositoryImpl(
 
     override suspend fun getUserProfile(): Result<User, Error> {
         val uid = sessionManager.getUid() ?: return Result.Failure<Error>(UserError("No UID"))
+        println( "Fetching user profile for UID: $uid")
 
         val local = userDao.getUserProfile(uid)
         if (local != null) {

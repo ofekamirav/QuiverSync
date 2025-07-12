@@ -15,7 +15,7 @@ struct RegisterScreen: View {
     
     let onBackBtn: () -> Void
     let onSuccess: () -> Void
-
+    @Binding var isLoggedIn: Bool
     
     var body: some View {
         VStack {
@@ -31,7 +31,7 @@ struct RegisterScreen: View {
                     onSuccess: onSuccess
                 )
             case .loaded(let loaded):
-                MainTabView()
+                MainTabView(isLoggedIn : $isLoggedIn)
             case .error(let error):
                 ErrorView(messege: error.message)
             

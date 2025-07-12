@@ -13,6 +13,7 @@ import Shared
 public struct ProfileView: View {
     
     let user : User
+    @Binding var isLoggedIn: Bool
     
 
     
@@ -29,7 +30,11 @@ public struct ProfileView: View {
                 Spacer()
                 
                 ProfileActions(onLogout: {
-                    print("Logout pressed")
+                    Task {
+                        let sessionManager = SessionManager(context: nil)
+                        try await sessionManager.clearUserData()
+                        isLoggedIn = false
+                    }
                 }, onEdit: {
                     print( "Edit pressed")
                 })

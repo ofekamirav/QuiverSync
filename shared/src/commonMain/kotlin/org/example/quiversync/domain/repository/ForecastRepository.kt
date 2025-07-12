@@ -18,4 +18,9 @@ interface ForecastRepository {
 
     suspend fun deleteOutDateForecast():
         Result<Unit, TMDBError>
+
+    suspend fun deleteBySpot(
+        latitude: Double,
+        longitude: Double
+    ): Result<Unit, TMDBError>
 }

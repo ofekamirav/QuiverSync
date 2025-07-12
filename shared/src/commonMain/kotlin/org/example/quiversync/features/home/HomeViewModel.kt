@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.quiversync.data.remote.dto.BoardMatchUi
 import org.example.quiversync.features.BaseViewModel
+import org.example.quiversync.data.local.Result
+import org.example.quiversync.domain.model.forecast.DailyForecast
 
 class HomeViewModel(
     private val homeUseCases: HomeUseCases,
@@ -22,12 +24,16 @@ class HomeViewModel(
             _uiState.value = HomeState.Loading
 
             val forecastResult = homeUseCases.getWeeklyForecastByLocationUseCase()
-            if (forecastResult.isFailure) {
-                _uiState.value = HomeState.Error(forecastResult.exceptionOrNull()?.message ?: "Forecast failed")
-                return@launch
+            val forecast : List<DailyForecast>
+            when (forecastResult) {
+                is Result.Success -> {
+                    forecast = forecastResult.data ?: emptyList<DailyForecast>()
+                }
+                is Result.Failure -> {
+                    _uiState.value = HomeState.Error(forecastResult.error?.message ?: "Unknown error")
+                    return@launch
+                }
             }
-
-            val forecast = forecastResult.getOrThrow()
 
             val bestBoardMatch = BoardMatchUi(
                 surfboardId = "best_board_match",

@@ -1,44 +1,71 @@
 CREATE TABLE GeminiPredictionEntity (
+    predictionID INTEGER PRIMARY KEY AUTOINCREMENT,
+    userID TEXT NOT NULL,
     surfboardID TEXT NOT NULL,
     forecastDate TEXT NOT NULL,
     forecastLatitude REAL NOT NULL,
     forecastLongitude REAL NOT NULL,
     score INTEGER NOT NULL,
-    description TEXT NOT NULL,
-    UNIQUE(forecastDate, forecastLatitude, forecastLongitude)
+    description TEXT NOT NULL
     );
+
+GET_ALL_PREDICTIONS:
+SELECT * FROM GeminiPredictionEntity;
+
+GET_ALL_PREDICTIONS_NO_USER:
+SELECT * FROM GeminiPredictionEntity;
 
 DELETE_BEST_MATCH_FOR_DATE:
 DELETE FROM GeminiPredictionEntity
-WHERE forecastDate = ?
+WHERE userID =?
+  AND forecastDate = ?
+  AND forecastLatitude = ?
+  AND forecastLongitude = ?;
+
+GET_BEST_MATCH:
+SELECT * FROM GeminiPredictionEntity
+WHERE userID =?
+  AND forecastDate = ?
+  AND forecastLatitude = ?
+  AND forecastLongitude = ?;
+
+GET_PREDICTIONS_BY_DATE:
+SELECT * FROM GeminiPredictionEntity
+WHERE userID = ?
+  AND forecastDate = ?;
+
+deleteMatchesBySpot:
+DELETE FROM GeminiPredictionEntity
+WHERE userID = ?
+  AND forecastLatitude = ?
+  AND forecastLongitude = ?;
+
+UPDATE_PREDICTION:
+UPDATE GeminiPredictionEntity
+SET userID = ?,
+    surfboardID = ?,
+    forecastDate = ?,
+    forecastLatitude = ?,
+    forecastLongitude = ?,
+    score = ?,
+    description = ?
+WHERE userID = ?
+  AND forecastDate = ?
   AND forecastLatitude = ?
   AND forecastLongitude = ?;
 
 INSERT_BEST_MATCH:
-INSERT OR REPLACE INTO GeminiPredictionEntity(
-    surfboardID, forecastDate, forecastLatitude, forecastLongitude, score , description
-) VALUES (  ?, ?, ?,?,? ,?);
+INSERT INTO GeminiPredictionEntity(
+    userID, surfboardID, forecastDate, forecastLatitude, forecastLongitude, score , description
+) VALUES (?, ?, ?, ?, ?, ?, ?);
 
-GET_BEST_MATCH:
+
+
+deleteAllPredictions:
+DELETE FROM GeminiPredictionEntity;
+
+GET_PREDICTIONS_BY_SPOT_AND_ID:
 SELECT * FROM GeminiPredictionEntity
-WHERE forecastDate = ?
+WHERE userID = ?
   AND forecastLatitude = ?
-  AND forecastLongitude = ?
-LIMIT 1;
-
-GET_PREDICTIONS_BY_DATE:
-SELECT * FROM GeminiPredictionEntity
-WHERE forecastDate = ?;
-
-deleteMatchesBySpot:
-DELETE FROM GeminiPredictionEntity
-WHERE forecastLatitude = ?
   AND forecastLongitude = ?;
-
-GET_TOP_MATCH_BY_USER_SPOT_AND_DATE:
-SELECT * FROM GeminiPredictionEntity
-WHERE forecastDate = ?
-  AND forecastLatitude = ?
-  AND forecastLongitude = ?
-ORDER BY score DESC
-LIMIT 1;

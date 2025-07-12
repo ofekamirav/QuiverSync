@@ -5,10 +5,13 @@ import org.example.quiversync.domain.model.prediction.GeminiPrediction
 
 fun GeminiPredictionEntity.toGeminiMatch(): GeminiPrediction {
     return GeminiPrediction(
+        predictionID = predictionID,
+        userID = userID,
         surfboardID = surfboardID,
-        forecastDate = forecastDate,
+        date = forecastDate,
         forecastLatitude = forecastLatitude,
         forecastLongitude = forecastLongitude,
-        score = score.toInt()
+        score = score.toInt(),
+        description = description
     )
 }

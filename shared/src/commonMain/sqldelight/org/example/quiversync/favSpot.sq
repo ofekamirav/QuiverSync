@@ -1,26 +1,29 @@
 CREATE TABLE FavSpotEntity (
+    spotID TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
-    UNIQUE(latitude, longitude)
-);
+    userID TEXT NOT NULL
+    );
 
 selectAllFavSpots:
-SELECT * FROM FavSpotEntity;
-
-insertFavSpot:
-INSERT INTO FavSpotEntity( name, latitude, longitude)
-VALUES ( ?, ?, ?);
-
-deleteFavSpot:
-DELETE FROM FavSpotEntity
-WHERE latitude = ?
-AND longitude = ?;
+SELECT * FROM FavSpotEntity
+WHERE userID = ?;
 
 getFavSpotByLocation:
 SELECT * FROM FavSpotEntity
 WHERE latitude = ?
-AND longitude = ?;
+AND longitude = ?
+AND userID = ?;
 
 deleteAllFavSpots:
-DELETE FROM FavSpotEntity;
+DELETE FROM FavSpotEntity
+WHERE userID = ?;
+
+deleteFavSpot:
+DELETE FROM FavSpotEntity
+WHERE spotID = ?;
+
+inserOrReplaceSpot:
+INSERT OR REPLACE INTO FavSpotEntity(spotID, name, latitude, longitude, userID)
+VALUES (?, ?, ?, ?, ?);

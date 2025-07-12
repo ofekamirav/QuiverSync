@@ -41,7 +41,7 @@ data class GeminiPartResponse(
 data class GeminiMatchResponse(
     val forecastLatitude: Double,//forecast id && spotID
     val forecastLongitude: Double,//forecast id
-    val forecastDate: String,
+    val date: String,
     val surfboardID: String,
     val score: Int,
     val description: String

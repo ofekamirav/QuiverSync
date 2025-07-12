@@ -8,14 +8,13 @@ import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.prediction.GeminiPrediction
 import org.example.quiversync.domain.repository.GeminiRepository
 
-data class GetBestBoardForSingleDayUseCase(
+data class GenerateSingleDayMatchUseCase(
     private val repository: GeminiRepository,
 ) {
-    suspend operator fun invoke(surfboards: List<Surfboard>, dailyForecast: DailyForecast, user: User): Result<GeminiPrediction,TMDBError> {
+    suspend operator fun invoke(surfboards: List<Surfboard>, dailyForecast: DailyForecast): Result<GeminiPrediction,TMDBError> {
         return repository.generateSingleDayMatch(
             surfboards = surfboards,
-            dailyForecast = dailyForecast,
-            user = user
+            dailyForecast = dailyForecast
         )
     }
 }

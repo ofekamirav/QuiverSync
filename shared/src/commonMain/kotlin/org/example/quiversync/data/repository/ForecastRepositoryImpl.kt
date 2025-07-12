@@ -20,20 +20,30 @@ class ForecastRepositoryImpl(
 
 ): ForecastRepository {
     private val queries = database.dailyForecastQueries
+
+
     override suspend fun getWeeklyForecast(
         latitude: Double,
         longitude: Double,
     ): Result<List<DailyForecast>,TMDBError> {
         val howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne()
         val lastLocation = sessionManager.getLastLocation()
+        val userID = sessionManager.getUid()
 
         val isFar = lastLocation == null || isOutsideRadius(
             lastLocation.latitude, lastLocation.longitude, latitude, longitude
         )
 
-        if (isFar && howManyDaily < 7) {
-            queries.deleteBySpot(latitude, longitude)
-            geminiPredictionDao.deleteBySpot(latitude, longitude)
+        if (isFar && howManyDaily < 6) {
+            if(howManyDaily > 0){
+                println("Deleting old forecasts for spot ($latitude, $longitude) because they are outdated or insufficient")
+                queries.deleteBySpot(latitude, longitude)
+            }
+            if (userID != null) {
+                println("Deleting old Gemini predictions for spot ($latitude, $longitude) for user $userID")
+                geminiPredictionDao.deleteBySpotAndUser(latitude, longitude,userID)
+            }
+            println("Fetching new weekly forecast from API for spot ($latitude, $longitude)")
             val weeklyResult = api.getFiveDayForecast(latitude, longitude)
 
             if (weeklyResult.isFailure) {
@@ -64,8 +74,13 @@ class ForecastRepositoryImpl(
 
             sessionManager.setLastLocation(Location(latitude, longitude))
         }
+        else{
+            println( "Using local database for spot ($latitude, $longitude) with $howManyDaily days of forecast")
+        }
 
-        val localList = queries.selectAll().executeAsList().map { it.toDailyForecast() }
+        val localList = queries.SELECT_BY_SPOT( latitude, longitude)
+            .executeAsList()
+            .map { it.toDailyForecast() }
 
         return if (localList.isNotEmpty()) {
             Result.Success(localList)
@@ -82,6 +97,8 @@ class ForecastRepositoryImpl(
             .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
             .date
             .toString()
+//        queries.deleteBySpot(latitude, longitude)
+//        println("deleted old forecasts for spot ($latitude, $longitude)")
         val howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne()
         if(howManyDaily < 4) {
             // If we have less than 4 days, we need to fetch the weekly forecast again
@@ -90,7 +107,43 @@ class ForecastRepositoryImpl(
                 return Result.Failure(TMDBError("Unknown error"))
             }
         }
+        else{
+            println("Using local database for spot ($latitude, $longitude) with $howManyDaily days of forecast")
+        }
+//        val forecasts = queries.selectAll().executeAsList()
+//
+//        println("📊 Daily Forecasts:")
+//        forecasts.forEachIndexed { index, it ->
+//            println(
+//                """
+//        🔹 Forecast #${index + 1}
+//        ─────────────────────
+//        📅 Date         : ${it.date}
+//        📍 Location     : (${it.latitude}, ${it.longitude})
+//        🌊 Wave Height  : ${it.waveHeight} m
+//        💨 Wind Speed   : ${it.windSpeed} m/s
+//        🧭 Wind Dir     : ${it.windDirection}°
+//        🌊 Swell Period : ${it.swellPeriod} s
+//        🌊 Swell Dir    : ${it.swellDirection}°
+//        """.trimIndent()
+//            )
+//        }
         val local = queries.selectToday(date, latitude, longitude).executeAsOneOrNull()
+        println("📊 Creating Prompt With Daily Forecast From Local:")
+        println(
+            """
+        🔹 Forecast 
+        ─────────────────────
+        📅 Date         : ${local?.date}
+        📍 Location     : (${local?.latitude}, ${local?.longitude})
+        🌊 Wave Height  : ${local?.waveHeight} m
+        💨 Wind Speed   : ${local?.windSpeed} m/s
+        🧭 Wind Dir     : ${local?.windDirection}°
+        🌊 Swell Period : ${local?.swellPeriod} s
+        🌊 Swell Dir    : ${local?.swellDirection}°
+        """.trimIndent()
+        )
+
         return Result.Success(local?.toDailyForecast())
     }
 
@@ -104,6 +157,19 @@ class ForecastRepositoryImpl(
             return Result.Success(Unit)
         } catch (e: Exception) {
             return Result.Failure(TMDBError("Error updating forecast: ${e.message ?: "Unknown error"}"))
+        }
+    }
+
+    override suspend fun deleteBySpot(
+        latitude: Double,
+        longitude: Double
+    ): Result<Unit, TMDBError> {
+
+        try {
+            queries.deleteBySpot(latitude, longitude)
+            return Result.Success(Unit)
+        } catch (e: Exception) {
+            return Result.Failure(TMDBError("Error deleting forecast: ${e.message ?: "Unknown error"}"))
         }
     }
 

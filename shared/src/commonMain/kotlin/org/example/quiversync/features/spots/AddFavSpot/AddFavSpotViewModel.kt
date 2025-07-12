@@ -7,10 +7,12 @@ import kotlinx.coroutines.launch
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.features.BaseViewModel
-import org.example.quiversync.features.spots.FavSpotMainPage.FavSpotsUseCases
+import org.example.quiversync.features.spots.FavSpotsUseCases
+import org.example.quiversync.features.spots.SpotEventBus
 
 class AddFavSpotViewModel(
-    private val favSpotUseCases: FavSpotsUseCases
+    private val favSpotUseCases: FavSpotsUseCases,
+    private val spotEventBus: SpotEventBus
 ) :BaseViewModel() {
     private val _addFavSpotState = MutableStateFlow<AddFavSpotState>(AddFavSpotState.Idle(FavoriteSpotForm()))
     val addFavSpotState : StateFlow<AddFavSpotState> get() = _addFavSpotState
@@ -58,16 +60,38 @@ class AddFavSpotViewModel(
         if (hasErrors) return
 
         scope.launch {
-            _addFavSpotState.value = AddFavSpotState.Loading
-            val result = favSpotUseCases.AddFavSpotUseCase(
-                FavoriteSpot(
-                    name = currentState.data.name,
-                    spotLatitude = currentState.data.latitude,
-                    spotLongitude = currentState.data.longitude
-                )
+            val spot = FavoriteSpot(
+                spotID = "",
+                userID = "", // Assuming userID is set elsewhere or not needed for this operation
+                name = currentState.data.name,
+                spotLatitude = currentState.data.latitude,
+                spotLongitude = currentState.data.longitude
             )
+            when(val forecastResult = favSpotUseCases.getWeeklyForecastBySpotUseCase(spot)) {
+                is Result.Success -> {
+                   val forecast = forecastResult.data
+                    _addFavSpotState.emit(AddFavSpotState.Loading)
+                    if (forecast == null) {
+                        _addFavSpotState.value = AddFavSpotState.Error("No forecast data available for this spot")
+                        return@launch
+                    }
+                    forecast.let { dailyForecasts ->
+                        if(dailyForecasts.first().waveHeight <= 0.0) {
+                            _addFavSpotState.value = AddFavSpotState.Error("Please enter a valid spot near the ocean yew!")
+                            return@launch
+                        }
+                    }
+
+                }
+                is Result.Failure -> {
+                    _addFavSpotState.value = AddFavSpotState.Error("Failed to fetch forecast: ${forecastResult.error?.message}")
+                    return@launch
+                }
+            }
+            val result = favSpotUseCases.addFavSpotUseCase(spot)
             if( result is Result.Success ) {
                 _addFavSpotState.value = AddFavSpotState.Loaded
+                spotEventBus.emitBoardAdded()
             } else {
                 _addFavSpotState.value = AddFavSpotState.Error("Failed to add favorite spot")
             }

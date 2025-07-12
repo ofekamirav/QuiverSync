@@ -18,6 +18,8 @@ struct ErrorView: View {
                 .ignoresSafeArea()
             Text(messege)
                 .font(.title)
+            Text("Please try again later")
+                
         }
     }
 }

@@ -1,6 +1,5 @@
 package org.example.quiversync.features.spots.AddFavSpot
 
-import org.example.quiversync.domain.model.FavoriteSpot
 
 sealed class AddFavSpotState {
     data class Idle(val data: FavoriteSpotForm = FavoriteSpotForm()) : AddFavSpotState()

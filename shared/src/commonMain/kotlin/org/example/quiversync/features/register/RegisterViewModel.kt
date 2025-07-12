@@ -44,7 +44,7 @@ class RegisterViewModel(
             it.copy(
                 nameError = nameError,
                 emailError = emailError,
-                passwordError = passwordError
+                passwordError = passwordError,
             )
         }
 

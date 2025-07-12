@@ -13,6 +13,10 @@ CREATE TABLE DailyForecastEntity (
 selectAll:
 SELECT * FROM DailyForecastEntity;
 
+SELECT_BY_SPOT:
+SELECT * FROM DailyForecastEntity
+WHERE latitude = ? AND longitude = ?;
+
 deleteForecastsOlderThan:
 DELETE FROM DailyForecastEntity
 WHERE date < ?;

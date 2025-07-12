@@ -1,53 +1,73 @@
-//
-//  Untitled.swift
+//  ForecastRow.swift
 //  iosApp
 //
 //  Created by gal levi on 25/06/2025.
 //  Copyright © 2025 orgName. All rights reserved.
-//
+
 import SwiftUI
 import Shared
 
 struct ForecastRow: View {
-    
+
     let prediction: DailyPrediction
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
-            VStack(spacing: 8) {
-                Image(prediction.Surfboard.imageRes)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 64, height: 80)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            VStack(spacing: 10) {
+                AsyncImage(url: URL(string: prediction.surfboard.imageRes)) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 64, height: 80)
+                            .clipped()
+                    case .failure(_):
+                        Image(systemName: "photo")
+                            .resizable()
+                            .frame(width: 64, height: 80)
+                            .foregroundColor(.gray.opacity(0.6))
+                    case .empty:
+                        ProgressView()
+                            .frame(width: 64, height: 80)
+                    @unknown default:
+                        ProgressView()
+                            .frame(width: 64, height: 80)
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .shadow(radius: 2)
 
                 ChipView(
-                    text: "\(prediction.confidence)% match",
+                    text: "\(prediction.prediction.score)% match",
                     color: AppColors.surfBlue.opacity(0.1)
                 )
+                .padding(.top, 4)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(prediction.Surfboard.type)
-                    .font(.headline)
+            VStack(alignment: .leading, spacing: 6) {
+                Text(prediction.surfboard.company)
+                    .font(.system(.headline, design: .rounded))
                     .foregroundColor(AppColors.deepBlue)
 
-                Text(prediction.Surfboard.model)
+                Text(prediction.surfboard.model)
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
-                Text(prediction.DailyForecast.date)
+                Text(prediction.dailyForecast.date)
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.gray.opacity(0.8))
 
                 HStack(spacing: 16) {
-                    Label("\(prediction.DailyForecast.waveHeight, specifier: "%.1f") m", systemImage: "water.waves")
-                    Label("\(prediction.DailyForecast.windSpeed, specifier: "%.1f") m/s", systemImage: "wind")
+                    Label("\(prediction.dailyForecast.waveHeight, specifier: "%.1f") m", systemImage: "water.waves")
+                    Label("\(prediction.dailyForecast.windSpeed, specifier: "%.1f") m/s", systemImage: "wind")
                 }
-                .font(.subheadline)
+                .font(.system(size: 14, weight: .medium, design: .rounded))
                 .foregroundColor(AppColors.deepBlue)
-                .padding(.top, 4)
+                .padding(.top, 6)
             }
+            Spacer()
         }
+        .padding(.vertical, 8)
     }
 }
