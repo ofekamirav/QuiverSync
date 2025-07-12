@@ -32,6 +32,18 @@ buildkonfig {
             "UPLOAD_PRESET",
             localProperties.getProperty("cloudinary.uploadPreset", "")
         )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "STORM_GLASS_API_KEY",
+            localProperties.getProperty("STORMGLASS_API_KEY","")
+
+        )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "GEMINI_API_KEY",
+            localProperties.getProperty("GEMINI_API_KEY","")
+
+        )
     }
 }
 

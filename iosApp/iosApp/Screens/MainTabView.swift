@@ -11,6 +11,7 @@ import Shared
 
 struct MainTabView: View {
     @State private var selectedTab: BottomTab = .home
+    @Binding var isLoggedIn: Bool
     
     
     
@@ -34,19 +35,14 @@ struct MainTabView: View {
                 HomeScreen()
                     .tabItem { Label("Home", systemImage: "house") }
                     .tag(BottomTab.home)
-                QuiverScreen()
-                    .tabItem { Label("Quiver", systemImage: "surfboard.fill") }
-                    .tag(BottomTab.quiver)
-                ProfileScreen()
+//                QuiverScreen()
+//                    .tabItem { Label("Quiver", systemImage: "surfboard.fill") }
+//                    .tag(BottomTab.quiver)
+                ProfileScreen(isLoggedIn: $isLoggedIn)
                     .tabItem { Label("Profile", systemImage: "person.crop.circle") }
                     .tag(BottomTab.profile)
-                    
                 
-                ForecastScreen()
-                    .tabItem { Label("Spots", systemImage: "map") }
-                    .tag(BottomTab.spots)
-                
-                ForecastResults()
+                FavSpotsScreen()
                     .tabItem { Label("Forecast", systemImage: "sun.min") }
                     .tag(BottomTab.forecast)
     //

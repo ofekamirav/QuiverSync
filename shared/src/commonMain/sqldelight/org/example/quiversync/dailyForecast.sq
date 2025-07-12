@@ -13,6 +13,14 @@ CREATE TABLE DailyForecastEntity (
 selectAll:
 SELECT * FROM DailyForecastEntity;
 
+SELECT_BY_SPOT:
+SELECT * FROM DailyForecastEntity
+WHERE latitude = ? AND longitude = ?;
+
+deleteForecastsOlderThan:
+DELETE FROM DailyForecastEntity
+WHERE date < ?;
+
 insertOrReplace:
 INSERT OR REPLACE INTO DailyForecastEntity(
     date, latitude, longitude, waveHeight, windSpeed, windDirection, swellPeriod, swellDirection
@@ -24,6 +32,10 @@ DELETE FROM DailyForecastEntity;
 selectToday:
 SELECT * FROM DailyForecastEntity
 WHERE date = ? AND latitude = ? AND longitude = ? LIMIT 1;
+
+howManyBySpot:
+SELECT COUNT(*) FROM DailyForecastEntity
+WHERE latitude = ? AND longitude = ?;
 
 deleteBySpot:
 DELETE FROM DailyForecastEntity

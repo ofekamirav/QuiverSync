@@ -43,4 +43,19 @@ class UserDao(
     fun deleteProfile(uid: String) {
         queries.deleteProfile(uid)
     }
+
+    fun getAllProfiles(): List<User> {
+        return queries.getAllProfiles().executeAsList().map { userEntity ->
+            User(
+                uid = userEntity.uid,
+                name = userEntity.name,
+                email = userEntity.email,
+                dateOfBirth = userEntity.dateOfBirth,
+                heightCm = userEntity.heightCm,
+                weightKg = userEntity.weightKg,
+                surfLevel = userEntity.surfLevel,
+                profilePicture = userEntity.profilePicture
+            )
+        }
+    }
 }

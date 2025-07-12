@@ -39,9 +39,12 @@ data class GeminiPartResponse(
 
 @Serializable
 data class GeminiMatchResponse(
-    val surfboardId: String,
+    val forecastLatitude: Double,//forecast id && spotID
+    val forecastLongitude: Double,//forecast id
+    val date: String,
+    val surfboardID: String,
     val score: Int,
-    val reason: String
+    val description: String
 )
 
 data class BoardMatchUi(

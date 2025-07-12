@@ -20,3 +20,6 @@ INSERT OR REPLACE INTO UserProfileEntity (
 
 deleteProfile:
 DELETE FROM UserProfileEntity WHERE uid = ?;
+
+getAllProfiles:
+SELECT * FROM UserProfileEntity;

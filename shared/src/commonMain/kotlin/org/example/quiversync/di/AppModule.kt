@@ -22,26 +22,46 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import org.example.quiversync.QuiverSyncDatabase
 import org.example.quiversync.data.local.dao.DatabaseDriverFactory
+import org.example.quiversync.data.local.dao.FavSpotDao
+import org.example.quiversync.data.local.dao.GeminiPredictionDao
 import org.example.quiversync.data.local.dao.QuiverDao
 import org.example.quiversync.data.local.dao.UserDao
 import org.example.quiversync.data.remote.api.GeminiApi
 import org.example.quiversync.data.remote.api.StormGlassApi
+import org.example.quiversync.data.remote.datasource.favSpot.FavSpotRemoteSource
 import org.example.quiversync.data.remote.datasource.quiver.QuiverRemoteDataSource
 import org.example.quiversync.data.remote.datasource.quiver.QuiverRemoteDataSourceService
+import org.example.quiversync.data.remote.datasource.favSpot.FavSpotRemoteSourceService
 import org.example.quiversync.data.repository.AuthRepositoryImpl
+import org.example.quiversync.data.repository.FavSpotRepositoryImpl
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.data.repository.ForecastRepositoryImpl
+import org.example.quiversync.data.repository.GeminiRepositoryImpl
 import org.example.quiversync.data.repository.QuiverRepositoryImpl
 import org.example.quiversync.data.repository.UserRepositoryImpl
 import org.example.quiversync.domain.repository.AuthRepository
+import org.example.quiversync.domain.repository.FavSpotRepository
 import org.example.quiversync.domain.repository.ForecastRepository
+import org.example.quiversync.domain.repository.GeminiRepository
 import org.example.quiversync.domain.repository.QuiverRepository
 import org.example.quiversync.domain.repository.UserRepository
-import org.example.quiversync.domain.usecase.GetWeeklyForecastByLocationUseCase
-import org.example.quiversync.domain.usecase.GetWeeklyForecastBySpotUseCase
+import org.example.quiversync.domain.usecase.forecast.GetWeeklyForecastByLocationUseCase
+import org.example.quiversync.domain.usecase.forecast.GetWeeklyForecastBySpotUseCase
 import org.example.quiversync.domain.usecase.register.RegisterUserUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.UploadImageUseCase
+import org.example.quiversync.domain.usecase.favSpots.AddFavSpot
+import org.example.quiversync.domain.usecase.favSpots.ClearAllFavSpots
+import org.example.quiversync.domain.usecase.favSpots.GetAllFavUserSpots
+import org.example.quiversync.domain.usecase.favSpots.RemoveFavSpot
+import org.example.quiversync.domain.usecase.forecast.DeleteBySpot
+import org.example.quiversync.domain.usecase.forecast.DeleteOutDateForecastUseCase
+import org.example.quiversync.domain.usecase.forecast.GetDailyForecast
+import org.example.quiversync.domain.usecase.gemini.DeleteAllPredictionsBySpotUseCase
+import org.example.quiversync.domain.usecase.gemini.GenerateAllTodayPredictionsUseCase
+import org.example.quiversync.domain.usecase.gemini.GenerateWeeklyPredictionsUseCase
+import org.example.quiversync.domain.usecase.gemini.GenerateSingleDayMatchUseCase
+import org.example.quiversync.domain.usecase.gemini.GetPredictionsForTodayUseCase
 import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
 import org.example.quiversync.domain.usecase.loginUseCases.SignInWithGoogleUseCase
 import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
@@ -70,11 +90,14 @@ import org.example.quiversync.features.register.RegisterUseCases
 import org.example.quiversync.features.register.RegisterViewModel
 import org.example.quiversync.features.settings.SecurityAndPrivacyViewModel
 import org.example.quiversync.features.settings.SettingsViewModel
+import org.example.quiversync.features.spots.AddFavSpot.AddFavSpotViewModel
+import org.example.quiversync.features.spots.FavSpotMainPage.FavSpotsViewModel
+import org.example.quiversync.features.spots.FavSpotsUseCases
+import org.example.quiversync.features.spots.SpotEventBus
 import org.example.quiversync.features.user.UserUseCases
 import org.example.quiversync.features.user.UserViewModel
 import org.example.quiversync.features.user.edit_user.EditProfileDetailsViewModel
 import org.example.quiversync.utils.event.EventBus
-import org.koin.core.module.dsl.viewModelOf
 
 
 fun initKoin(config: KoinAppDeclaration? = null) {
@@ -108,26 +131,33 @@ val commonModule= module {
 
    // SharedFlow / Event Bus
    single { EventBus }
-
+   single { SpotEventBus }
 
 
    //-----------------------------------------------------Repositories---------------------------------------------
    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
-   single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get()) }
+   single<FavSpotRepository>{FavSpotRepositoryImpl(get(), get(), get())}
+   single<GeminiRepository>{GeminiRepositoryImpl(get(), get(), get() , get())}
+   single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get() , get()) }
    single<UserRepository> { UserRepositoryImpl(get(), get(),get()) }
    single<QuiverRepository> { QuiverRepositoryImpl(get(), get(), get()) }
 
    //----------------------------------------------------- Firebase- Remote Data Source----------------------------------
    single<QuiverRemoteDataSource>{ QuiverRemoteDataSourceService(get()) }
+   single<FavSpotRemoteSource> { FavSpotRemoteSourceService(get()) }
+
 
    //---------------------------------------------------SqlDelight + Dao----------------------------------------
    single { QuiverSyncDatabase(get()) }
    single { get<QuiverSyncDatabase>().dailyForecastQueries }
-   single { get<QuiverSyncDatabase>().geminiMatchQueries }
+   single { get<QuiverSyncDatabase>().geminiPredictionQueries }
    single { get<QuiverSyncDatabase>().userProfileQueries }
    single { get<QuiverSyncDatabase>().surfboardQueries }
+   single { get<QuiverSyncDatabase>().favSpotQueries }
    single { UserDao(get()) }
    single { QuiverDao(get()) }
+   single {GeminiPredictionDao(get())}
+   single { FavSpotDao(get()) }
 
 
    //---------------------------------------------------UseCases--------------------------------------------
@@ -155,6 +185,26 @@ val commonModule= module {
    single { DeleteSurfboardUseCase(get()) }
    single { UnpublishSurfboardFromRentalUseCase(get()) }
    single { GetBoardsNumberUseCase(get()) }
+
+   // FavSpot UseCases
+   single { AddFavSpot(get()) }
+   single { ClearAllFavSpots(get()) }
+   single { GetAllFavUserSpots(get()) }
+   single { RemoveFavSpot(get()) }
+
+   // Forecast UseCases
+   single { DeleteOutDateForecastUseCase(get()) }
+   single { GetDailyForecast(get()) }
+   single { DeleteBySpot(get()) }
+
+   // Gemini UseCases
+   single { GenerateWeeklyPredictionsUseCase(get()) }
+   single { GenerateSingleDayMatchUseCase(get()) }
+   single { DeleteAllPredictionsBySpotUseCase(get()) }
+   single { GenerateAllTodayPredictionsUseCase(get()) }
+//   single { GetPredictionsForTodayUseCase(get()) }
+
+
    //Data Classes for UseCases
    single{
       HomeUseCases(
@@ -190,9 +240,39 @@ val commonModule= module {
       )
    }
 
+   // FavSpots UseCases Collection
+   single {
+      FavSpotsUseCases(
+
+            // FavSpots UseCases
+            deleteOutDateForecastUseCase = get(),
+            getAllFavUserSpotsUseCase = get(),
+            addFavSpotUseCase = get(),
+            removeFavSpotsUseCase = get(),
+
+            // Quiver&User UseCases
+            getAllQuiverUseCase = get(),
+            getUserProfileUseCase = get(),
+
+
+            // Forecast UseCases
+            getDailyForecast = get(),
+            getWeeklyForecastBySpotUseCase = get(),
+            deleteBySpotUseCase = get(),
+
+            // Gemini UseCases
+            generateBestBoardForSingleDayUseCase = get(),
+            generateWeeklyPredictions = get(),
+            deleteAllPredictionsBySpotUseCase = get(),
+            generateAllTodayPredictionsUseCase = get()
+      )
+   }
+
+
 
    // --------------------------------------------ViewModels--------------------------------------------------
    single { RegisterViewModel(get()) }
+   single { OnboardingViewModel(get(), get(),get()) }
    single { UserViewModel(get(), get()) }
    single { HomeViewModel(get()) }
    single { LoginViewModel(get(), get()) }
@@ -202,7 +282,9 @@ val commonModule= module {
    single { SettingsViewModel(get()) }
    single { EditProfileDetailsViewModel(get()) }
    single { SecurityAndPrivacyViewModel(get()) }
-   single { ForgotPasswordViewModel(get()) }
+    single { FavSpotsViewModel(get(),get()) }
+    single { AddFavSpotViewModel(get() , get())}
+    single { ForgotPasswordViewModel(get()) }
 
 
 
@@ -215,10 +297,10 @@ fun createJson(): Json = Json {
 }
 
 fun createHttpClient(clientEngine: HttpClientEngine, json: Json) = HttpClient(clientEngine) {
-   install(Logging) {
-      level = LogLevel.ALL
-      logger = Logger.DEFAULT
-   }
+//   install(Logging) {
+//      level = LogLevel.ALL
+//      logger = Logger.DEFAULT
+//   }
    install(ContentNegotiation) {
       json(json)
    }

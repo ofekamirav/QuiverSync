@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.forecast.WeeklyForecast
 import org.example.quiversync.features.home.HomeState
 import org.example.quiversync.features.home.HomeViewModel
@@ -75,7 +76,7 @@ fun HomeScreen(
 }
 @Composable
 fun HomeScreenContent(
-    forecast: WeeklyForecast,
+    forecast: List<DailyForecast>,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(true) }
@@ -93,7 +94,7 @@ fun HomeScreenContent(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 MainConditions(
-                    forecast = forecast.list.first(),
+                    forecast = forecast.first(),
                     expanded = expanded,
                     onExpandToggle = { expanded = !expanded }
                 )
@@ -111,7 +112,7 @@ fun HomeScreenContent(
             ) {
                 Column(modifier = Modifier.weight(0.6f)) {
                     MainConditions(
-                        forecast = forecast.list.first(),
+                        forecast = forecast.first(),
                         expanded = expanded,
                         onExpandToggle = { expanded = !expanded }
                     )

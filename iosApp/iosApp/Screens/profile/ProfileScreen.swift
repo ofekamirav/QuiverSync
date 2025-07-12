@@ -11,6 +11,7 @@ import Shared
 
 public struct ProfileScreen: View {
     @ObservedObject private(set) var viewModel = ProfileScreenModelWrapper()
+    @Binding var isLoggedIn: Bool
     
     public var body: some View {
         VStack{
@@ -18,7 +19,7 @@ public struct ProfileScreen: View {
             case .loading:
                 LoadingView(colorName: "background")
             case .loaded(let loaded):
-                ProfileView(user: loaded.user)
+                ProfileView(user: loaded.user , isLoggedIn: $isLoggedIn)
             case .error(let error): ErrorView(messege: error.message)
             }
         }
@@ -39,7 +40,7 @@ extension ProfileScreen{
         @Published var uiState: UserState
         
         init() {
-            self.viewModel = UserViewModel()
+            self.viewModel = KoinKt.userViewModel()
             self.uiState = viewModel.uiState.value
         }
         

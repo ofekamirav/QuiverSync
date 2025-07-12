@@ -12,48 +12,65 @@ import Shared
 
 public struct WeeklyForecastPopup: View {
     @Binding var selectedSpot : FavoriteSpot?
-    let weeklyPrediction: WeeklyPrediction
-
+    let favSpotsData: FavSpotsData
+    let favSpotsViewModel : FavSpotsViewModel
+    
     public var body: some View {
-        ZStack {
-            // Popup container
-            VStack(alignment: .leading, spacing: 12) {
-                // Header
-                HStack {
-                    Text("Weekly Forecast")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(AppColors.deepBlue)
+        
+        if let spot = selectedSpot {
+            
 
-                    Spacer()
-
-                    Button(action: {
-                        selectedSpot = nil
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
+            let weeklyPrediction = favSpotsData.weeklyUiPredictions
+            
+            
+            ZStack {
+                VStack(alignment: .leading, spacing: 12) {
+                    // Header
+                    HStack {
+                        Text("Weekly Forecast")
                             .font(.title)
-                            .foregroundColor(.gray)
-                    }
-                }
-                .padding(.bottom, 8)
-                
+                            .fontWeight(.bold)
+                            .foregroundColor(AppColors.deepBlue)
 
-                Divider()
+                        Spacer()
 
-                // Lazy list of daily predictions
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(weeklyPrediction.List, id: \.DailyForecast.date) { prediction in
-                            ForecastRow(prediction: prediction)
-                                .padding()
-                                .background(AppColors.foamWhite)
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                        Button(action: {
+                            selectedSpot = nil
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.title)
+                                .foregroundColor(.gray)
                         }
                     }
+                    .padding(.bottom, 8)
+                    Text("\(spot.name)")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+
+                    Divider()
+
+                    // Scrollable forecast rows
+                    ScrollView {
+//                        LazyVStack(spacing: 12) {
+                            ForEach(weeklyPrediction, id: \.dailyForecast.date) { prediction in
+
+                                ForecastRow(prediction: prediction)
+                                    .padding()
+                                    .background(AppColors.foamWhite)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                            }
+//                        }
+//                        .padding(.bottom, 24) // Add spacing below last card
+                    }
+
+
+                    Spacer(minLength: 0) // Prevent clipping
                 }
+                .padding()
+                .padding(.horizontal)
             }
-            .padding()
-            .padding(.horizontal)
+        }else{
+            FavSpotsScreen()
         }
     }
 }

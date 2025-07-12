@@ -39,7 +39,6 @@ import org.example.quiversync.presentation.screens.rentals.RentalsHubScreen
 import org.example.quiversync.presentation.screens.settings.EditProfileDetailsScreen
 import org.example.quiversync.presentation.screens.settings.SecurityAndPrivacyScreen
 import org.example.quiversync.presentation.screens.settings.SettingsScreen
-import org.example.quiversync.presentation.screens.spots.FavoriteSpotsScreen
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
@@ -246,7 +245,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 )
             }
             composable(Screen.Spots.route) {
-                FavoriteSpotsScreen(modifier = Modifier.padding(innerPadding))
+//                FavoriteSpotsScreen(modifier = Modifier.padding(innerPadding))
             }
             composable(Screen.Rentals.route) {
                 RentalsHubScreen(modifier = Modifier.padding(innerPadding))

@@ -15,7 +15,7 @@ struct RegisterScreen: View {
     
     let onBackBtn: () -> Void
     let onSuccess: () -> Void
-
+    @Binding var isLoggedIn: Bool
     
     var body: some View {
         VStack {
@@ -23,15 +23,15 @@ struct RegisterScreen: View {
             case .loading:
                 LoadingView(colorName: "background")
                 
-            case .loaded(let loaded):
-
+            case .idle(let idle):
                 RegisterView(
-                    state: loaded.data,
+                    state: idle.data,
                     RegViewModel: viewModel.viewModel,
                     onBackClick: onBackBtn,
                     onSuccess: onSuccess
                 )
-                
+            case .loaded(let loaded):
+                MainTabView(isLoggedIn : $isLoggedIn)
             case .error(let error):
                 ErrorView(messege: error.message)
             
@@ -40,11 +40,11 @@ struct RegisterScreen: View {
         .onAppear {
             viewModel.startObserving()
         }
-        .onReceive(viewModel.$uistate) { newState in
-            if case .loaded(let loaded) = onEnum(of: newState), loaded.data.isWaiting {
-                onSuccess()
-            }
-        }
+//        .onReceive(viewModel.$uistate) { newState in
+//            if case .loaded(let loaded) = onEnum(of: newState), loaded.data.isWaiting {
+//                onSuccess()
+//            }
+//        }
 
 
     }

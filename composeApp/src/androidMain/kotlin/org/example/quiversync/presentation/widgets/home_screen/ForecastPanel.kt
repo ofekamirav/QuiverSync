@@ -9,14 +9,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.forecast.WeeklyForecast
 import org.example.quiversync.presentation.theme.OceanPalette
 
 @Composable
 fun ForecastPanel(
-    forecast: WeeklyForecast
+    forecast: List<DailyForecast>
 ) {
-    val upcomingDays = forecast.list.drop(1)
+    val upcomingDays = forecast.drop(1)
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(

@@ -1,12 +1,12 @@
 package org.example.quiversync.domain.model.forecast
 
-data class DailyForecast (
-    val date : String,
-    val waveHeight: Double,
-    val windSpeed: Double,
-    val latitude: Double,
-    val longitude: Double,
-    val windDirection: Double,
-    val swellPeriod: Double,
-    val swellDirection: Double,
-    )                                                                                                    
+data class DailyForecast(
+    val date: String = "",
+    val waveHeight: Double = 0.0,
+    val windSpeed: Double = 0.0,
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+    val windDirection: Double = 0.0,
+    val swellPeriod: Double = 0.0,
+    val swellDirection: Double = 0.0,
+)
