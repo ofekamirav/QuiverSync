@@ -269,6 +269,9 @@ fun CompleteRegisterScreen(
                             cameraLauncher.launch(null)
                         } else {
                             cameraPermissionState.launchPermissionRequest()
+                            if (cameraPermissionState.status.isGranted) {
+                                cameraLauncher.launch(null)
+                            }
                         }
                     },
                     onChooseFromGallery = {
@@ -277,6 +280,9 @@ fun CompleteRegisterScreen(
                             galleryLauncher.launch("image/*")
                         } else {
                             storagePermissionState.launchPermissionRequest()
+                            if (storagePermissionState.status.isGranted) {
+                                galleryLauncher.launch("image/*")
+                            }
                         }
                     }
                 )

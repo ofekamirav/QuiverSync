@@ -114,7 +114,6 @@ fun SettingsScreen(
     }
 
     if (isLoading) {
-        // Show a loading indicator if needed
         Box(
             modifier = Modifier
                 .fillMaxSize()

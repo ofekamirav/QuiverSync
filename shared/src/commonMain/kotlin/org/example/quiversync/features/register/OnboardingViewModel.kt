@@ -87,17 +87,17 @@ class OnboardingViewModel(
     private fun validateAndComplete() {
         val currentState = _onboardingState.value
         if (currentState !is OnboardingState.Idle) return
-        val height = currentState.heightCm.toDoubleOrNull()
-        val weight = currentState.weightKg.toDoubleOrNull()
+        val height = currentState.heightCm.toDouble()
+        val weight = currentState.weightKg.toDouble()
 
         val heightError = when {
-            height == null -> "Height is required"
+            false -> "Height is required"
             height > 250.0 || height < 50.0 -> "Enter a valid height"
             else -> null
         }
 
         val weightError = when {
-            weight == null -> "Weight is required"
+            false -> "Weight is required"
             weight > 200.0 || weight < 20.0 -> "Enter a valid weight"
             else -> null
         }
@@ -125,8 +125,8 @@ class OnboardingViewModel(
             _onboardingState.value = OnboardingState.Loading
             val details = OnboardingProfileDetails(
                 dateOfBirth = currentState.dateOfBirth,
-                heightCm = height ?: 0.0,
-                weightKg = weight ?: 0.0,
+                heightCm = height,
+                weightKg = weight,
                 surfLevel = currentState.selectedSurfLevel!!.label,
                 profilePicture = currentState.profileImageUrl
             )

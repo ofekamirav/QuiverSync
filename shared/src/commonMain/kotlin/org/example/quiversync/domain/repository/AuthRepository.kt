@@ -1,7 +1,6 @@
 package org.example.quiversync.domain.repository
 
 import org.example.quiversync.domain.model.User
-import org.example.quiversync.utils.Location
 import org.example.quiversync.data.local.Error
 import org.example.quiversync.data.local.Result
 
@@ -14,4 +13,5 @@ interface AuthRepository {
     suspend fun isUserSignedInWithPassword(): Boolean
     suspend fun reauthenticate(password: String): Result<Unit, Error>
     suspend fun updatePassword(newPassword: String): Result<Unit, Error>
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit, Error>
 }

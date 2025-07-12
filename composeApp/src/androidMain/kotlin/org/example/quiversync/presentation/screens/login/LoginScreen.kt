@@ -1,4 +1,4 @@
-package org.example.quiversync.presentation.screens
+package org.example.quiversync.presentation.screens.login
 
 import android.widget.Toast
 import org.example.quiversync.R
@@ -31,8 +31,6 @@ import org.example.quiversync.features.login.LoginData
 import org.example.quiversync.features.login.LoginEvent
 import org.example.quiversync.features.login.LoginState
 import org.example.quiversync.features.login.LoginViewModel
-import org.example.quiversync.features.register.RegisterEvent
-import org.example.quiversync.features.register.RegisterState
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.presentation.components.CustomTextField
 import org.example.quiversync.presentation.components.GradientButton
@@ -48,7 +46,8 @@ import org.koin.androidx.compose.koinViewModel
 fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel(),
     onRegisterClick: () -> Unit = {},
-    onSignInSuccess: () -> Unit = {}
+    onSignInSuccess: () -> Unit = {},
+    onForgotPasswordClick: () -> Unit = {}
 ) {
     val uiState by viewModel.loginState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -81,6 +80,7 @@ fun LoginScreen(
                 onRegisterClick = onRegisterClick,
                 onEvent = viewModel::onEvent,
                 currentState = currentState,
+                onForgotPasswordClick = onForgotPasswordClick,
             )
         }
     }
@@ -91,6 +91,7 @@ fun LoginScreen(
 fun LoginScreenContent(
     currentState: LoginState.Idle,
     onRegisterClick: () -> Unit = {},
+    onForgotPasswordClick: () -> Unit = {},
     onEvent: (LoginEvent) -> Unit = {},
     isLoading: Boolean = false
 ) {
@@ -179,7 +180,7 @@ fun LoginScreenContent(
                     text = "Forgot Password?",
                     color = textColor,
                     fontSize = 12.sp,
-                    modifier = Modifier.clickable { }
+                    modifier = Modifier.clickable { onForgotPasswordClick() },
                 )
             }
 

@@ -160,4 +160,24 @@ class AuthRepositoryImpl(
             Result.Failure(AuthError("Failed to update password: ${e.message}"))
         }
     }
+    override suspend fun sendPasswordResetEmail(email: String): Result<Unit, Error> {
+        return try {
+            auth.sendPasswordResetEmail(email)
+            Result.Success(Unit)
+        } catch (e: FirebaseAuthException) {
+            val message = e.message ?: ""
+            val errorMessage = when {
+                message.contains("USER_NOT_FOUND", ignoreCase = true) ->
+                    "No account was found with this email address."
+
+                message.contains("OPERATION_NOT_ALLOWED", ignoreCase = true) ->
+                    "Password reset is not enabled for this account. Please sign in with Google or Apple."
+
+                else -> message
+            }
+            Result.Failure(AuthError(errorMessage))
+        } catch (e: Exception) {
+            Result.Failure(AuthError("An unexpected error occurred. Please check your network connection."))
+        }
+    }
 }
