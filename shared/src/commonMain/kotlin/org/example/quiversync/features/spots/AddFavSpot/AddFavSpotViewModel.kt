@@ -67,10 +67,9 @@ class AddFavSpotViewModel(
                 spotLatitude = currentState.data.latitude,
                 spotLongitude = currentState.data.longitude
             )
-            when(val forecastResult = favSpotUseCases.getWeeklyForecastBySpotUseCase(spot)) {
+            when(val forecastResult = favSpotUseCases.getWeeklyForecastBySpotUseCase(spot,false)) {
                 is Result.Success -> {
                    val forecast = forecastResult.data
-                    _addFavSpotState.emit(AddFavSpotState.Loading)
                     if (forecast == null) {
                         _addFavSpotState.value = AddFavSpotState.Error("No forecast data available for this spot")
                         return@launch
@@ -88,10 +87,13 @@ class AddFavSpotViewModel(
                     return@launch
                 }
             }
+            _addFavSpotState.emit(AddFavSpotState.Loading)
+
             val result = favSpotUseCases.addFavSpotUseCase(spot)
             if( result is Result.Success ) {
                 _addFavSpotState.value = AddFavSpotState.Loaded
                 spotEventBus.emitBoardAdded()
+                _addFavSpotState.value = AddFavSpotState.Idle(FavoriteSpotForm())
             } else {
                 _addFavSpotState.value = AddFavSpotState.Error("Failed to add favorite spot")
             }

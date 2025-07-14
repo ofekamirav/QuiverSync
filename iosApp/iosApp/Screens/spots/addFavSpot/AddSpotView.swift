@@ -27,6 +27,7 @@ struct AddSpotView: View {
     @State private var searchResults: [MKLocalSearchCompletion] = []
     @State private var selectedCoordinate: CLLocationCoordinate2D? = nil
     @StateObject private var searchDelegateHolder = SearchDelegateHolder()
+    @Binding var errorMessage: String
 
     
 //    private var searchCompleter = MKLocalSearchCompleter()
@@ -88,7 +89,6 @@ struct AddSpotView: View {
                     Button(action: {
                         print("💾 Save spot button tapped")
                         addSpotViewModel.onEvent(event: AddFavSpotEventSaveClicked())
-                        showAddSpotScreen = false
                     }) {
                         Text("Save this spot!")
                             .foregroundColor(.white)
@@ -113,8 +113,31 @@ struct AddSpotView: View {
             }
         }
         .background(AppColors.foamWhite)
+        .overlay(
+            Group {
+                if !errorMessage.isEmpty {
+                    VStack {
+                        Spacer()
+                        Text(errorMessage)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.red.opacity(0.9))
+                            .cornerRadius(12)
+                            .padding(.bottom, 30)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            errorMessage = ""
+                        }
+                    }
+                }
+            }
+        )
+
 
     }
+    
     
     // 🔍 Search logic
     private func searchForPlace(_ query: String) {
@@ -131,6 +154,7 @@ struct AddSpotView: View {
             }
         }
     }
+    
 }
 
 // MARK: - Helper
@@ -163,6 +187,7 @@ class SearchDelegateHolder: NSObject, ObservableObject, MKLocalSearchCompleterDe
     private func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print("❌ Autocomplete error: \(error.message)")
     }
+    
 }
 
 

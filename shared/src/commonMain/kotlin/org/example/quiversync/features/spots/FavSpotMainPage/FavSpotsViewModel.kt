@@ -182,7 +182,7 @@ class FavSpotsViewModel(
                         dailyForecast = dailyForecastResult.data ?: DailyForecast()
                     } else {
                         println("FavSpotsViewModel: Daily forecast not found, trying weekly forecast")
-                        val weeklyForecastResult = favSpotsUseCases.getWeeklyForecastBySpotUseCase(spot)
+                        val weeklyForecastResult = favSpotsUseCases.getWeeklyForecastBySpotUseCase(spot , false)
                         when(weeklyForecastResult){
                             is Result.Failure -> {
                                 _uiState.value = FavSpotsState.Error(
@@ -301,7 +301,7 @@ class FavSpotsViewModel(
 
             val finalWeeklyPrediction = mutableListOf<DailyPrediction>()
 
-            val weeklyForecastResult = favSpotsUseCases.getWeeklyForecastBySpotUseCase(spot)
+            val weeklyForecastResult = favSpotsUseCases.getWeeklyForecastBySpotUseCase(spot , false)
             when(weeklyForecastResult) {
                 is Result.Failure -> {
                     _uiState.emit(FavSpotsState.Error(

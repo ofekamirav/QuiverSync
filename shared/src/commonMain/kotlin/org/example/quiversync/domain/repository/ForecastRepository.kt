@@ -8,7 +8,8 @@ import org.example.quiversync.domain.model.forecast.WeeklyForecast
 interface ForecastRepository {
     suspend fun getWeeklyForecast(
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        isHomePage: Boolean
     ): Result<List<DailyForecast>,TMDBError>
 
     suspend fun getDailyForecastByDateAndSpot(

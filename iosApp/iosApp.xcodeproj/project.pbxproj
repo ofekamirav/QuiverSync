@@ -27,7 +27,6 @@
 		696305612E211FA600018B65 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 696305602E211FA600018B65 /* FirebaseCrashlytics */; };
 		696305632E211FA600018B65 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 696305622E211FA600018B65 /* FirebaseFirestore */; };
 		6975DFA22E04B6B000D14119 /* QuiverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6975DFA12E04B6AD00D14119 /* QuiverView.swift */; };
-		6975DFA42E04B6E100D14119 /* SurfboardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6975DFA32E04B6E000D14119 /* SurfboardCard.swift */; };
 		697E7CAD2E0561C00030392F /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CAC2E0561B60030392F /* ProfileScreen.swift */; };
 		697E7CAF2E05656E0030392F /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CAE2E05656B0030392F /* LoadingView.swift */; };
 		697E7CB12E0565D80030392F /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CB02E0565D50030392F /* ErrorView.swift */; };
@@ -37,9 +36,30 @@
 		697E7CBA2E0572090030392F /* UserDetailsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CB92E0572040030392F /* UserDetailsList.swift */; };
 		697E7CBC2E05729B0030392F /* ProfileActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CBB2E0572960030392F /* ProfileActions.swift */; };
 		699AE8AC2E1D3D0100717A8B /* FavSpotWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699AE8AB2E1D3CFA00717A8B /* FavSpotWrapper.swift */; };
+		69A923712E23A4F7001EB624 /* QuiverViewModelWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923702E23A4F6001EB624 /* QuiverViewModelWrapper.swift */; };
+		69A923742E23A961001EB624 /* BoardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923732E23A960001EB624 /* BoardCard.swift */; };
+		69A923762E23A986001EB624 /* SurfboardDetailDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923752E23A97F001EB624 /* SurfboardDetailDialog.swift */; };
+		69A923782E23A9AD001EB624 /* PublishSurfboardDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923772E23A9AC001EB624 /* PublishSurfboardDialog.swift */; };
+		69A9237A2E23A9C0001EB624 /* CustomDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923792E23A9BF001EB624 /* CustomDialog.swift */; };
+		69A9237D2E23B7E0001EB624 /* AddBoardWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9237C2E23B7D4001EB624 /* AddBoardWrapper.swift */; };
+		69A9237F2E23B7E7001EB624 /* AddBoardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9237E2E23B7E3001EB624 /* AddBoardScreen.swift */; };
+		69A923822E23B7FB001EB624 /* AddBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923812E23B7F7001EB624 /* AddBoardView.swift */; };
+		69A923852E23BA15001EB624 /* AddBoardStep1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923842E23BA14001EB624 /* AddBoardStep1View.swift */; };
+		69A923872E23BA1D001EB624 /* AddBoardStep2View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923862E23BA1C001EB624 /* AddBoardStep2View.swift */; };
+		69A923892E23BA23001EB624 /* WizardNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923882E23BA22001EB624 /* WizardNavigationBar.swift */; };
+		69A9238B2E23BA2D001EB624 /* BoardImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9238A2E23BA2C001EB624 /* BoardImagePicker.swift */; };
+		69A9238D2E23BA34001EB624 /* SelectableBoardTypeGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9238C2E23BA33001EB624 /* SelectableBoardTypeGrid.swift */; };
+		69A9238F2E23BA3B001EB624 /* FinsSetupDropdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9238E2E23BA3A001EB624 /* FinsSetupDropdown.swift */; };
+		69A923922E23C518001EB624 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923912E23C516001EB624 /* CustomTextField.swift */; };
+		69A923942E23C573001EB624 /* ImageSourceSelectorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923932E23C572001EB624 /* ImageSourceSelectorSheet.swift */; };
+		69A923962E23D06F001EB624 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923952E23D06E001EB624 /* ImagePicker.swift */; };
+		69A923992E23D17D001EB624 /* KotlinInteropExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923982E23D17C001EB624 /* KotlinInteropExtensions.swift */; };
+		69A9239B2E23D262001EB624 /* OutlinedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9239A2E23D260001EB624 /* OutlinedButton.swift */; };
 		69C1292D2E15676A0054411E /* RegisterViewModelWrapper+Bindings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C1292C2E1567660054411E /* RegisterViewModelWrapper+Bindings.swift */; };
 		69C86FF52E12ACBF00850490 /* RegisterWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C86FF42E12ACB600850490 /* RegisterWrapper.swift */; };
 		69C86FF72E12B4E500850490 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C86FF62E12B4E100850490 /* RegisterView.swift */; };
+		69D40BA22E246CEB007FFD89 /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D40BA12E246CE7007FFD89 /* HomeScreen.swift */; };
+		69D40BA42E246CF6007FFD89 /* HomeWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D40BA32E246CF1007FFD89 /* HomeWrapper.swift */; };
 		69DAB07C2E118BB800D83C51 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 69DAB07B2E118BB800D83C51 /* GoogleService-Info.plist */; };
 		69E55AA92E02D20600B530D3 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55AA82E02D1FE00B530D3 /* LoginView.swift */; };
 		69E55AAF2E02DD9400B530D3 /* RegisterScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55AAE2E02DD8C00B530D3 /* RegisterScreen.swift */; };
@@ -47,9 +67,8 @@
 		69E55AB32E02DDDF00B530D3 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55AB22E02DDDD00B530D3 /* MainTabView.swift */; };
 		69E55ABB2E02DE3600B530D3 /* AddSpotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55ABA2E02DE3100B530D3 /* AddSpotView.swift */; };
 		69E55ACB2E02DEAE00B530D3 /* RentalsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55ACA2E02DEAD00B530D3 /* RentalsScreen.swift */; };
-		69E55ACD2E02DEBC00B530D3 /* AddBoardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55ACC2E02DEBB00B530D3 /* AddBoardScreen.swift */; };
 		69E55ACF2E02DED300B530D3 /* QuiverScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55ACE2E02DEC600B530D3 /* QuiverScreen.swift */; };
-		69E55AD12E02DEE100B530D3 /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55AD02E02DEDC00B530D3 /* HomeScreen.swift */; };
+		69E55AD12E02DEE100B530D3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55AD02E02DEDC00B530D3 /* HomeView.swift */; };
 		69E55AD32E02DF7F00B530D3 /* AppEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55AD22E02DF7E00B530D3 /* AppEntryView.swift */; };
 		69E55AD52E02E01B00B530D3 /* BottomTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55AD42E02E01A00B530D3 /* BottomTab.swift */; };
 		69E55AD92E02EE0700B530D3 /* CustomInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E55AD82E02EDFA00B530D3 /* CustomInputField.swift */; };
@@ -87,7 +106,6 @@
 		692B517C2E16D9920036FCD8 /* LoginScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreen.swift; sourceTree = "<group>"; };
 		694813FD2E1E870700F9F297 /* Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
 		6975DFA12E04B6AD00D14119 /* QuiverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuiverView.swift; sourceTree = "<group>"; };
-		6975DFA32E04B6E000D14119 /* SurfboardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfboardCard.swift; sourceTree = "<group>"; };
 		697E7CAC2E0561B60030392F /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		697E7CAE2E05656B0030392F /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		697E7CB02E0565D50030392F /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
@@ -97,9 +115,30 @@
 		697E7CB92E0572040030392F /* UserDetailsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailsList.swift; sourceTree = "<group>"; };
 		697E7CBB2E0572960030392F /* ProfileActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileActions.swift; sourceTree = "<group>"; };
 		699AE8AB2E1D3CFA00717A8B /* FavSpotWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavSpotWrapper.swift; sourceTree = "<group>"; };
+		69A923702E23A4F6001EB624 /* QuiverViewModelWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuiverViewModelWrapper.swift; sourceTree = "<group>"; };
+		69A923732E23A960001EB624 /* BoardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardCard.swift; sourceTree = "<group>"; };
+		69A923752E23A97F001EB624 /* SurfboardDetailDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfboardDetailDialog.swift; sourceTree = "<group>"; };
+		69A923772E23A9AC001EB624 /* PublishSurfboardDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishSurfboardDialog.swift; sourceTree = "<group>"; };
+		69A923792E23A9BF001EB624 /* CustomDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDialog.swift; sourceTree = "<group>"; };
+		69A9237C2E23B7D4001EB624 /* AddBoardWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardWrapper.swift; sourceTree = "<group>"; };
+		69A9237E2E23B7E3001EB624 /* AddBoardScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardScreen.swift; sourceTree = "<group>"; };
+		69A923812E23B7F7001EB624 /* AddBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardView.swift; sourceTree = "<group>"; };
+		69A923842E23BA14001EB624 /* AddBoardStep1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardStep1View.swift; sourceTree = "<group>"; };
+		69A923862E23BA1C001EB624 /* AddBoardStep2View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardStep2View.swift; sourceTree = "<group>"; };
+		69A923882E23BA22001EB624 /* WizardNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WizardNavigationBar.swift; sourceTree = "<group>"; };
+		69A9238A2E23BA2C001EB624 /* BoardImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardImagePicker.swift; sourceTree = "<group>"; };
+		69A9238C2E23BA33001EB624 /* SelectableBoardTypeGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableBoardTypeGrid.swift; sourceTree = "<group>"; };
+		69A9238E2E23BA3A001EB624 /* FinsSetupDropdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinsSetupDropdown.swift; sourceTree = "<group>"; };
+		69A923912E23C516001EB624 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
+		69A923932E23C572001EB624 /* ImageSourceSelectorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSourceSelectorSheet.swift; sourceTree = "<group>"; };
+		69A923952E23D06E001EB624 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		69A923982E23D17C001EB624 /* KotlinInteropExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinInteropExtensions.swift; sourceTree = "<group>"; };
+		69A9239A2E23D260001EB624 /* OutlinedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlinedButton.swift; sourceTree = "<group>"; };
 		69C1292C2E1567660054411E /* RegisterViewModelWrapper+Bindings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RegisterViewModelWrapper+Bindings.swift"; sourceTree = "<group>"; };
 		69C86FF42E12ACB600850490 /* RegisterWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterWrapper.swift; sourceTree = "<group>"; };
 		69C86FF62E12B4E100850490 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		69D40BA12E246CE7007FFD89 /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
+		69D40BA32E246CF1007FFD89 /* HomeWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWrapper.swift; sourceTree = "<group>"; };
 		69DAB07B2E118BB800D83C51 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		69E55AA82E02D1FE00B530D3 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		69E55AAE2E02DD8C00B530D3 /* RegisterScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterScreen.swift; sourceTree = "<group>"; };
@@ -107,9 +146,8 @@
 		69E55AB22E02DDDD00B530D3 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		69E55ABA2E02DE3100B530D3 /* AddSpotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSpotView.swift; sourceTree = "<group>"; };
 		69E55ACA2E02DEAD00B530D3 /* RentalsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RentalsScreen.swift; sourceTree = "<group>"; };
-		69E55ACC2E02DEBB00B530D3 /* AddBoardScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardScreen.swift; sourceTree = "<group>"; };
 		69E55ACE2E02DEC600B530D3 /* QuiverScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuiverScreen.swift; sourceTree = "<group>"; };
-		69E55AD02E02DEDC00B530D3 /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
+		69E55AD02E02DEDC00B530D3 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		69E55AD22E02DF7E00B530D3 /* AppEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEntryView.swift; sourceTree = "<group>"; };
 		69E55AD42E02E01A00B530D3 /* BottomTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTab.swift; sourceTree = "<group>"; };
 		69E55AD82E02EDFA00B530D3 /* CustomInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomInputField.swift; sourceTree = "<group>"; };
@@ -193,15 +231,6 @@
 			path = HelperFunctions;
 			sourceTree = "<group>";
 		};
-		6975DFA02E04B69A00D14119 /* quiverScreenHelpers */ = {
-			isa = PBXGroup;
-			children = (
-				6975DFA32E04B6E000D14119 /* SurfboardCard.swift */,
-				6975DFA12E04B6AD00D14119 /* QuiverView.swift */,
-			);
-			path = quiverScreenHelpers;
-			sourceTree = "<group>";
-		};
 		697E7CAB2E055B910030392F /* profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -225,6 +254,58 @@
 			path = FavSpotsMainScreen;
 			sourceTree = "<group>";
 		};
+		69A923722E23A783001EB624 /* components */ = {
+			isa = PBXGroup;
+			children = (
+				69A923792E23A9BF001EB624 /* CustomDialog.swift */,
+				69A923772E23A9AC001EB624 /* PublishSurfboardDialog.swift */,
+				69A923752E23A97F001EB624 /* SurfboardDetailDialog.swift */,
+				69A923732E23A960001EB624 /* BoardCard.swift */,
+			);
+			path = components;
+			sourceTree = "<group>";
+		};
+		69A9237B2E23B7CB001EB624 /* addBoard */ = {
+			isa = PBXGroup;
+			children = (
+				69A923832E23BA03001EB624 /* stepsAndWizard */,
+				69A923802E23B7EA001EB624 /* components */,
+				69A9237E2E23B7E3001EB624 /* AddBoardScreen.swift */,
+				69A9237C2E23B7D4001EB624 /* AddBoardWrapper.swift */,
+				69A923812E23B7F7001EB624 /* AddBoardView.swift */,
+			);
+			path = addBoard;
+			sourceTree = "<group>";
+		};
+		69A923802E23B7EA001EB624 /* components */ = {
+			isa = PBXGroup;
+			children = (
+				69A9239A2E23D260001EB624 /* OutlinedButton.swift */,
+				69A9238E2E23BA3A001EB624 /* FinsSetupDropdown.swift */,
+				69A9238C2E23BA33001EB624 /* SelectableBoardTypeGrid.swift */,
+				69A9238A2E23BA2C001EB624 /* BoardImagePicker.swift */,
+			);
+			path = components;
+			sourceTree = "<group>";
+		};
+		69A923832E23BA03001EB624 /* stepsAndWizard */ = {
+			isa = PBXGroup;
+			children = (
+				69A923882E23BA22001EB624 /* WizardNavigationBar.swift */,
+				69A923862E23BA1C001EB624 /* AddBoardStep2View.swift */,
+				69A923842E23BA14001EB624 /* AddBoardStep1View.swift */,
+			);
+			path = stepsAndWizard;
+			sourceTree = "<group>";
+		};
+		69A923972E23D173001EB624 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				69A923982E23D17C001EB624 /* KotlinInteropExtensions.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		69C1292E2E157D5E0054411E /* Login */ = {
 			isa = PBXGroup;
 			children = (
@@ -244,6 +325,18 @@
 				69E55AAE2E02DD8C00B530D3 /* RegisterScreen.swift */,
 			);
 			path = register;
+			sourceTree = "<group>";
+		};
+		69D40BA02E246CC2007FFD89 /* components */ = {
+			isa = PBXGroup;
+			children = (
+				69E55AF22E033BE200B530D3 /* ChipView.swift */,
+				69E55AF02E033BB200B530D3 /* BoardRecommendationCardView.swift */,
+				69E55AEE2E033BA200B530D3 /* ConditionItemView.swift */,
+				69E55AF42E033C0300B530D3 /* ForecastItemView.swift */,
+				69E55AEC2E033B9300B530D3 /* CurrentConditionsView.swift */,
+			);
+			path = components;
 			sourceTree = "<group>";
 		};
 		69E55AAB2E02DD4900B530D3 /* Navigation */ = {
@@ -276,12 +369,10 @@
 		69E55AB42E02DDE900B530D3 /* home */ = {
 			isa = PBXGroup;
 			children = (
-				69E55AF22E033BE200B530D3 /* ChipView.swift */,
-				69E55AF02E033BB200B530D3 /* BoardRecommendationCardView.swift */,
-				69E55AEE2E033BA200B530D3 /* ConditionItemView.swift */,
-				69E55AF42E033C0300B530D3 /* ForecastItemView.swift */,
-				69E55AEC2E033B9300B530D3 /* CurrentConditionsView.swift */,
-				69E55AD02E02DEDC00B530D3 /* HomeScreen.swift */,
+				69D40BA32E246CF1007FFD89 /* HomeWrapper.swift */,
+				69D40BA12E246CE7007FFD89 /* HomeScreen.swift */,
+				69E55AD02E02DEDC00B530D3 /* HomeView.swift */,
+				69D40BA02E246CC2007FFD89 /* components */,
 			);
 			path = home;
 			sourceTree = "<group>";
@@ -289,9 +380,11 @@
 		69E55AB52E02DDF300B530D3 /* quiver */ = {
 			isa = PBXGroup;
 			children = (
-				6975DFA02E04B69A00D14119 /* quiverScreenHelpers */,
+				69A9237B2E23B7CB001EB624 /* addBoard */,
+				69A923722E23A783001EB624 /* components */,
+				69A923702E23A4F6001EB624 /* QuiverViewModelWrapper.swift */,
 				69E55ACE2E02DEC600B530D3 /* QuiverScreen.swift */,
-				69E55ACC2E02DEBB00B530D3 /* AddBoardScreen.swift */,
+				6975DFA12E04B6AD00D14119 /* QuiverView.swift */,
 			);
 			path = quiver;
 			sourceTree = "<group>";
@@ -321,6 +414,9 @@
 		69E55ADA2E02EE5000B530D3 /* components */ = {
 			isa = PBXGroup;
 			children = (
+				69A923952E23D06E001EB624 /* ImagePicker.swift */,
+				69A923932E23C572001EB624 /* ImageSourceSelectorSheet.swift */,
+				69A923912E23C516001EB624 /* CustomTextField.swift */,
 				697E7CB02E0565D50030392F /* ErrorView.swift */,
 				697E7CAE2E05656B0030392F /* LoadingView.swift */,
 				69E55AE32E02F04200B530D3 /* DotItem.swift */,
@@ -377,6 +473,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				69A923972E23D173001EB624 /* Utils */,
 				692B51772E16C3C90036FCD8 /* Generics */,
 				69E55AEA2E0332FD00B530D3 /* Resources */,
 				69E55AE52E02F81D00B530D3 /* Theme */,
@@ -508,9 +605,13 @@
 				69E55AD92E02EE0700B530D3 /* CustomInputField.swift in Sources */,
 				697E7CB72E0570420030392F /* StatItem.swift in Sources */,
 				69E55AAF2E02DD9400B530D3 /* RegisterScreen.swift in Sources */,
+				69A923852E23BA15001EB624 /* AddBoardStep1View.swift in Sources */,
+				69A923762E23A986001EB624 /* SurfboardDetailDialog.swift in Sources */,
+				69A9239B2E23D262001EB624 /* OutlinedButton.swift in Sources */,
 				694813FE2E1E870B00F9F297 /* Functions.swift in Sources */,
 				6904CA6F2E0BF0E10039C9D9 /* ExtendCard.swift in Sources */,
 				6975DFA22E04B6B000D14119 /* QuiverView.swift in Sources */,
+				69D40BA22E246CEB007FFD89 /* HomeScreen.swift in Sources */,
 				692B51792E16C3DF0036FCD8 /* Wrapper.swift in Sources */,
 				69E55AF32E033BE300B530D3 /* ChipView.swift in Sources */,
 				69E55ACB2E02DEAE00B530D3 /* RentalsScreen.swift in Sources */,
@@ -520,19 +621,30 @@
 				691827412E1EC4FB00B26BD2 /* LocationManager.swift in Sources */,
 				697E7CB12E0565D80030392F /* ErrorView.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
+				69A923992E23D17D001EB624 /* KotlinInteropExtensions.swift in Sources */,
+				69A9237A2E23A9C0001EB624 /* CustomDialog.swift in Sources */,
 				691827462E1F1DDF00B26BD2 /* LocationSearchService.swift in Sources */,
+				69D40BA42E246CF6007FFD89 /* HomeWrapper.swift in Sources */,
 				69C1292D2E15676A0054411E /* RegisterViewModelWrapper+Bindings.swift in Sources */,
 				69E55AE02E02EE7B00B530D3 /* DividerWithText.swift in Sources */,
 				69E55AB12E02DDBA00B530D3 /* WelcomeBottomSheetScreen.swift in Sources */,
 				69E55ADC2E02EE6A00B530D3 /* GradientButton.swift in Sources */,
 				6904CA752E0C027C0039C9D9 /* ForecastRow.swift in Sources */,
+				69A9238F2E23BA3B001EB624 /* FinsSetupDropdown.swift in Sources */,
 				699AE8AC2E1D3D0100717A8B /* FavSpotWrapper.swift in Sources */,
+				69A923712E23A4F7001EB624 /* QuiverViewModelWrapper.swift in Sources */,
+				69A923892E23BA23001EB624 /* WizardNavigationBar.swift in Sources */,
 				69E55AF12E033BB200B530D3 /* BoardRecommendationCardView.swift in Sources */,
 				69E55ABB2E02DE3600B530D3 /* AddSpotView.swift in Sources */,
 				69E55AE22E02EF7A00B530D3 /* ProfileImageUpload.swift in Sources */,
 				69E55AD32E02DF7F00B530D3 /* AppEntryView.swift in Sources */,
+				69A9238B2E23BA2D001EB624 /* BoardImagePicker.swift in Sources */,
+				69A9237D2E23B7E0001EB624 /* AddBoardWrapper.swift in Sources */,
 				6918273F2E1EBCD900B26BD2 /* AddSpotWrapper.swift in Sources */,
 				69E55AD52E02E01B00B530D3 /* BottomTab.swift in Sources */,
+				69A923942E23C573001EB624 /* ImageSourceSelectorSheet.swift in Sources */,
+				69A923962E23D06F001EB624 /* ImagePicker.swift in Sources */,
+				69A923872E23BA1D001EB624 /* AddBoardStep2View.swift in Sources */,
 				697E7CB52E056C000030392F /* ProfileHeader.swift in Sources */,
 				6904CA712E0BFB180039C9D9 /* WeeklyForecastPopup.swift in Sources */,
 				69EAE8272E05CA1E004E31CD /* FavSpotsView.swift in Sources */,
@@ -542,22 +654,26 @@
 				69E55AE72E02F82B00B530D3 /* Theme.swift in Sources */,
 				69E55AED2E033B9300B530D3 /* CurrentConditionsView.swift in Sources */,
 				69E55AE42E02F04400B530D3 /* DotItem.swift in Sources */,
+				69A923742E23A961001EB624 /* BoardCard.swift in Sources */,
 				697E7CAD2E0561C00030392F /* ProfileScreen.swift in Sources */,
 				69E55ADE2E02EE7100B530D3 /* SocialLoginButton.swift in Sources */,
 				692B517B2E16D98C0036FCD8 /* LoginWrapper.swift in Sources */,
 				697E7CBC2E05729B0030392F /* ProfileActions.swift in Sources */,
 				69EAE8292E05CB39004E31CD /* SpotCard.swift in Sources */,
-				69E55AD12E02DEE100B530D3 /* HomeScreen.swift in Sources */,
+				69E55AD12E02DEE100B530D3 /* HomeView.swift in Sources */,
 				69EAE8252E05B683004E31CD /* FavSpotsScreen.swift in Sources */,
 				69E55AEF2E033BA400B530D3 /* ConditionItemView.swift in Sources */,
-				69E55ACD2E02DEBC00B530D3 /* AddBoardScreen.swift in Sources */,
+				69A9237F2E23B7E7001EB624 /* AddBoardScreen.swift in Sources */,
+				69A923922E23C518001EB624 /* CustomTextField.swift in Sources */,
 				69E55AA92E02D20600B530D3 /* LoginView.swift in Sources */,
 				692B517D2E16D9B40036FCD8 /* LoginScreen.swift in Sources */,
-				6975DFA42E04B6E100D14119 /* SurfboardCard.swift in Sources */,
 				69E55AF52E033C0300B530D3 /* ForecastItemView.swift in Sources */,
 				69C86FF52E12ACBF00850490 /* RegisterWrapper.swift in Sources */,
 				697E7CAF2E05656E0030392F /* LoadingView.swift in Sources */,
+				69A9238D2E23BA34001EB624 /* SelectableBoardTypeGrid.swift in Sources */,
+				69A923822E23B7FB001EB624 /* AddBoardView.swift in Sources */,
 				69E55AB32E02DDDF00B530D3 /* MainTabView.swift in Sources */,
+				69A923782E23A9AD001EB624 /* PublishSurfboardDialog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

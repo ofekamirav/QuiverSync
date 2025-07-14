@@ -6,9 +6,6 @@ import org.example.quiversync.domain.model.forecast.WeeklyForecast
 
 sealed class HomeState {
     object Loading : HomeState()
-    data class Loaded(
-        val forecast: List<DailyForecast>,
-        val todayMatchBoard: BoardMatchUi
-        ) : HomeState()
+    data class Loaded(val homePageData: HomePageData) : HomeState()
     data class Error(val message: String) : HomeState()
 }

@@ -208,7 +208,9 @@ val commonModule= module {
    //Data Classes for UseCases
    single{
       HomeUseCases(
-          getWeeklyForecastByLocationUseCase = get()
+          getWeeklyForecastByLocationUseCase = get(),
+            getQuiverUseCase = get(),
+            getDailyPrediction = get()
       )
    }
    single {
@@ -297,10 +299,10 @@ fun createJson(): Json = Json {
 }
 
 fun createHttpClient(clientEngine: HttpClientEngine, json: Json) = HttpClient(clientEngine) {
-//   install(Logging) {
-//      level = LogLevel.ALL
-//      logger = Logger.DEFAULT
-//   }
+   install(Logging) {
+      level = LogLevel.ALL
+      logger = Logger.DEFAULT
+   }
    install(ContentNegotiation) {
       json(json)
    }

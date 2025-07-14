@@ -1,5 +1,6 @@
 package org.example.quiversync.data.session
 
+import kotlinx.datetime.toLocalDateTime
 import org.example.quiversync.utils.Location
 import platform.Foundation.NSUserDefaults
 
@@ -47,4 +48,20 @@ actual class SessionManager actual constructor(context: Any?) {
         setLatitude(location.latitude)
         setLongitude(location.longitude)
     }
+
+    actual suspend fun setLastRefresh() {
+        val date = kotlinx.datetime.Clock.System.now()
+            .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+            .date
+            .toString()
+        return defaults.setObject(date, forKey = "lastRefresh")
+    }
+
+    actual suspend fun getLastRefresh(): String? {
+        return defaults.stringForKey("lastRefresh")
+    }
+
+
+
+
 }

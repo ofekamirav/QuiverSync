@@ -30,6 +30,9 @@ struct LoginScreen: View {
                 MainTabView(isLoggedIn: $isLoggedIn)
             case .error(let error):
                 ErrorView(messege: error.message)
+                
+            case .navigateToOnboarding:
+                MainTabView(isLoggedIn: $isLoggedIn)
             }
         }
         .onAppear{

@@ -46,5 +46,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We use your photo library to let you choose a surfboard image.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We use your camera to take a picture of your surfboard.</string>
 </dict>
 </plist>
