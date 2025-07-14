@@ -108,74 +108,44 @@ class AddBoardViewModel(
     }
 
 
-    private fun onSurfboardImageSelected(imageBytes: ByteArray) {
-        println("🐛 [onSurfboardImageSelected] Triggered with ${imageBytes.size} bytes")
-
-        val currentIdleState = _uiState.value as? AddBoardState.Idle
-        if (currentIdleState == null) {
-            println("❌ [onSurfboardImageSelected] _uiState is not Idle. Current state: ${_uiState.value}")
-            return
-        }
+    fun onSurfboardImageSelected(imageBytes: ByteArray) {
+        val currentIdleState = _uiState.value as? AddBoardState.Idle ?: return
 
         scope.launch {
-            println("🚀 [onSurfboardImageSelected] Launching coroutine for image upload")
-            _uiState.value = currentIdleState.copy(
-                data = currentIdleState.data.copy(
-                    isUploadingImage = true,
-                    imageUploadError = null
-                )
-            )
+            _uiState.value = currentIdleState.copy(data = currentIdleState.data.copy(isUploadingImage = true, imageUploadError = null))
 
             try {
-                println("📤 [onSurfboardImageSelected] Calling uploadSurfboardImageUseCase...")
                 val result = uploadSurfboardImageUseCase(
                     bytes = imageBytes,
                     folder = UploadImageUseCase.Folder.SURFBOARDS
                 )
-                println("✅ [onSurfboardImageSelected] uploadSurfboardImageUseCase finished with result: $result")
 
-                val updatedIdleState = _uiState.value as? AddBoardState.Idle
-                if (updatedIdleState == null) {
-                    println("❌ [onSurfboardImageSelected] _uiState changed unexpectedly, now: ${_uiState.value}")
-                    return@launch
-                }
+                val updatedIdleState = _uiState.value as? AddBoardState.Idle ?: return@launch
 
-                when (result) {
+               when(result){
                     is Result.Success -> {
-                        println("🎉 [onSurfboardImageSelected] Image uploaded successfully: ${result.data}")
-                        _uiState.value = updatedIdleState.copy(
-                            data = updatedIdleState.data.copy(
-                                imageUrl = result.data,
-                                imageUploadError = null,
-                                isUploadingImage = false
-                            )
-                        )
+                        _uiState.value = updatedIdleState.copy(data = updatedIdleState.data.copy(
+                            imageUrl = result.data,
+                            imageUploadError = null,
+                            isUploadingImage = false
+                        ))
+                        platformLogger("AddBoardViewModel", "Image uploaded successfully: ${result.data}")
                     }
-
                     is Result.Failure -> {
-                        println("⚠️ [onSurfboardImageSelected] Image upload failed: ${result.error?.message}")
-                        _uiState.value = updatedIdleState.copy(
-                            data = updatedIdleState.data.copy(
-                                imageUploadError = "Upload failed: ${result.error?.message}",
-                                isUploadingImage = false
-                            )
-                        )
+                        platformLogger("AddBoardViewModel", "Image upload failed: ${result.error?.message}")
+                        _uiState.value = updatedIdleState.copy(data = updatedIdleState.data.copy(
+                            imageUploadError = "Upload failed: ${result.error?.message}",
+                            isUploadingImage = false
+                        ))
                     }
-                }
+               }
 
             } catch (e: Exception) {
-                println("💥 [onSurfboardImageSelected] Exception thrown: ${e.message}")
-                val fallbackIdle = _uiState.value as? AddBoardState.Idle
-                if (fallbackIdle != null) {
-                    _uiState.value = fallbackIdle.copy(
-                        data = fallbackIdle.data.copy(
-                            isUploadingImage = false,
-                            imageUploadError = "Unexpected error: ${e.message}"
-                        )
-                    )
-                } else {
-                    println("❌ [onSurfboardImageSelected] Could not recover state after exception.")
-                }
+                val fallbackIdle = _uiState.value as? AddBoardState.Idle ?: return@launch
+                _uiState.value = fallbackIdle.copy(data = fallbackIdle.data.copy(
+                    isUploadingImage = false,
+                    imageUploadError = "Unexpected error: ${e.message}"
+                ))
             }
         }
     }
