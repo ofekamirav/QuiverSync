@@ -2,6 +2,7 @@ package org.example.quiversync.domain.model
 
 import kotlinx.serialization.Serializable
 import org.example.quiversync.data.local.Error
+import kotlin.jvm.JvmStatic
 
 @Serializable
 data class Surfboard(
@@ -35,5 +36,5 @@ enum class FinsSetup(val serverName: String) {
     TWIN("Twin"),
     THRUSTER("Thruster"),
     QUAD("Quad"),
-    FIVEFINS("Five Fins")
+    FIVEFINS("Five Fins");
 }

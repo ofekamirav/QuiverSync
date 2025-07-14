@@ -11,7 +11,7 @@ import SwiftUI
 struct CurrentConditionsView: View {
     let waveHeight: String
     let wind: String
-    let tide: String
+    let swellPeriod: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -26,7 +26,7 @@ struct CurrentConditionsView: View {
             HStack(spacing: 32) {
                 ConditionItemView(label: "Wave Height", value: waveHeight, icon: "water.waves")
                 ConditionItemView(label: "Wind", value: wind, icon: "wind")
-                ConditionItemView(label: "Tide", value: tide, icon: "water.waves.and.arrow.trianglehead.up")
+                ConditionItemView(label: "Swell Period", value: swellPeriod, icon: "clock.arrow.circlepath")
             }
             .frame(maxWidth: .infinity, alignment: .center)
         }

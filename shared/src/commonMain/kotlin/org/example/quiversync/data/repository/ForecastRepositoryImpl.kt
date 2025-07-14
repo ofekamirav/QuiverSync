@@ -25,16 +25,41 @@ class ForecastRepositoryImpl(
     override suspend fun getWeeklyForecast(
         latitude: Double,
         longitude: Double,
+        inHomePage: Boolean
     ): Result<List<DailyForecast>,TMDBError> {
         val howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne()
-        val lastLocation = sessionManager.getLastLocation()
         val userID = sessionManager.getUid()
-
+        val lastLocation = sessionManager.getLastLocation()
         val isFar = lastLocation == null || isOutsideRadius(
             lastLocation.latitude, lastLocation.longitude, latitude, longitude
         )
 
-        if (isFar && howManyDaily < 6) {
+        //only if you are on the home page and the spot is not far from the last location i need to check if i need to refresh the forecasts
+        //if not far , i will check in the local or will load weekly from the API
+        if(inHomePage && !isFar) {
+                val currentDate = kotlinx.datetime.Clock.System.now()
+                    .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+                    .date
+                    .toString()
+
+                val lastRefresh = sessionManager.getLastRefresh()
+                if (lastRefresh == null || lastRefresh != currentDate) {
+                    println("Refreshing forecasts for spot ($latitude, $longitude) because last refresh is outdated")
+                    sessionManager.setLastRefresh()
+                } else {
+                    println("Using local database for spot ($latitude, $longitude) with $howManyDaily days of forecast")
+                    if (lastLocation != null) {
+                        return Result.Success(
+                            queries.SELECT_BY_SPOT(lastLocation.latitude, lastLocation.longitude)
+                                .executeAsList()
+                                .map { it.toDailyForecast() }
+                        )
+                    }
+                }
+        }
+
+
+        if (howManyDaily < 6) {
             if(howManyDaily > 0){
                 println("Deleting old forecasts for spot ($latitude, $longitude) because they are outdated or insufficient")
                 queries.deleteBySpot(latitude, longitude)
@@ -97,12 +122,10 @@ class ForecastRepositoryImpl(
             .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
             .date
             .toString()
-//        queries.deleteBySpot(latitude, longitude)
-//        println("deleted old forecasts for spot ($latitude, $longitude)")
         val howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne()
         if(howManyDaily < 4) {
             // If we have less than 4 days, we need to fetch the weekly forecast again
-            val weeklyResult = getWeeklyForecast(latitude, longitude)
+            val weeklyResult = getWeeklyForecast(latitude, longitude , false)
             if (weeklyResult is Result.Failure) {
                 return Result.Failure(TMDBError("Unknown error"))
             }
@@ -110,39 +133,7 @@ class ForecastRepositoryImpl(
         else{
             println("Using local database for spot ($latitude, $longitude) with $howManyDaily days of forecast")
         }
-//        val forecasts = queries.selectAll().executeAsList()
-//
-//        println("📊 Daily Forecasts:")
-//        forecasts.forEachIndexed { index, it ->
-//            println(
-//                """
-//        🔹 Forecast #${index + 1}
-//        ─────────────────────
-//        📅 Date         : ${it.date}
-//        📍 Location     : (${it.latitude}, ${it.longitude})
-//        🌊 Wave Height  : ${it.waveHeight} m
-//        💨 Wind Speed   : ${it.windSpeed} m/s
-//        🧭 Wind Dir     : ${it.windDirection}°
-//        🌊 Swell Period : ${it.swellPeriod} s
-//        🌊 Swell Dir    : ${it.swellDirection}°
-//        """.trimIndent()
-//            )
-//        }
         val local = queries.selectToday(date, latitude, longitude).executeAsOneOrNull()
-        println("📊 Creating Prompt With Daily Forecast From Local:")
-        println(
-            """
-        🔹 Forecast 
-        ─────────────────────
-        📅 Date         : ${local?.date}
-        📍 Location     : (${local?.latitude}, ${local?.longitude})
-        🌊 Wave Height  : ${local?.waveHeight} m
-        💨 Wind Speed   : ${local?.windSpeed} m/s
-        🧭 Wind Dir     : ${local?.windDirection}°
-        🌊 Swell Period : ${local?.swellPeriod} s
-        🌊 Swell Dir    : ${local?.swellDirection}°
-        """.trimIndent()
-        )
 
         return Result.Success(local?.toDailyForecast())
     }

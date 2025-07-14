@@ -11,7 +11,7 @@ class GetWeeklyForecastBySpotUseCase(
     private val repository: ForecastRepository
 
 ) {
-    suspend operator fun invoke(spot:FavoriteSpot): Result<List<DailyForecast>,TMDBError> {
-        return repository.getWeeklyForecast(spot.spotLatitude, spot.spotLongitude)
+    suspend operator fun invoke(spot:FavoriteSpot, isHomePage : Boolean): Result<List<DailyForecast>,TMDBError> {
+        return repository.getWeeklyForecast(spot.spotLatitude, spot.spotLongitude , isHomePage)
     }
 }

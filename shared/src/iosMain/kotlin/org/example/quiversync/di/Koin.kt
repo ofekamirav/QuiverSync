@@ -1,5 +1,6 @@
 package org.example.quiversync.di
 
+import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.features.quiver.add_board.AddBoardViewModel
@@ -25,3 +26,5 @@ fun favSpotsViewModel() : FavSpotsViewModel = KoinPlatform.getKoin().get()
 fun addFavSpotViewModel() : AddFavSpotViewModel = KoinPlatform.getKoin().get()
 
 fun addBoardViewModel() : AddBoardViewModel = KoinPlatform.getKoin().get()
+
+fun homePageViewModel() : HomeViewModel = KoinPlatform.getKoin().get()

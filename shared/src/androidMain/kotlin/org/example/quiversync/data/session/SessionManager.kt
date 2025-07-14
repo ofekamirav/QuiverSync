@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.toLocalDateTime
 import org.example.quiversync.utils.Location
 
 private val Context.dataStore by preferencesDataStore("quiver_sync_prefs")
@@ -14,6 +15,7 @@ actual class SessionManager actual constructor(context: Any?) {
     private val uidKey = stringPreferencesKey("uid")
     private val latitudeKey = doublePreferencesKey("latitude")
     private val longitudeKey = doublePreferencesKey("longitude")
+    private val lastRefreshKey = stringPreferencesKey("lastRefresh")
 
 
     actual suspend fun clearUserData() {
@@ -60,6 +62,18 @@ actual class SessionManager actual constructor(context: Any?) {
             it[latitudeKey] = location.latitude
             it[longitudeKey] = location.longitude
         }
+    }
+
+    actual suspend fun setLastRefresh() {
+        val date = kotlinx.datetime.Clock.System.now()
+            .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+            .date
+            .toString()
+        context.dataStore.edit { it[lastRefreshKey] = date }
+    }
+
+    actual suspend fun getLastRefresh(): String? {
+        return context.dataStore.data.first()[lastRefreshKey]
     }
 
 }

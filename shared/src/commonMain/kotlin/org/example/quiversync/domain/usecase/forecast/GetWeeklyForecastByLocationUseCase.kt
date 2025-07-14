@@ -15,7 +15,8 @@ class GetWeeklyForecastByLocationUseCase(
             ?: return Result.Failure(TMDBError("Could not get current location"))
         return repository.getWeeklyForecast(
             latitude = location.latitude,
-            longitude = location.longitude
+            longitude = location.longitude,
+            isHomePage = true // Assuming this is always true for the home page use case
         )
     }
 }

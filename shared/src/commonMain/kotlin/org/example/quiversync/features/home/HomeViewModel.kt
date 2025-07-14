@@ -6,7 +6,11 @@ import kotlinx.coroutines.launch
 import org.example.quiversync.data.remote.dto.BoardMatchUi
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.data.local.Result
+import org.example.quiversync.domain.model.FinsSetup
+import org.example.quiversync.domain.model.Surfboard
+import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.domain.model.forecast.DailyForecast
+import org.example.quiversync.domain.model.prediction.GeminiPrediction
 
 class HomeViewModel(
     private val homeUseCases: HomeUseCases,
@@ -19,7 +23,7 @@ class HomeViewModel(
         fetchForecastAndBoardMatch()
     }
 
-    fun fetchForecastAndBoardMatch() {
+    private fun fetchForecastAndBoardMatch() {
         scope.launch {
             _uiState.value = HomeState.Loading
 
@@ -34,24 +38,70 @@ class HomeViewModel(
                     return@launch
                 }
             }
+            val quiverResult = homeUseCases.getQuiverUseCase()
+            var quiver  = emptyList<Surfboard>()
+            when(quiverResult){
+                is Result.Failure -> {
+                }
 
-            val bestBoardMatch = BoardMatchUi(
-                surfboardId = "best_board_match",
-                brand = "Best Brand",
-                model = "Best Model",
-                imageUrl = "https://example.com/best_board_image.jpg",
-                score = 95
-            )
-//                homeUseCases.getBestBoardMatchUseCase(
-//                date = forecast.list.first().date,
-//                latitude = forecast.list.first().latitude,
-//                longitude = forecast.list.first().longitude
-//            ).getOrNull()
+                is Result.Success->{
+                    if (quiverResult.data != null ){
+                        quiver = quiverResult.data
+                    }
+                }
+            }
+            if (quiver.isEmpty()) {
+                _uiState.value = HomeState.Loaded(
+                    HomePageData(
+                        weeklyForecast = forecast,
+                        predictionForToday = GeminiPrediction()
+                        , surfboard = Surfboard(
+                            id = "default",
+                            ownerId = "default",
+                            model = "Default Model",
+                            company = "Default Company",
+                            type = SurfboardType.SHORTBOARD,
+                            height = "6'0\"",
+                            width = "18.5\"",
+                            volume = "30L",
+                            finSetup = FinsSetup.THRUSTER,
+                            imageRes = "default_image.png",
+                            addedDate = "2023-01-01",
+                            latitude = 0.0,
+                            longitude = 0.0,
+                            isRentalPublished = false,
+                            isRentalAvailable = false,
+                            pricePerDay = 0.0
+                        )
+                    )
+                )
+                return@launch
+            }
+            val bestBoardMatch = forecast.firstOrNull()
+                ?.let { homeUseCases.getDailyPrediction(quiver , it) }
+                ?: return@launch
 
-            _uiState.value = HomeState.Loaded(
-                forecast = forecast,
-                todayMatchBoard = bestBoardMatch
-            )
+            when (bestBoardMatch) {
+                is Result.Failure -> {
+                    _uiState.value = HomeState.Error(bestBoardMatch.error?.message ?: "Failed to retrieve best board match")
+                    return@launch
+                }
+                is Result.Success -> {
+                    val prediction = bestBoardMatch.data ?: return@launch
+                    val surfboard = quiver.find { it.id ==  prediction.surfboardID }
+                    if (surfboard == null) {
+                        _uiState.value = HomeState.Error("Surfboard not found for the best match")
+                        return@launch
+                    }
+                    _uiState.value = HomeState.Loaded(
+                        HomePageData(
+                            weeklyForecast = forecast,
+                            predictionForToday = prediction,
+                            surfboard = surfboard
+                        )
+                    )
+                }
+            }
         }
     }
 }

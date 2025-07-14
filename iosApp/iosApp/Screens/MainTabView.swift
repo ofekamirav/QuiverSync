@@ -35,9 +35,9 @@ struct MainTabView: View {
                 HomeScreen()
                     .tabItem { Label("Home", systemImage: "house") }
                     .tag(BottomTab.home)
-//                QuiverScreen()
-//                    .tabItem { Label("Quiver", systemImage: "surfboard.fill") }
-//                    .tag(BottomTab.quiver)
+                QuiverScreen()
+                    .tabItem { Label("Quiver", systemImage: "surfboard.fill") }
+                    .tag(BottomTab.quiver)
                 ProfileScreen(isLoggedIn: $isLoggedIn)
                     .tabItem { Label("Profile", systemImage: "person.crop.circle") }
                     .tag(BottomTab.profile)
