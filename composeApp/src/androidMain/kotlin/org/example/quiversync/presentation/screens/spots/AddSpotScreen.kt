@@ -32,11 +32,13 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import org.example.quiversync.presentation.components.GradientButton
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 
 @Composable
 fun AddSpotScreen(
-    onBackClick: () -> Unit = {}
+    modifier: Modifier = Modifier,
+    onAddSpotClick: () -> Unit = {}
 ) {
     val defaultLocation = LatLng(34.0195, -118.4912) // Santa Monica
     val cameraPositionState = rememberCameraPositionState {
@@ -85,13 +87,12 @@ fun AddSpotScreen(
                 )
             }
         }
-        Button(
-            onClick = { /* Handle add spot button click */ },
+        GradientButton(
+            text = "Add Spot",
+            onClick = onAddSpotClick,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-        ) {
-            Text(text = "Add Spot")
-        }
+        )
     }
 }
 

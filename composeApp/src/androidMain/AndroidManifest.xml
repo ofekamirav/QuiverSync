@@ -4,6 +4,9 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="${AppConfig.googleMapsApiKey}" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
