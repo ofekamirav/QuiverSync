@@ -26,12 +26,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import org.example.quiversync.R
+import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.presentation.theme.OceanPalette
 
 
 @Composable
-fun BoardRecommendationCard() {
+fun BoardRecommendationCard(surfboard: Surfboard, score: String) {
     val isDark = isSystemInDarkTheme()
     val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.White
     Card(
@@ -43,19 +45,20 @@ fun BoardRecommendationCard() {
             Text("Today's Board Recommendation", style = MaterialTheme.typography.titleMedium, color = OceanPalette.DeepBlue)
             Spacer(modifier = Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.hs_shortboard),
+                AsyncImage(
+                    model = surfboard.imageRes,
+                    placeholder = painterResource(id = R.drawable.hs_shortboard),
                     contentDescription = null,
                     modifier = Modifier.size(48.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Text("Shortboard", fontWeight = FontWeight.Bold, color = OceanPalette.DeepBlue)
-                    Text("5\"10 \" x 19\" x 2.3\"", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                    Text(surfboard.type.name, fontWeight = FontWeight.Bold, color = OceanPalette.DeepBlue)
+                    Text("${surfboard.height} \" x ${surfboard.width} \" x ${surfboard.volume}L\"", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Chip("Perfect Match", OceanPalette.SkyBlue.copy(alpha = 0.1f))
-                        Chip("98% Confidence", Color(0xFFDFFFEF))
+                        Chip("${score}% Confidence", Color(0xFFDFFFEF))
                     }
                 }
             }

@@ -12,6 +12,7 @@ import org.example.quiversync.domain.repository.UserRepository
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.Error
 import org.example.quiversync.domain.model.UserError
+import org.example.quiversync.utils.Location
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.utils.extensions.toDto
 
@@ -59,6 +60,26 @@ class UserRepositoryImpl(
 
     override suspend fun deleteProfileLocal(uid: String) {
         userDao.deleteProfile(uid)
+    }
+
+    override suspend fun getUserCurrentLocation(): Result<Location, Error> {
+        val latitude = sessionManager.getLatitude()
+        val longitude = sessionManager.getLongitude()
+        if (latitude == null || longitude == null) {
+            return Result.Failure(UserError("Location not set"))
+        }
+        return Result.Success(Location(latitude, longitude))
+    }
+
+    override suspend fun updateUserCurrentLocation(location: Location): Result<Unit, Error> {
+        return try {
+            sessionManager.setLatitude(location.latitude)
+            sessionManager.setLongitude(location.longitude)
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            platformLogger("UserRepository", "Failed to update user location: ${e.message}")
+            Result.Failure(UserError("Update failed: ${e.message}"))
+        }
     }
 
 }

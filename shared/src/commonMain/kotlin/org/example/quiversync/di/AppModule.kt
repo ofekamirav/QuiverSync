@@ -166,7 +166,7 @@ val commonModule= module {
    single { UpdateUserProfileUseCase(get()) }
    single { UploadImageUseCase(get()) }
     single { UpdateProfileDetailsUseCase(get()) }
-   single { GetWeeklyForecastByLocationUseCase(get(), get()) }
+   single { GetWeeklyForecastByLocationUseCase(get(),get()) }
    single { GetWeeklyForecastBySpotUseCase(get()) }
    single { GetUserProfileUseCase(get()) }
    single { LogoutUseCase(get()) }

@@ -6,6 +6,6 @@ import org.example.quiversync.domain.model.prediction.GeminiPrediction
 
 data class HomePageData(
     val weeklyForecast: List<DailyForecast>,
-    val predictionForToday : GeminiPrediction,
-    val surfboard: Surfboard
+    val predictionForToday : GeminiPrediction?,
+    val surfboard: Surfboard?
 )

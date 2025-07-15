@@ -3,6 +3,9 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
+}
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -70,6 +73,10 @@ android {
     buildFeatures{
         buildConfig = true
     }
+    defaultConfig {
+        val googleMapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
+        manifestPlaceholders["Maps_API_KEY_PLACEHOLDER"] = googleMapsApiKey
+    }
 }
 
 dependencies {
@@ -108,6 +115,8 @@ dependencies {
     implementation(libs.cloudinary.android)
     //Google Sign-In
     implementation(libs.google.play.services.auth)
+    //Google Location
+    implementation(libs.google.play.services.location)
 
 
 

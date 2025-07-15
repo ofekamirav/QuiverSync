@@ -126,6 +126,8 @@ kotlin {
             implementation(libs.cloudinary.android)
             //SqlDelight
             implementation(libs.sqldelight.android.driver)
+            //Location
+            implementation(libs.google.play.services.location)
 
         }
         iosMain.dependencies {
