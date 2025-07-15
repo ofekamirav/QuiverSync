@@ -1,7 +1,9 @@
 package org.example.quiversync.base
 
 import android.app.Application
+import android.content.Context
 import com.cloudinary.android.MediaManager
+import com.google.android.libraries.places.api.Places
 import com.google.firebase.Firebase
 import com.google.firebase.initialize
 import org.example.quiversync.di.initKoin
@@ -22,5 +24,8 @@ class MyApplication: Application() {
             "cloud_name" to AppConfig.cloudName
         )
         MediaManager.init(this, config)
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, AppConfig.googleMapsApiKey)
+        }
     }
 }

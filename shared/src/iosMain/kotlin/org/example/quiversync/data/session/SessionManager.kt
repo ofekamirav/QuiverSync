@@ -12,6 +12,7 @@ actual class SessionManager actual constructor(context: Any?) {
         defaults.removeObjectForKey("uid")
         defaults.removeObjectForKey("latitude")
         defaults.removeObjectForKey("longitude")
+        defaults.removeObjectForKey("lastRefresh")
     }
 
     actual suspend fun getUid(): String? {
@@ -61,7 +62,13 @@ actual class SessionManager actual constructor(context: Any?) {
         return defaults.stringForKey("lastRefresh")
     }
 
+    actual suspend fun getUnitsPreference(): String? {
+        return defaults.stringForKey("units") ?: "metric"
+    }
 
+    actual suspend fun setUnitsPreference(units: String) {
+        defaults.setObject(units, forKey = "units")
+    }
 
 
 }

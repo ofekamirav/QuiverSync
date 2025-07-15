@@ -32,10 +32,11 @@ class UserViewModel(
             val result = userUseCases.getUserProfileUseCase()
             val userId = sessionManager.getUid().toString()
             val boardsNumber: Int = userUseCases.getBoardsNumberUseCase(userId)
+            val spotsNumber: Int = userUseCases.getSpotsNumberUseCase(userId)
             when (result) {
                 is Result.Success -> {
-                    if(boardsNumber!= null) {
-                        result.data?.let { _uiState.emit(UserState.Loaded(it,boardsNumber)) }
+                    if(boardsNumber!= null && spotsNumber != null) {
+                        result.data?.let { _uiState.emit(UserState.Loaded(it,boardsNumber, spotsNumber)) }
                     }
                 }
                 is Result.Failure -> {

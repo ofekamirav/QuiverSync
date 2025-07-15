@@ -29,6 +29,8 @@ fun colorForStatus(status: RentalStatus): Color {
         RentalStatus.COMPLETED -> Color.Gray
         RentalStatus.REJECTED -> MaterialTheme.colorScheme.error
         RentalStatus.CANCELLED -> MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+        RentalStatus.CONFIRMED -> OceanPalette.approve
+        RentalStatus.ACTIVE -> OceanPalette.SkyBlue
     }
 }
 

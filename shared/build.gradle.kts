@@ -44,6 +44,11 @@ buildkonfig {
             localProperties.getProperty("GEMINI_API_KEY","")
 
         )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "MAPS_API_KEY",
+            localProperties.getProperty("MAPS_API_KEY","")
+        )
     }
 }
 
@@ -121,6 +126,8 @@ kotlin {
             implementation(libs.cloudinary.android)
             //SqlDelight
             implementation(libs.sqldelight.android.driver)
+            //Location
+            implementation(libs.google.play.services.location)
 
         }
         iosMain.dependencies {

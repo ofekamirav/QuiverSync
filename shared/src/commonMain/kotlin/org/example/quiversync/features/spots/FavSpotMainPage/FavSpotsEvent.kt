@@ -6,4 +6,5 @@ interface FavSpotsEvent {
     data class DeleteSpot(val favoriteSpot: FavoriteSpot) : FavSpotsEvent
     data class LoadWeekPredictions(val favoriteSpot: FavoriteSpot) : FavSpotsEvent
     data class ErrorOccurred(val message: String) : FavSpotsEvent
+    object UndoDeleteSpot : FavSpotsEvent
 }

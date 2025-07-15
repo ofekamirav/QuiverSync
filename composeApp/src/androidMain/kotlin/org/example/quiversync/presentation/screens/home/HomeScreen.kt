@@ -1,22 +1,33 @@
 package org.example.quiversync.presentation.screens.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import org.example.quiversync.domain.model.forecast.DailyForecast
-import org.example.quiversync.domain.model.forecast.WeeklyForecast
+import org.example.quiversync.domain.model.forecast.WeeklyForecast // ייבוא אם רלוונטי
+import org.example.quiversync.domain.model.prediction.GeminiPrediction // ייבוא אם רלוונטי
+import org.example.quiversync.domain.model.Surfboard // ייבוא אם רלוונטי
+import org.example.quiversync.features.home.HomePageData // ייבוא HomePageData
 import org.example.quiversync.features.home.HomeState
 import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.presentation.screens.WelcomeBottomSheet
 import org.example.quiversync.presentation.screens.skeletons.HomeSkeleton
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
+import org.example.quiversync.presentation.widgets.ErrorScreen
 import org.example.quiversync.presentation.widgets.home_screen.ForecastPanel
 import org.example.quiversync.presentation.widgets.home_screen.MainConditions
 import org.example.quiversync.utils.LocalWindowInfo
@@ -24,7 +35,8 @@ import org.example.quiversync.utils.WindowWidthSize
 import org.koin.androidx.compose.koinViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
@@ -32,7 +44,25 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ){
     val state by viewModel.uiState.collectAsState()
+    val isImperial by viewModel.isImperial.collectAsState()
+
     var showBottomSheet by remember { mutableStateOf(false) }
+    val locationPermissionState = rememberPermissionState(
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
+
+    LaunchedEffect(Unit) {
+        if (!locationPermissionState.status.isGranted) {
+            locationPermissionState.launchPermissionRequest()
+        }
+    }
+
+    LaunchedEffect(locationPermissionState.status.isGranted) {
+        if (locationPermissionState.status.isGranted) {
+            viewModel.refreshWithLocation()
+        }
+    }
+
     LaunchedEffect(showWelcomeBottomSheetOnStart) {
         if (showWelcomeBottomSheetOnStart) {
             showBottomSheet = true
@@ -43,24 +73,36 @@ fun HomeScreen(
             show = showBottomSheet,
             onDismiss = { showBottomSheet = false },
         )
+    }
 
-
+    if (!locationPermissionState.status.isGranted) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            ErrorScreen(
+                message = "Please grant location permission to access weather data.",
+                modifier = Modifier.padding(16.dp),
+                icon = Icons.Default.LocationOn,
+                buttonText = "Grant Permission",
+                onButtonClick = {
+                    locationPermissionState.launchPermissionRequest()
+                }
+            )
+        }
+        return
     }
 
     when (state) {
         is HomeState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                HomeSkeleton()
-            }
+            HomeSkeleton(modifier)
         }
         is HomeState.Loaded -> {
-            val forecast = (state as HomeState.Loaded).forecast
+            val data = (state as HomeState.Loaded).homePageData
             HomeScreenContent(
-                forecast = forecast,
-                modifier = modifier
+                homePageData = data,
+                modifier = modifier,
+                isImperial = isImperial
             )
         }
         is HomeState.Error -> {
@@ -74,14 +116,32 @@ fun HomeScreen(
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreenContent(
-    forecast: List<DailyForecast>,
-    modifier: Modifier = Modifier
+    homePageData: HomePageData,
+    modifier: Modifier = Modifier,
+    isImperial: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(true) }
-    val scrollState = rememberScrollState()
     val windowInfo = LocalWindowInfo.current
+
+    val weeklyForecast = homePageData.weeklyForecast
+    val predictionForToday = homePageData.predictionForToday
+    val surfboard = homePageData.surfboard
+
+    val todayForecast = weeklyForecast.firstOrNull()
+
+    if (todayForecast == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("No forecast data available.", color = MaterialTheme.colorScheme.onSurface)
+        }
+        return
+    }
 
     when (windowInfo.widthSize) {
         WindowWidthSize.COMPACT -> {
@@ -89,16 +149,18 @@ fun HomeScreenContent(
                 modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp)
-                    .verticalScroll(scrollState),
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 MainConditions(
-                    forecast = forecast.first(),
+                    forecast = todayForecast,
+                    prediction = predictionForToday,
+                    surfboard = surfboard,
                     expanded = expanded,
-                    onExpandToggle = { expanded = !expanded }
+                    onExpandToggle = { expanded = !expanded },
+                    isImperialUnits = isImperial
                 )
-                ForecastPanel(forecast)
+                ForecastPanel(weeklyForecast, isImperial)
             }
         }
 
@@ -112,13 +174,16 @@ fun HomeScreenContent(
             ) {
                 Column(modifier = Modifier.weight(0.6f)) {
                     MainConditions(
-                        forecast = forecast.first(),
+                        forecast = todayForecast,
+                        prediction = predictionForToday,
+                        surfboard = surfboard,
                         expanded = expanded,
-                        onExpandToggle = { expanded = !expanded }
+                        onExpandToggle = { expanded = !expanded },
+                        isImperialUnits = isImperial,
                     )
                 }
                 Column(modifier = Modifier.weight(0.4f)) {
-                    ForecastPanel(forecast)
+                    ForecastPanel(weeklyForecast, isImperial)
                 }
             }
         }

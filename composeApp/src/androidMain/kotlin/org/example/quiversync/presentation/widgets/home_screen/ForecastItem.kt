@@ -1,5 +1,7 @@
 package org.example.quiversync.presentation.widgets.home_screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.example.quiversync.R
 import org.example.quiversync.presentation.theme.OceanPalette
+import org.example.quiversync.utils.extentions.UnitConverter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ForecastItem(day: String, date: String, waveHeight: String, wind: String) {
     val isDark = isSystemInDarkTheme()
@@ -40,7 +44,7 @@ fun ForecastItem(day: String, date: String, waveHeight: String, wind: String) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(day, fontWeight = FontWeight.Bold, color = OceanPalette.DeepBlue)
+                Text(UnitConverter.getDayOfWeekName(day), fontWeight = FontWeight.Bold, color = OceanPalette.DeepBlue)
                 Text(date, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {

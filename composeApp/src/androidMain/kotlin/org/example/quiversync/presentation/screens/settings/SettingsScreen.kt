@@ -8,11 +8,14 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -48,6 +51,8 @@ fun SettingsScreen(
 ) {
     val isLoading by viewModel.isLoading.collectAsState()
     val showSecurityAndPrivacyState by viewModel.showSecurityAndPrivacy.collectAsState()
+    val isImperialUnits by viewModel.isImperialUnits.collectAsState()
+
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
         CustomDialog(
@@ -68,7 +73,6 @@ fun SettingsScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(24.dp))
-
         SettingItem(
             iconRes = Icons.Filled.Edit,
             label = "Edit Profile Details",
@@ -86,6 +90,12 @@ fun SettingsScreen(
             label = "Notifications",
             onClick = onNotificationsSettings
         )
+        SettingItem(
+            iconRes = Icons.Filled.Straighten,
+            onClick = { viewModel.toggleUnits() },
+            label = if (isImperialUnits) "Imperial units" else "Metric units"
+        )
+
         SettingItem(
             iconRes = Icons.Filled.HelpOutline,
             label = "Help & Support",

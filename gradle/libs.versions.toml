@@ -40,7 +40,8 @@ material3 = "1.3.2"
 lifecycleViewmodelKtx = "2.8.7"
 navigationCompose = "2.7.7"
 places = "4.3.1"
-playServicesMaps = "19.2.0"
+playServicesMaps = "18.2.0"
+playServicesLocation = "21.2.0"
 playServicesAuth = "21.3.0"
 ksp = "2.0.0-1.0.21"
 lottie = "6.3.0"
@@ -77,6 +78,7 @@ firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "fir
 firebase-common-ktx = { module = "com.google.firebase:firebase-common-ktx", version.ref = "firebaseCommonKtx" }
 firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebaseFirestore" }
 google-android-material = { module = "com.google.android.material:material", version.ref = "google-material" }
+google-play-services-location = { module="com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 androidx-ui-graphics = { module = "androidx.compose.ui:ui-graphics", version.ref = "uiGraphics" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }

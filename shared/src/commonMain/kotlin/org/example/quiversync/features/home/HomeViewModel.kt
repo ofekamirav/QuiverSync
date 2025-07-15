@@ -3,7 +3,6 @@ package org.example.quiversync.features.home
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.example.quiversync.data.remote.dto.BoardMatchUi
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.domain.model.FinsSetup
@@ -12,6 +11,7 @@ import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.prediction.GeminiPrediction
+import org.example.quiversync.utils.extensions.platformLogger
 
 class HomeViewModel(
     private val homeUseCases: HomeUseCases,
@@ -19,18 +19,34 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow<HomeState>(HomeState.Loading)
     val uiState: StateFlow<HomeState> get() = _uiState
 
+    private val _isImperial =  MutableStateFlow<Boolean>(false)
+    val isImperial: StateFlow<Boolean> get() = _isImperial
 
     init {
         fetchForecastAndBoardMatch()
+        scope.launch {
+         if(homeUseCases.isImperialUnitsUseCases()){
+            _isImperial.value = true
+         }
+            else {
+                _isImperial.value = false
+            }
+        }
     }
+
+    fun refreshWithLocation() {
+        fetchForecastAndBoardMatch()
+    }
+
 
     private fun fetchForecastAndBoardMatch() {
         scope.launch {
             _uiState.value = HomeState.Loading
 
             val forecastResult = homeUseCases.getWeeklyForecastByLocationUseCase()
-            val forecast : List<DailyForecast>
+            platformLogger("HomeViewModel", "forecast for the week by your location: $forecastResult")
             val userResult = homeUseCases.getUser()
+            val forecast: List<DailyForecast>
             val user : User
             when (userResult){
                 is Result.Success ->{
@@ -51,6 +67,11 @@ class HomeViewModel(
             when (forecastResult) {
                 is Result.Success -> {
                     forecast = forecastResult.data ?: emptyList<DailyForecast>()
+                    if (forecastResult.data == null) {
+                        _uiState.value = HomeState.Error("No forecast data available")
+                        return@launch
+                    }
+
                 }
                 is Result.Failure -> {
                     _uiState.value = HomeState.Error(forecastResult.error?.message ?: "Unknown error")
@@ -58,6 +79,7 @@ class HomeViewModel(
                 }
             }
             val quiverResult = homeUseCases.getQuiverUseCase()
+            platformLogger("HomeViewModel", "quiver result: $quiverResult")
             var quiver  = emptyList<Surfboard>()
             when(quiverResult){
                 is Result.Failure -> {
@@ -101,10 +123,12 @@ class HomeViewModel(
             val bestBoardMatch = forecast.firstOrNull()
                 ?.let { homeUseCases.getDailyPrediction(quiver , it , user) }
                 ?: return@launch
+            platformLogger("HomeViewModel", "best board match: $bestBoardMatch")
 
 
             when (bestBoardMatch) {
                 is Result.Failure -> {
+                    platformLogger("HomeViewModel", "Error fetching best board match: ${bestBoardMatch.error?.message}")
                     _uiState.value = HomeState.Error(bestBoardMatch.error?.message ?: "Failed to retrieve best board match")
                     return@launch
                 }
@@ -112,9 +136,11 @@ class HomeViewModel(
                     val prediction = bestBoardMatch.data ?: return@launch
                     val surfboard = quiver.find { it.id ==  prediction.surfboardID }
                     if (surfboard == null) {
+                        platformLogger("HomeViewModel", "Surfboard not found for the best match: ${prediction.surfboardID}")
                         _uiState.value = HomeState.Error("Surfboard not found for the best match")
                         return@launch
                     }
+                    platformLogger("HomeViewModel", "Best board match: ${prediction.surfboardID} with score ${prediction.score}")
                     _uiState.value = HomeState.Loaded(
                         HomePageData(
                             weeklyForecast = forecast,
@@ -126,4 +152,5 @@ class HomeViewModel(
             }
         }
     }
+
 }

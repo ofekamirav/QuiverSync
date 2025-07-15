@@ -23,14 +23,6 @@ private fun MainContentSkeleton(brush: Brush) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(24.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(brush)
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
                 .height(120.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(brush)

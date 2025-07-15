@@ -23,6 +23,12 @@ class FavSpotsViewModel(
     private val _uiState = MutableStateFlow<FavSpotsState>(FavSpotsState.Loading)
     val uiState: StateFlow<FavSpotsState> get() = _uiState
 
+    private val _isImperialUnits = MutableStateFlow(false)
+    val isImperialUnits: StateFlow<Boolean> get() = _isImperialUnits
+
+    private var lastDismissedSpot: FavoriteSpot? = null
+
+
     /**
      * Initializes the ViewModel by deleting outdated forecasts and fetching essential data
      * to populate the initial UI state.
@@ -30,6 +36,7 @@ class FavSpotsViewModel(
     init {
         scope.launch {
             favSpotsUseCases.deleteOutDateForecastUseCase()
+            _isImperialUnits.value = favSpotsUseCases.isImperialUnitsUseCase()
         }
         fetchEssentialData()
         scope.launch {
@@ -61,6 +68,9 @@ class FavSpotsViewModel(
                     _uiState.emit(FavSpotsState.Error(event.message))
                 }
             }
+            is FavSpotsEvent.UndoDeleteSpot -> {
+                undoDeleteSpot()
+            }
         }
     }
 
@@ -70,6 +80,31 @@ class FavSpotsViewModel(
      * @param favoriteSpot The spot to delete
      */
     private fun deleteSpot(favoriteSpot:FavoriteSpot) {
+
+        val currentLoadedState = _uiState.value as? FavSpotsState.Loaded ?: return
+        val currentData = currentLoadedState.favSpotsData
+
+        val updatedSpots = currentData.spots.filter { it.spotID != favoriteSpot.spotID }
+        val updatedPredictions = currentData.allSpotsDailyPredictions.filter {
+            it.forecastLatitude != favoriteSpot.spotLatitude || it.forecastLongitude != favoriteSpot.spotLongitude
+        }
+        val updatedForecasts = currentData.currentForecastsForAllSpots.filter {
+            it.latitude != favoriteSpot.spotLatitude || it.longitude != favoriteSpot.spotLongitude
+        }
+
+        lastDismissedSpot = favoriteSpot
+
+        _uiState.update {
+            FavSpotsState.Loaded(
+                currentData.copy(
+                    spots = updatedSpots,
+                    allSpotsDailyPredictions = updatedPredictions,
+                    currentForecastsForAllSpots = updatedForecasts
+                )
+            )
+        }
+
+
         scope.launch {
             println("FavSpotsViewModel: Deleting Predictions (${favoriteSpot.spotLatitude}, ${favoriteSpot.spotLongitude})")
             val resPredictionDelete = favSpotsUseCases.deleteAllPredictionsBySpotUseCase(
@@ -97,6 +132,7 @@ class FavSpotsViewModel(
             val result = favSpotsUseCases.removeFavSpotsUseCase(favSpot = favoriteSpot)
             if (result is Result.Success) {
                 fetchEssentialData()
+                lastDismissedSpot = null
             } else if (result is Result.Failure) {
                 _uiState.value =
                     FavSpotsState.Error(result.error?.message ?: "Failed to delete spot")
@@ -199,25 +235,6 @@ class FavSpotsViewModel(
                     }
                     currentForecastsForAllSpots = currentForecastsForAllSpots + dailyForecast
 
-//
-//                    val predictionResult = favSpotsUseCases.generateBestBoardForSingleDayUseCase(
-//                            surfboards = quiver,
-//                            dailyForecast = dailyForecast)
-//
-//                    when(predictionResult){
-//                        is Result.Failure -> {
-//                            _uiState.value = FavSpotsState.Error(
-//                                predictionResult.error?.message ?: "Failed to fetch prediction"
-//                            )
-//                        }
-//
-//                        is Result.Success -> {
-//                            if (predictionResult.data != null) {
-//                                prediction = prediction + predictionResult.data
-//                            }
-//                        }
-//
-//                    }
                 }
 
                 // ==================== Generate predictions for each spot  ==================================
@@ -391,6 +408,14 @@ class FavSpotsViewModel(
         val currentState = _uiState.value
         if (currentState is FavSpotsState.Loaded) {
             _uiState.update { FavSpotsState.Loaded(update(currentState.favSpotsData)) }
+        }
+    }
+
+
+    private fun undoDeleteSpot() {
+        lastDismissedSpot?.let { spotToRestore ->
+            fetchEssentialData()
+            lastDismissedSpot = null
         }
     }
 

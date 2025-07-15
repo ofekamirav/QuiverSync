@@ -5,4 +5,6 @@ import org.example.quiversync.BuildKonfig
 object AppConfig {
     val cloudName: String get() = BuildKonfig.CLOUD_NAME
     val uploadPreset: String get() = BuildKonfig.UPLOAD_PRESET
+    val googleMapsApiKey: String get() = BuildKonfig.MAPS_API_KEY
+    val stormGlassApi: String get() = BuildKonfig.STORM_GLASS_API_KEY
 }

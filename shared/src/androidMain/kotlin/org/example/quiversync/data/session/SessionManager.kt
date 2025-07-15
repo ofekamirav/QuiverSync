@@ -16,6 +16,8 @@ actual class SessionManager actual constructor(context: Any?) {
     private val latitudeKey = doublePreferencesKey("latitude")
     private val longitudeKey = doublePreferencesKey("longitude")
     private val lastRefreshKey = stringPreferencesKey("lastRefresh")
+    private val unitsPreferenceKey = stringPreferencesKey("units_preference")
+
 
 
     actual suspend fun clearUserData() {
@@ -23,6 +25,7 @@ actual class SessionManager actual constructor(context: Any?) {
             preferences.remove(uidKey)
             preferences.remove(latitudeKey)
             preferences.remove(longitudeKey)
+            preferences.remove(lastRefreshKey)
         }
     }
 
@@ -74,6 +77,14 @@ actual class SessionManager actual constructor(context: Any?) {
 
     actual suspend fun getLastRefresh(): String? {
         return context.dataStore.data.first()[lastRefreshKey]
+    }
+
+    actual suspend fun getUnitsPreference(): String? {
+        return context.dataStore.data.first()[unitsPreferenceKey] ?: "metric"
+    }
+
+    actual suspend fun setUnitsPreference(units: String) {
+        context.dataStore.edit { it[unitsPreferenceKey] = units }
     }
 
 }

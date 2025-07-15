@@ -19,7 +19,7 @@ import org.koin.dsl.module
 actual val platformModule: Module = module {
     single<HttpClientEngine> { OkHttp.create() }
     single<ImageUploader> { ActualImageUploader(androidContext()) }
-    single<LocationProvider> { AndroidLocationProvider(get<Context>()) }
+    single<LocationProvider> { AndroidLocationProvider(androidContext()) }
     single { SessionManager(androidContext()) }
     single<SqlDriver> { DatabaseDriverFactory(androidContext()).createDriver() }
 
