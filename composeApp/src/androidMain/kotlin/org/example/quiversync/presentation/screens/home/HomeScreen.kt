@@ -1,5 +1,7 @@
 package org.example.quiversync.presentation.screens.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -33,6 +35,7 @@ import org.example.quiversync.utils.WindowWidthSize
 import org.koin.androidx.compose.koinViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(
@@ -41,6 +44,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ){
     val state by viewModel.uiState.collectAsState()
+    val isImperial by viewModel.isImperial.collectAsState()
+
     var showBottomSheet by remember { mutableStateOf(false) }
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -90,18 +95,14 @@ fun HomeScreen(
 
     when (state) {
         is HomeState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                HomeSkeleton()
-            }
+            HomeSkeleton(modifier)
         }
         is HomeState.Loaded -> {
             val data = (state as HomeState.Loaded).homePageData
             HomeScreenContent(
                 homePageData = data,
-                modifier = modifier
+                modifier = modifier,
+                isImperial = isImperial
             )
         }
         is HomeState.Error -> {
@@ -116,13 +117,14 @@ fun HomeScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreenContent(
     homePageData: HomePageData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isImperial: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(true) }
-    val scrollState = rememberScrollState()
     val windowInfo = LocalWindowInfo.current
 
     val weeklyForecast = homePageData.weeklyForecast
@@ -147,8 +149,7 @@ fun HomeScreenContent(
                 modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp)
-                    .verticalScroll(scrollState),
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 MainConditions(
@@ -156,9 +157,10 @@ fun HomeScreenContent(
                     prediction = predictionForToday,
                     surfboard = surfboard,
                     expanded = expanded,
-                    onExpandToggle = { expanded = !expanded }
+                    onExpandToggle = { expanded = !expanded },
+                    isImperialUnits = isImperial
                 )
-                ForecastPanel(weeklyForecast)
+                ForecastPanel(weeklyForecast, isImperial)
             }
         }
 
@@ -176,11 +178,12 @@ fun HomeScreenContent(
                         prediction = predictionForToday,
                         surfboard = surfboard,
                         expanded = expanded,
-                        onExpandToggle = { expanded = !expanded }
+                        onExpandToggle = { expanded = !expanded },
+                        isImperialUnits = isImperial,
                     )
                 }
                 Column(modifier = Modifier.weight(0.4f)) {
-                    ForecastPanel(weeklyForecast)
+                    ForecastPanel(weeklyForecast, isImperial)
                 }
             }
         }

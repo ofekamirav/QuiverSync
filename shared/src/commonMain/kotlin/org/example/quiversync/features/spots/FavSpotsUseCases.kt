@@ -13,6 +13,7 @@ import org.example.quiversync.domain.usecase.gemini.GenerateWeeklyPredictionsUse
 import org.example.quiversync.domain.usecase.gemini.GenerateSingleDayMatchUseCase
 import org.example.quiversync.domain.usecase.quiver.GetMyQuiverUseCase
 import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
+import org.example.quiversync.domain.usecase.user.IsImperialUnitsUseCase
 
 class FavSpotsUseCases(
     // Favorite Spots Use Cases
@@ -24,6 +25,7 @@ class FavSpotsUseCases(
     val getUserProfileUseCase: GetUserProfileUseCase,
 
     val getUser : GetUserProfileUseCase,
+    val isImperialUnitsUseCase: IsImperialUnitsUseCase,
 
     // Forecast and Prediction Use Cases
     val getDailyForecast: GetDailyForecast,

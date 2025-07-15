@@ -23,6 +23,9 @@ class FavSpotsViewModel(
     private val _uiState = MutableStateFlow<FavSpotsState>(FavSpotsState.Loading)
     val uiState: StateFlow<FavSpotsState> get() = _uiState
 
+    private val _isImperialUnits = MutableStateFlow(false)
+    val isImperialUnits: StateFlow<Boolean> get() = _isImperialUnits
+
     private var lastDismissedSpot: FavoriteSpot? = null
 
 
@@ -33,6 +36,7 @@ class FavSpotsViewModel(
     init {
         scope.launch {
             favSpotsUseCases.deleteOutDateForecastUseCase()
+            _isImperialUnits.value = favSpotsUseCases.isImperialUnitsUseCase()
         }
         fetchEssentialData()
         scope.launch {

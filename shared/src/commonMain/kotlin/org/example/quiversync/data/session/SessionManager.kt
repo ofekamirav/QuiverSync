@@ -16,6 +16,8 @@ expect class SessionManager(context: Any?) {
     suspend fun setLastLocation(location: Location)
     suspend fun setLastRefresh()
     suspend fun getLastRefresh(): String?
+    suspend fun getUnitsPreference(): String?
+    suspend fun setUnitsPreference(units: String)
 
 }
 

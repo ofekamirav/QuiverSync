@@ -1,6 +1,8 @@
 package org.example.quiversync.presentation.navigation
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -23,10 +25,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.presentation.components.LoadingAnimation
+import org.example.quiversync.presentation.components.LottieSplashScreen
 import org.example.quiversync.presentation.screens.login.LoginScreen
 import org.example.quiversync.presentation.screens.profile.ProfileScreen
 import org.example.quiversync.presentation.screens.register.RegisterScreen
@@ -39,12 +43,14 @@ import org.example.quiversync.presentation.screens.rentals.RentalsHubScreen
 import org.example.quiversync.presentation.screens.settings.EditProfileDetailsScreen
 import org.example.quiversync.presentation.screens.settings.SecurityAndPrivacyScreen
 import org.example.quiversync.presentation.screens.settings.SettingsScreen
+import org.example.quiversync.presentation.screens.spots.AddSpotScreen
 import org.example.quiversync.presentation.screens.spots.FavoriteSpotsScreen
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
 import org.koin.compose.koinInject
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation(sessionManager: SessionManager = koinInject()) {
@@ -52,11 +58,30 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showLottieSplash by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
+        val minSplashTime = 3000L
+        val startTime = System.currentTimeMillis()
         val uid = sessionManager.getUid()
         Log.d("AppNavigation","User ID from SessionManager: $uid")
         isLoggedIn = uid != null
+        val endTime = System.currentTimeMillis()
+        val elapsed = endTime - startTime
+        if (elapsed < minSplashTime) {
+            delay(minSplashTime - elapsed)
+        }
+        showLottieSplash = false
+    }
+
+    if (showLottieSplash) {
+        LottieSplashScreen(
+            animationFileName = "splash_intro_animation.json",
+            iterations = 1,
+            onAnimationFinished = {
+            }
+        )
+        return
     }
 
     if (isLoggedIn == null) {
@@ -136,7 +161,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                         titleContentColor = MaterialTheme.colorScheme.primary,
                         navigationIconContentColor = MaterialTheme.colorScheme.primary
                     ),
-                    modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
+                    //modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
                     actions = {
                         if (currentRoute == Screen.Profile.route) {
                             IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {
@@ -205,7 +230,8 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             composable(Screen.Login.route) {
                 LoginScreen(
@@ -248,7 +274,11 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 )
             }
             composable(Screen.Spots.route) {
-                FavoriteSpotsScreen(modifier = Modifier.padding(innerPadding), snackbarHostState = snackbarHostState)
+                FavoriteSpotsScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    snackbarHostState = snackbarHostState,
+                    onAddSpotClick = { navController.navigate(Screen.AddSpot.route) }
+                )
             }
             composable(Screen.Rentals.route) {
                 RentalsHubScreen(modifier = Modifier.padding(innerPadding))
@@ -334,6 +364,12 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                                 launchSingleTop = true
                             }
                      }
+                 )
+            }
+            composable(Screen.AddSpot.route) {
+                 AddSpotScreen(
+                     modifier = Modifier.padding(innerPadding),
+                     onSpotAdded = { navController.popBackStack() }
                  )
             }
         }

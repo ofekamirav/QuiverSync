@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -91,6 +92,7 @@ fun BoardCard(
                 modifier = Modifier
                     .size(80.dp)
                     .padding(bottom = 12.dp)
+                    .clip(RoundedCornerShape(20.dp))
             )
             Text(
                 board.model,

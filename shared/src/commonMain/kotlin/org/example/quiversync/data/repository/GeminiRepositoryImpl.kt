@@ -11,6 +11,7 @@ import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.repository.GeminiRepository
+import org.example.quiversync.utils.extensions.platformLogger
 
 class GeminiRepositoryImpl(
     private val api: GeminiApi,
@@ -40,12 +41,11 @@ class GeminiRepositoryImpl(
                 dailyForecast.longitude,
                 user.uid
             )
-
             if (existingPrediction != null) {
-                println("GeminiRepositoryImpl : generateSingleDayMatch() - Found existing prediction with score galoyoyoy ${existingPrediction.score} ")
+                println("GeminiRepositoryImpl : generateSingleDayMatch() - Found existing prediction with score ${existingPrediction.score} ")
                 return Result.Success(existingPrediction)
             }else{
-//                println("GeminiRepositoryImpl : generateSingleDayMatch() - No existing prediction found for user $uid on date ${dailyForecast.date}")
+                platformLogger("GeminiRepositoryImpl", "generateSingleDayMatch() - No existing prediction found, generating new match")
             }
             when (val result = api.predictionForOneDay(surfboards, dailyForecast, user)) {
                 is Result.Failure -> Result.Failure(result.error)

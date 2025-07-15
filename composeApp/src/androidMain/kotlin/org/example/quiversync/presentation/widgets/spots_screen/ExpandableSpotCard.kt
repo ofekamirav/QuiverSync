@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.widgets.spots_screen
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -8,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -37,20 +41,38 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import org.example.quiversync.R
 import org.example.quiversync.domain.model.FavoriteSpot
+import org.example.quiversync.domain.model.FinsSetup
 import org.example.quiversync.domain.model.Surfboard
+import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.domain.model.forecast.DailyForecast
-import org.example.quiversync.domain.model.prediction.GeminiPrediction
 import org.example.quiversync.presentation.theme.OceanPalette
+import org.example.quiversync.presentation.theme.QuiverSyncTheme
+import org.example.quiversync.utils.extentions.UnitConverter
+import java.text.DecimalFormat
 
 
 @Composable
-fun ExpandableSpotCard(spot: FavoriteSpot, score: String, surfboard: Surfboard, forecast: DailyForecast) {
+fun ExpandableSpotCard(
+    spot: FavoriteSpot,
+    score: String,
+    surfboard: Surfboard,
+    forecast: DailyForecast,
+    onWeeklyForecastClick: () -> Unit,
+    isImperial: Boolean = true,
+) {
     var expanded by remember { mutableStateOf(false) }
     val isDark = isSystemInDarkTheme()
     val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.White
+    val waveHeightDisplay = if(isImperial) {
+        UnitConverter.metersToFeet(forecast.waveHeight).toString()
+    } else {
+        forecast.waveHeight.toString()
+    }
 
     Card(
         modifier = Modifier
@@ -97,36 +119,35 @@ fun ExpandableSpotCard(spot: FavoriteSpot, score: String, surfboard: Surfboard, 
                         .fillMaxWidth()
                         .padding(top = 12.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(8.dp))
-
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painter = painterResource(id = R.drawable.hs_shortboard),
+                            AsyncImage(
+                                model = surfboard.imageRes,
+                                placeholder = painterResource(id = R.drawable.hs_shortboard),
                                 contentDescription = "Board",
                                 modifier = Modifier
                                     .size(48.dp)
-                                    .padding(end = 12.dp)
+                                    .padding(end = 8.dp)
+                                    .clip(RoundedCornerShape(12.dp))
                             )
-                            Column {
+                            Column(
+                                horizontalAlignment = Alignment.Start,
+                                verticalArrangement = Arrangement.Center
+                            ) {
                                 Text(
                                     text = surfboard.model,
                                     fontWeight = FontWeight.Bold,
                                     color = OceanPalette.DeepBlue
                                 )
-                                Text(
-                                    text = "${score}% Match",
-                                    color = Color.Gray,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                MatchBadge(score.toInt())
                             }
                         }
 
-                        // 🌊 Wave height with icon
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_waves),
@@ -135,37 +156,78 @@ fun ExpandableSpotCard(spot: FavoriteSpot, score: String, surfboard: Surfboard, 
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
+                            val df = DecimalFormat("##.##")
                             Text(
-                                text = "${forecast.waveHeight} ft",
+                                text = "${df.format(forecast.waveHeight)} ${waveHeightDisplay}",
                                 color = OceanPalette.DeepBlue,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
-
                     Spacer(modifier = Modifier.height(8.dp))
-                    ConfidenceProgress(score.toInt())
+                    Button(
+                        onClick = onWeeklyForecastClick,
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = Color.White
+                        ),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Weekly Forecast",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+
+@Preview(name = "Expanded Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun ConfidenceProgress(percentage: Int) {
-    val animatedProgress by animateFloatAsState(
-        targetValue = percentage / 100f,
-        animationSpec = tween(durationMillis = 800),
-        label = "ConfidenceAnim"
+fun ExpandableSpotCardExpandedPreview() {
+    var expanded by remember { mutableStateOf(true) } // Keep expanded true for this preview
+
+    val dummySpot = FavoriteSpot(
+        spotID = "1",
+        name = "Mavericks, California",
+        spotLatitude = 37.4935,
+        spotLongitude = -122.5049,
+        userID = "user123",
+    )
+    val dummySurfboard = Surfboard(
+        id = "2",
+        model = "Gun",
+        volume = "60L",
+        imageRes = "https://example.com/gun_surfboard.png", // ודא שזה נתיב תקין, אולי R.drawable.hs_shortboard עבור בדיקות
+        ownerId = "user123",
+        company = "Channel Islands",
+        type = SurfboardType.FUNBOARD,
+        height = "9.0",
+        width = "22.0",
+        finSetup = FinsSetup.THRUSTER,
+        addedDate = "2023-10-01",
+    )
+    val dummyForecast = DailyForecast(
+        date = "2023-10-28",
+        waveHeight = 15.2,
+        windSpeed = 12.0,
+        windDirection = 0.1,
+        swellDirection = 0.2,
+        swellPeriod = 12.0,
     )
 
-    LinearProgressIndicator(
-        progress = animatedProgress,
-        color = OceanPalette.SurfBlue,
-        trackColor = OceanPalette.SkyBlue.copy(alpha = 0.3f),
-        modifier = Modifier
-            .width(100.dp)
-            .height(6.dp)
-            .clip(RoundedCornerShape(8.dp))
-    )
+    QuiverSyncTheme(darkTheme = true) {
+        ExpandableSpotCard(
+            spot = dummySpot,
+            score = "85",
+            surfboard = dummySurfboard,
+            forecast = dummyForecast,
+            onWeeklyForecastClick = {}
+        )
+    }
 }

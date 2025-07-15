@@ -1,6 +1,5 @@
 package org.example.quiversync.di
 
-import app.cash.sqldelight.db.SqlDriver
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
@@ -8,6 +7,7 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.firestore
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
@@ -21,7 +21,6 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import org.example.quiversync.QuiverSyncDatabase
-import org.example.quiversync.data.local.dao.DatabaseDriverFactory
 import org.example.quiversync.data.local.dao.FavSpotDao
 import org.example.quiversync.data.local.dao.GeminiPredictionDao
 import org.example.quiversync.data.local.dao.QuiverDao
@@ -61,7 +60,6 @@ import org.example.quiversync.domain.usecase.gemini.DeleteAllPredictionsBySpotUs
 import org.example.quiversync.domain.usecase.gemini.GenerateAllTodayPredictionsUseCase
 import org.example.quiversync.domain.usecase.gemini.GenerateWeeklyPredictionsUseCase
 import org.example.quiversync.domain.usecase.gemini.GenerateSingleDayMatchUseCase
-import org.example.quiversync.domain.usecase.gemini.GetPredictionsForTodayUseCase
 import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
 import org.example.quiversync.domain.usecase.loginUseCases.SignInWithGoogleUseCase
 import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
@@ -73,9 +71,11 @@ import org.example.quiversync.domain.usecase.quiver.SetSurfboardAsUnavailableUse
 import org.example.quiversync.domain.usecase.quiver.UnpublishSurfboardFromRentalUseCase
 import org.example.quiversync.domain.usecase.user.CheckUserAuthMethodUseCase
 import org.example.quiversync.domain.usecase.user.GetBoardsNumberUseCase
+import org.example.quiversync.domain.usecase.user.GetSpotsNumberUseCase
 import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
+import org.example.quiversync.domain.usecase.user.IsImperialUnitsUseCase
 import org.example.quiversync.domain.usecase.user.LogoutUseCase
 import org.example.quiversync.domain.usecase.user.SendPasswordResetEmailUseCase
 import org.example.quiversync.domain.usecase.user.UpdatePasswordUseCase
@@ -162,19 +162,21 @@ val commonModule= module {
 
    //---------------------------------------------------UseCases--------------------------------------------
    //User UseCases
-   single { RegisterUserUseCase(get()) }
-   single { UpdateUserProfileUseCase(get()) }
-   single { UploadImageUseCase(get()) }
+    single { RegisterUserUseCase(get()) }
+    single { UpdateUserProfileUseCase(get()) }
+    single { UploadImageUseCase(get()) }
     single { UpdateProfileDetailsUseCase(get()) }
-   single { GetWeeklyForecastByLocationUseCase(get(),get()) }
-   single { GetWeeklyForecastBySpotUseCase(get()) }
-   single { GetUserProfileUseCase(get()) }
-   single { LogoutUseCase(get()) }
-   single { LoginUserUseCase(get()) }
-   single { CheckUserAuthMethodUseCase(get()) }
-   single { UpdatePasswordUseCase(get()) }
-   single { SendPasswordResetEmailUseCase(get()) }
-   single { SignInWithGoogleUseCase(get()) }
+    single { GetWeeklyForecastByLocationUseCase(get(),get()) }
+    single { GetWeeklyForecastBySpotUseCase(get()) }
+    single { GetUserProfileUseCase(get()) }
+    single { LogoutUseCase(get()) }
+    single { LoginUserUseCase(get()) }
+    single { CheckUserAuthMethodUseCase(get()) }
+    single { UpdatePasswordUseCase(get()) }
+    single { SendPasswordResetEmailUseCase(get()) }
+    single { SignInWithGoogleUseCase(get()) }
+    single { GetSpotsNumberUseCase(get()) }
+    single { IsImperialUnitsUseCase(get()) }
 
    //Quiver UseCases
    single { AddBoardUseCase(get()) }
@@ -208,10 +210,11 @@ val commonModule= module {
    //Data Classes for UseCases
    single{
       HomeUseCases(
-          getWeeklyForecastByLocationUseCase = get(),
+            getWeeklyForecastByLocationUseCase = get(),
             getQuiverUseCase = get(),
             getDailyPrediction = get(),
-            getUser = get()
+            getUser = get(),
+            isImperialUnitsUseCases = get()
       )
    }
    single {
@@ -231,6 +234,7 @@ val commonModule= module {
           checkUserAuthMethod = get(),
           updatePasswordUseCase = get(),
           sendPasswordResetEmailUseCase = get(),
+          getSpotsNumberUseCase = get()
       )
    }
    single {
@@ -256,6 +260,7 @@ val commonModule= module {
             // Quiver&User UseCases
             getAllQuiverUseCase = get(),
             getUserProfileUseCase = get(),
+            isImperialUnitsUseCase = get(),
 
 
             // Forecast UseCases
@@ -268,7 +273,7 @@ val commonModule= module {
             generateBestBoardForSingleDayUseCase = get(),
             generateWeeklyPredictions = get(),
             deleteAllPredictionsBySpotUseCase = get(),
-            generateAllTodayPredictionsUseCase = get()
+            generateAllTodayPredictionsUseCase = get(),
       )
    }
 
@@ -283,7 +288,7 @@ val commonModule= module {
    single { OnboardingViewModel(get(), get(), get()) }
    single { QuiverViewModel(get()) }
    single { AddBoardViewModel(get(), get()) }
-   single { SettingsViewModel(get()) }
+   single { SettingsViewModel(get(), get()) }
    single { EditProfileDetailsViewModel(get()) }
    single { SecurityAndPrivacyViewModel(get()) }
     single { FavSpotsViewModel(get(),get()) }
@@ -301,6 +306,11 @@ fun createJson(): Json = Json {
 }
 
 fun createHttpClient(clientEngine: HttpClientEngine, json: Json) = HttpClient(clientEngine) {
+    install(HttpTimeout) {
+        connectTimeoutMillis = 30_000
+        socketTimeoutMillis  = 60_000
+        requestTimeoutMillis = 60_000
+    }
    install(Logging) {
       level = LogLevel.ALL
       logger = Logger.DEFAULT

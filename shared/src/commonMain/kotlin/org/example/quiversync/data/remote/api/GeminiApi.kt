@@ -273,7 +273,9 @@ class GeminiApi(
 
                 val fullText = geminiResponse.candidates.first().content.parts.first().text
 
-                val jsonText = Regex("""\{[\s\S]*?}""").find(fullText)?.value
+                val jsonText = Regex("""\{[\s\S]*?\}""")
+                    .find(fullText)
+                    ?.value
                     ?: throw IllegalStateException("No JSON object found in Gemini response")
 
                 println("✅ GeminiApi: Extracted JSON text: $jsonText")
@@ -338,7 +340,9 @@ class GeminiApi(
 
                 val fullText = geminiResponse.candidates.first().content.parts.first().text
 
-                val jsonArrayText = Regex("""(\[[\s\S]*?])""").find(fullText)?.value
+                val jsonArrayText = Regex("""\[[\s\S]*?\]""")
+                    .find(fullText)
+                    ?.value
                     ?: throw IllegalStateException("No JSON array found in Gemini response")
 
                 println("✅ GeminiApi: Extracted JSON array: $jsonArrayText")
@@ -405,7 +409,9 @@ class GeminiApi(
 
                 val fullText = geminiResponse.candidates.first().content.parts.first().text
 
-                val jsonArrayText = Regex("""(\[[\s\S]*?])""").find(fullText)?.value
+                val jsonArrayText = Regex("""\[[\s\S]*?\]""")
+                    .find(fullText)
+                    ?.value
                     ?: throw IllegalStateException("No JSON array found in Gemini response")
 
                 println("✅ GeminiApi: Extracted JSON array: $jsonArrayText")

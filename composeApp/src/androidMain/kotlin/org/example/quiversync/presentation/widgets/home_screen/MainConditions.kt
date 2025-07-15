@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +33,8 @@ import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.prediction.GeminiPrediction
 import org.example.quiversync.presentation.theme.OceanPalette
+import org.example.quiversync.utils.extentions.UnitConverter
+import java.text.DecimalFormat
 
 @Composable
 fun MainConditions(
@@ -39,8 +42,26 @@ fun MainConditions(
     prediction: GeminiPrediction?,
     surfboard: Surfboard?,
     expanded: Boolean,
+    isImperialUnits: Boolean,
     onExpandToggle: () -> Unit
 ) {
+
+    val displayWaveHeight = if (isImperialUnits) {
+        UnitConverter.metersToFeet(forecast.waveHeight)
+    } else {
+        forecast.waveHeight
+    }
+    val waveHeightUnit = if (isImperialUnits) "ft" else "m"
+
+    val displayWindSpeed = if (isImperialUnits) {
+        UnitConverter.msToKnots(forecast.windSpeed)
+    } else {
+        forecast.windSpeed
+    }
+    val windSpeedUnit = if (isImperialUnits) "knots" else "m/s"
+
+    val df = remember { DecimalFormat("#.##") }
+
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -73,9 +94,9 @@ fun MainConditions(
 
         AnimatedVisibility(visible = expanded) {
             CurrentConditions(
-                waveHeight = "${forecast.waveHeight} m",
-                wind = "${forecast.windSpeed} m/s",
-                tide = "${forecast.swellPeriod} s period"
+                waveHeight = "${df.format(displayWaveHeight)} $waveHeightUnit",
+                wind =  "${df.format(displayWindSpeed)} $windSpeedUnit",
+                tide = "${df.format(forecast.swellPeriod)} s period"
             )
         }
 

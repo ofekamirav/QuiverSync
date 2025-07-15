@@ -9,7 +9,7 @@ class GeminiPredictionDao(private val queries: GeminiPredictionQueries) {
 
     fun insert(prediction: GeminiPrediction , userId: String) {
         // Check if a prediction already exists for this date and location
-        println("GeminiPredictionDao: Iiiiiiiiinsrrtion $userId, prediction:" +
+        println("GeminiPredictionDao: Insertion $userId, prediction:" +
                 "$prediction")
         val existingPrediction = queries.GET_BEST_MATCH(userId, prediction.date, prediction.forecastLatitude, prediction.forecastLongitude).executeAsOneOrNull()
         if ( existingPrediction != null) {

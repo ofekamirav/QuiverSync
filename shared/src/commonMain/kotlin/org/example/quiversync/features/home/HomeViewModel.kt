@@ -19,8 +19,19 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow<HomeState>(HomeState.Loading)
     val uiState: StateFlow<HomeState> get() = _uiState
 
+    private val _isImperial =  MutableStateFlow<Boolean>(false)
+    val isImperial: StateFlow<Boolean> get() = _isImperial
+
     init {
         fetchForecastAndBoardMatch()
+        scope.launch {
+         if(homeUseCases.isImperialUnitsUseCases()){
+            _isImperial.value = true
+         }
+            else {
+                _isImperial.value = false
+            }
+        }
     }
 
     fun refreshWithLocation() {
@@ -34,8 +45,8 @@ class HomeViewModel(
 
             val forecastResult = homeUseCases.getWeeklyForecastByLocationUseCase()
             platformLogger("HomeViewModel", "forecast for the week by your location: $forecastResult")
-            val forecast : List<DailyForecast>
             val userResult = homeUseCases.getUser()
+            val forecast: List<DailyForecast>
             val user : User
             when (userResult){
                 is Result.Success ->{
@@ -56,6 +67,11 @@ class HomeViewModel(
             when (forecastResult) {
                 is Result.Success -> {
                     forecast = forecastResult.data ?: emptyList<DailyForecast>()
+                    if (forecastResult.data == null) {
+                        _uiState.value = HomeState.Error("No forecast data available")
+                        return@launch
+                    }
+
                 }
                 is Result.Failure -> {
                     _uiState.value = HomeState.Error(forecastResult.error?.message ?: "Unknown error")

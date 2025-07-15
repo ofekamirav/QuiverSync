@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
@@ -19,6 +20,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -53,6 +55,7 @@ fun FavoriteSpotsScreen(
     snackbarHostState: SnackbarHostState
 ) {
     val uiState = viewModel.uiState.collectAsState().value
+    val isImperial = viewModel.isImperialUnits.collectAsState().value
 
     when (uiState) {
         is FavSpotsState.Error -> ErrorContent(uiState.message)
@@ -60,7 +63,7 @@ fun FavoriteSpotsScreen(
             FavoriteSpotsScreenSkeleton(modifier)
         }
         is FavSpotsState.Loaded -> FavoriteSpotsContent(
-            modifier = modifier,
+            modifier = modifier.fillMaxSize(),
             favSpotsData = uiState.favSpotsData,
             onAddSpotClick = onAddSpotClick,
             onDeleteSpot = { spotToDelete ->
@@ -69,7 +72,8 @@ fun FavoriteSpotsScreen(
             onUndoDeleteSpot = {
                 viewModel.onEvent(FavSpotsEvent.UndoDeleteSpot)
             },
-            snackbarHostState = snackbarHostState
+            snackbarHostState = snackbarHostState,
+            isImperial = isImperial
         )
     }
 }
@@ -82,7 +86,8 @@ fun FavoriteSpotsContent(
     onDeleteSpot: (FavoriteSpot) -> Unit,
     onUndoDeleteSpot: () -> Unit,
     onAddSpotClick: () -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    isImperial: Boolean
 ){
     val spots = favSpotsData.spots
     val allPredictions = favSpotsData.allSpotsDailyPredictions
@@ -170,13 +175,14 @@ fun FavoriteSpotsContent(
                             SwipeToDismissBox(
                                 state = dismissState,
                                 enableDismissFromEndToStart = true,
-                                enableDismissFromStartToEnd = true,
+                                enableDismissFromStartToEnd = false,
+                                modifier = Modifier.clip(RoundedCornerShape(16.dp)),
                                 backgroundContent = {
                                     val direction = dismissState.dismissDirection ?: return@SwipeToDismissBox
                                     val color by animateColorAsState(
                                         when (dismissState.targetValue) {
-                                            SwipeToDismissBoxValue.StartToEnd, SwipeToDismissBoxValue.Settled  -> Color.LightGray
                                             SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error
+                                            else -> Color.Transparent
                                         }, label = "dismissColor"
                                     )
                                     val icon = Icons.Filled.Delete
@@ -190,7 +196,6 @@ fun FavoriteSpotsContent(
                                             .background(color)
                                             .padding(horizontal = 20.dp),
                                         contentAlignment = when (direction) {
-                                            SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
                                             SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
                                             else -> Alignment.Center
                                         }
@@ -210,14 +215,16 @@ fun FavoriteSpotsContent(
                                                 spot = spot,
                                                 score = score,
                                                 surfboard = it,
-                                                forecast = forecast
+                                                forecast = forecast,
+                                                onWeeklyForecastClick = {
+                                                    // Handle weekly forecast click if needed
+                                                },
+                                                isImperial = isImperial
                                             )
                                         }
                                     }
                                 }
                             )
-
-
                         }
                     }
                 }
@@ -274,13 +281,14 @@ fun FavoriteSpotsContent(
                             SwipeToDismissBox(
                                 state = dismissState,
                                 enableDismissFromEndToStart = true,
-                                enableDismissFromStartToEnd = true,
+                                enableDismissFromStartToEnd = false,
+                                modifier = Modifier.clip(RoundedCornerShape(16.dp)),
                                 backgroundContent = {
                                     val direction = dismissState.dismissDirection ?: return@SwipeToDismissBox
                                     val color by animateColorAsState(
                                         when (dismissState.targetValue) {
-                                            SwipeToDismissBoxValue.StartToEnd, SwipeToDismissBoxValue.Settled  -> Color.LightGray
                                             SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error
+                                            else -> Color.Transparent
                                         }, label = "dismissColor"
                                     )
                                     val icon = Icons.Filled.Delete
@@ -294,7 +302,6 @@ fun FavoriteSpotsContent(
                                             .background(color)
                                             .padding(horizontal = 20.dp),
                                         contentAlignment = when (direction) {
-                                            SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
                                             SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
                                             else -> Alignment.Center
                                         }
@@ -314,7 +321,10 @@ fun FavoriteSpotsContent(
                                                 spot = spot,
                                                 score = score,
                                                 surfboard = it,
-                                                forecast = forecast
+                                                forecast = forecast,
+                                                onWeeklyForecastClick = {
+                                                    // Handle weekly forecast click if needed
+                                                }
                                             )
                                         }
                                     }
@@ -331,14 +341,14 @@ fun FavoriteSpotsContent(
             containerColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .size(60.dp)
-                .padding(60.dp)
+                .size(80.dp)
+                .padding(16.dp)
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "Add Spot",
                 tint = Color.White,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(40.dp)
             )
         }
     }
