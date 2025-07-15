@@ -146,7 +146,8 @@ class AddBoardViewModel(
 
                 var finalUrl: String? = null
 
-                when (result) {
+
+               when(result){
                     is Result.Success -> {
                         if (result.data == "IOS uploader is been activated") {
                             println("📱 iOS mode: waiting for SwiftUI to upload image")
@@ -187,7 +188,6 @@ class AddBoardViewModel(
                             )
                         )
                     }
-
                     is Result.Failure -> {
                         println("❌ Upload error: ${result.error?.message}")
                         _uiState.value = updatedIdleState.copy(
@@ -197,8 +197,9 @@ class AddBoardViewModel(
                                 imageUploadError = "Upload failed: ${result.error?.message}"
                             )
                         )
+
                     }
-                }
+               }
 
             } catch (e: Exception) {
                 println("💥 Exception during upload: ${e.message}")
@@ -213,6 +214,7 @@ class AddBoardViewModel(
                 } else {
                     println("❌ Could not recover UI state after exception.")
                 }
+
             }
         }
     }
