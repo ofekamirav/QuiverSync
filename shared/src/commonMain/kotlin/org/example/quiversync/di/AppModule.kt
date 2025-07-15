@@ -210,7 +210,8 @@ val commonModule= module {
       HomeUseCases(
           getWeeklyForecastByLocationUseCase = get(),
             getQuiverUseCase = get(),
-            getDailyPrediction = get()
+            getDailyPrediction = get(),
+            getUser = get()
       )
    }
    single {
@@ -261,6 +262,7 @@ val commonModule= module {
             getDailyForecast = get(),
             getWeeklyForecastBySpotUseCase = get(),
             deleteBySpotUseCase = get(),
+            getUser = get(),
 
             // Gemini UseCases
             generateBestBoardForSingleDayUseCase = get(),

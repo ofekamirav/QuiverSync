@@ -19,7 +19,9 @@ public struct ProfileScreen: View {
             case .loading:
                 LoadingView(colorName: "background")
             case .loaded(let loaded):
-                ProfileView(user: loaded.user , isLoggedIn: $isLoggedIn)
+                ProfileView(user: loaded.user,
+                            boardsCount: Int(loaded.boards),
+                            isLoggedIn: $isLoggedIn)
             case .error(let error): ErrorView(messege: error.message)
             }
         }
@@ -30,31 +32,5 @@ public struct ProfileScreen: View {
 }
 
 
-//using SKIE for async req , not using corutines
-//Get the state from the Kotlin.
-extension ProfileScreen{
-    
-    @MainActor
-    class ProfileScreenModelWrapper: ObservableObject {
-        let viewModel: UserViewModel
-        @Published var uiState: UserState
-        
-        init() {
-            self.viewModel = KoinKt.userViewModel()
-            self.uiState = viewModel.uiState.value
-        }
-        
-        func startObserving() {
-            Task{
-                for await state in viewModel.uiState{
-                    self.uiState = state
-                }
-            }
-        }
-    }
-}
 
 
-//#Preview {
-//    ProfileScreen()
-//}

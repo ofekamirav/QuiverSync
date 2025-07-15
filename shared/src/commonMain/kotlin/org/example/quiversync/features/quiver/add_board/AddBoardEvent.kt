@@ -12,6 +12,7 @@ sealed interface AddBoardEvent {
     data class VolumeChanged(val value: String) : AddBoardEvent
     data class FinsSetupChanged(val value: FinsSetup) : AddBoardEvent
     data class surfboardImageSelected(val bytes: ByteArray) : AddBoardEvent
+    data class surfboardImageIOSChanged(val imageURL : String) : AddBoardEvent
     object NextStepClicked : AddBoardEvent
     object PreviousStepClicked : AddBoardEvent
     object SubmitClicked : AddBoardEvent

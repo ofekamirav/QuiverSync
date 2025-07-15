@@ -27,14 +27,16 @@ class UserRepositoryImpl(
 
         val local = userDao.getUserProfile(uid)
         if (local != null) {
+            println("Found local user profile for UID: $local")
             return Result.Success(local)
         }
 
         val snapshot = firestore.collection("users").document(uid).get()
         if (snapshot.exists) {
             val user = snapshot.data<User>()
+            println("Fetched user profile from Firestore: $user")
 
-            userDao.insertOrReplaceProfile(user)
+            userDao.insertOrReplaceProfile(user, uid)
             return Result.Success(user)
         }
         return Result.Failure<UserError>(UserError("User profile not found"))
@@ -46,7 +48,7 @@ class UserRepositoryImpl(
         return try {
             firestore.collection("users").document(uid).set(user.toDto(), merge = true)
 
-            userDao.insertOrReplaceProfile(user)
+            userDao.insertOrReplaceProfile(user , uid)
 
             Result.Success(Unit)
         } catch (e: Exception) {

@@ -31,7 +31,13 @@ public struct AddBoardScreen: View {
             case .loading:
                 LoadingView(colorName: "background")
             case .loaded:
-                LoadingView(colorName: "background")
+                Text("✅ Board added successfully!")
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                            onBackRequested()
+                        }
+                    }
+
             case .error(let error): ErrorView(messege: error.message)
             }
         }

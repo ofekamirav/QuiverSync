@@ -75,19 +75,24 @@ class GeminiApi(
         - 90–100 = ideal, 70–89 = good, 50–69 = usable, <50 = mismatch
         - Give concise reasoning (max 30 words).
 
-        --- OUTPUT FORMAT (strictly JSON, one object per board) ---
+        --- OUTPUT FORMAT (strictly JSON, one array of objects) ---
 
-        Respond **only** with a valid JSON Object. No explanation before or after.
+        Respond **only** with a valid JSON array. Do not wrap it in an outer object .
 
-            {
-                "surfboardID": "<board ID>",
-                "score": 85,
-                "description": "Short explanation (max 30 words)",
-                "forecastLatitude": ${forecast.latitude},
-                "forecastLongitude": ${forecast.longitude},
-                "date": "${forecast.date}"
-            },
-    """.trimIndent()
+        Each item in the array must be:
+
+        {
+          "surfboardID": "<board ID>",
+          "score": 85,
+          "description": "Short explanation (max 30 words)",
+          "forecastLatitude": ${forecast.latitude},
+          "forecastLongitude": ${forecast.longitude},
+          "date": "${forecast.date}"
+        }
+        
+        Do not include any explanation or markdown formatting. Respond with the raw JSON array only.
+
+        """.trimIndent()
     }
 
     private fun buildPromptForWeek(

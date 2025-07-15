@@ -6,18 +6,20 @@
 //  Copyright © 2025 orgName. All rights reserved.
 //
 
+
 import SwiftUI
 import Shared
 import Foundation
 
-
 struct AddBoardStep2View: View {
     let data: AddBoardFormData
     let onEvent: (AddBoardEvent) -> Void
-    
+
     @State private var showImageOptions = false
     @State private var showCamera = false
     @State private var showGallery = false
+    @State private var didStartIOSUpload = false
+    @State private var selectedImageData: Data?
 
     var body: some View {
         VStack(spacing: 20) {
@@ -30,13 +32,17 @@ struct AddBoardStep2View: View {
                     text: data.height,
                     label: "Height (In)",
                     keyboardType: .decimalPad,
-                    onValueChange: { onEvent(AddBoardEventHeightChanged(value: $0)) }
+                    onValueChange: { onEvent(AddBoardEventHeightChanged(value: $0)) },
+                    isError: data.heightError != nil,
+                    errorMessage: data.heightError
                 )
                 CustomTextField(
                     text: data.width,
                     label: "Width (In)",
                     keyboardType: .decimalPad,
-                    onValueChange: { onEvent(AddBoardEventWidthChanged(value: $0)) }
+                    onValueChange: { onEvent(AddBoardEventWidthChanged(value: $0)) },
+                    isError: data.widthError != nil,
+                    errorMessage: data.widthError
                 )
             }
 
@@ -44,7 +50,9 @@ struct AddBoardStep2View: View {
                 text: data.volume,
                 label: "Volume (L)",
                 keyboardType: .decimalPad,
-                onValueChange: { onEvent(AddBoardEventVolumeChanged(value: $0)) }
+                onValueChange: { onEvent(AddBoardEventVolumeChanged(value: $0)) },
+                isError: data.volumeError != nil,
+                errorMessage: data.volumeError
             )
 
             BoardImagePicker(
@@ -74,6 +82,7 @@ struct AddBoardStep2View: View {
         .sheet(isPresented: $showCamera) {
             ImagePicker(sourceType: .camera) { image in
                 if let data = image.jpegData(compressionQuality: 0.6) {
+                    selectedImageData = data
                     onEvent(AddBoardEventSurfboardImageSelected(bytes: data.toKotlinByteArray()))
                 }
             }
@@ -81,10 +90,33 @@ struct AddBoardStep2View: View {
         .sheet(isPresented: $showGallery) {
             ImagePicker(sourceType: .photoLibrary) { image in
                 if let data = image.jpegData(compressionQuality: 0.6) {
+                    selectedImageData = data
                     onEvent(AddBoardEventSurfboardImageSelected(bytes: data.toKotlinByteArray()))
                 }
             }
         }
+        .onChange(of: data.uploadFromIOS) { isTriggered in
+            if isTriggered && !didStartIOSUpload {
+                print("📸 Uploading image to Cloudinary...")
+                didStartIOSUpload = true
+                Task {
+                    do {
+                        guard let data = selectedImageData,
+                              let image = UIImage(data: data) else {
+                            print("❌ Invalid image data — upload skipped")
+                            return
+                        }
 
+                        let url = try await ImageUploader.uploadImageToCloudinary(image, folder: "surfboards")
+                        onEvent(AddBoardEventSurfboardImageIOSChanged(imageURL: url ?? "failed to upload"))
+                    } catch {
+                        print("❌ iOS image upload failed: \(error)")
+                    }
+                }
+            }
+        }
+        .animation(.easeInOut, value: data.heightError)
+        .animation(.easeInOut, value: data.widthError)
+        .animation(.easeInOut, value: data.volumeError)
     }
 }

@@ -8,6 +8,7 @@ import org.example.quiversync.features.register.RegisterViewModel
 import org.example.quiversync.features.spots.AddFavSpot.AddFavSpotViewModel
 import org.example.quiversync.features.spots.FavSpotMainPage.FavSpotsViewModel
 import org.example.quiversync.features.user.UserViewModel
+import org.example.quiversync.features.user.edit_user.EditProfileDetailsViewModel
 import org.koin.mp.KoinPlatform
 
 fun doInitKoin() = initKoin()
@@ -20,6 +21,8 @@ fun registerViewModel() : RegisterViewModel = KoinPlatform.getKoin().get()
 fun loginViewModel() : LoginViewModel = KoinPlatform.getKoin().get()
 
 fun userViewModel() : UserViewModel = KoinPlatform.getKoin().get()
+
+fun editProfileDetailsViewModel() : EditProfileDetailsViewModel = KoinPlatform.getKoin().get()
 
 fun favSpotsViewModel() : FavSpotsViewModel = KoinPlatform.getKoin().get()
 

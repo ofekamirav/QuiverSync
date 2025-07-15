@@ -23,6 +23,8 @@ class FavSpotsUseCases(
     val getAllQuiverUseCase: GetMyQuiverUseCase,
     val getUserProfileUseCase: GetUserProfileUseCase,
 
+    val getUser : GetUserProfileUseCase,
+
     // Forecast and Prediction Use Cases
     val getDailyForecast: GetDailyForecast,
     val getWeeklyForecastBySpotUseCase: GetWeeklyForecastBySpotUseCase,

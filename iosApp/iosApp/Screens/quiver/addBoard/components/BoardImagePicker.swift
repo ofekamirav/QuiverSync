@@ -24,15 +24,17 @@ struct BoardImagePicker: View {
                     ProgressView()
                         .frame(width: 120, height: 120)
                 } else if let url = imageUrl, let imageURL = URL(string: url) {
-                    AsyncImage(url: imageURL) { image in
+                    AsyncImage(url: imageURL, scale: 1) { image in
                         image
                             .resizable()
                             .scaledToFill()
                     } placeholder: {
                         ProgressView()
                     }
+                    .id(imageURL.absoluteString) 
                     .frame(width: 120, height: 120)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+
                 } else {
                     RoundedRectangle(cornerRadius: 16)
                         .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))

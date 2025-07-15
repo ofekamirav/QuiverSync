@@ -27,9 +27,9 @@ class UserDao(
 
     }
 
-    fun insertOrReplaceProfile(user: User) {
+    fun insertOrReplaceProfile(user: User , uid: String) {
         queries.insertOrReplaceProfile(
-            uid = user.uid,
+            uid = uid,
             name = user.name,
             email = user.email,
             dateOfBirth = user.dateOfBirth,
