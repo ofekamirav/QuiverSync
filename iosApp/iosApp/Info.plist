@@ -50,5 +50,7 @@
 	<string>We use your photo library to let you choose a surfboard image.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We use your camera to take a picture of your surfboard.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We use your location to show surf forecasts near you.</string>
 </dict>
 </plist>

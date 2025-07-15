@@ -23,7 +23,8 @@ struct AddBoardStep1View: View {
                 text: data.model,
                 label: "Model Name",
                 keyboardType: .default,
-                onValueChange: { onEvent(AddBoardEventModelChanged(value: $0)) }, isError: data.modelError != nil,
+                onValueChange: { onEvent(AddBoardEventModelChanged(value: $0)) },
+                isError: data.modelError != nil,
                 errorMessage: data.modelError
             )
 
@@ -31,7 +32,8 @@ struct AddBoardStep1View: View {
                 text: data.company,
                 label: "Company / Shaper",
                 keyboardType: .default,
-                onValueChange: { onEvent(AddBoardEventCompanyChanged(value: $0)) }, isError: data.companyError != nil,
+                onValueChange: { onEvent(AddBoardEventCompanyChanged(value: $0)) },
+                isError: data.companyError != nil,
                 errorMessage: data.companyError
             )
 
@@ -52,5 +54,7 @@ struct AddBoardStep1View: View {
             )
         }
         .padding()
+        .animation(.easeInOut, value: data.modelError)
+        .animation(.easeInOut, value: data.companyError)
     }
 }

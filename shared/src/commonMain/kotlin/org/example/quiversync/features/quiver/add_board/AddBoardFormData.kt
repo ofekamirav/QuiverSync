@@ -25,5 +25,6 @@ data class AddBoardFormData (
     val submissionError: String? = null,
     val submissionSuccess: Boolean = false,
     val surfboardImageError: String? = null,
-    val imageUploadError: String? = null
+    val imageUploadError: String? = null,
+    val uploadFromIOS: Boolean = false,
 )

@@ -9,6 +9,7 @@ import org.example.quiversync.data.local.Result
 import org.example.quiversync.domain.model.FinsSetup
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.SurfboardType
+import org.example.quiversync.domain.model.User
 import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.prediction.GeminiPrediction
 
@@ -29,6 +30,24 @@ class HomeViewModel(
 
             val forecastResult = homeUseCases.getWeeklyForecastByLocationUseCase()
             val forecast : List<DailyForecast>
+            val userResult = homeUseCases.getUser()
+            val user : User
+            when (userResult){
+                is Result.Success ->{
+                    if (userResult.data != null){
+                        user = userResult.data
+                    }else{
+                        _uiState.value = HomeState.Error("User not found")
+                        return@launch
+                    }
+                }
+
+                is Result.Failure<*> -> {
+                    _uiState.value = HomeState.Error("User not found")
+                    return@launch
+                }
+            }
+
             when (forecastResult) {
                 is Result.Success -> {
                     forecast = forecastResult.data ?: emptyList<DailyForecast>()
@@ -77,9 +96,12 @@ class HomeViewModel(
                 )
                 return@launch
             }
+            println( "Quiver size: ${quiver.size}, Forecast size: ${forecast.size} this is the user profile " +
+            " ${user.name} with id ${user.uid} and email ${user.email}")
             val bestBoardMatch = forecast.firstOrNull()
-                ?.let { homeUseCases.getDailyPrediction(quiver , it) }
+                ?.let { homeUseCases.getDailyPrediction(quiver , it , user) }
                 ?: return@launch
+
 
             when (bestBoardMatch) {
                 is Result.Failure -> {

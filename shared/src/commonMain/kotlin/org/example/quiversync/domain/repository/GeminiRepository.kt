@@ -9,7 +9,7 @@ import org.example.quiversync.domain.model.prediction.GeminiPrediction
 import org.example.quiversync.domain.model.Surfboard
 
 interface GeminiRepository {
-    suspend fun generateSingleDayMatch( surfboards: List<Surfboard> , dailyForecast: DailyForecast): Result<GeminiPrediction,TMDBError>
+    suspend fun generateSingleDayMatch( surfboards: List<Surfboard> , dailyForecast: DailyForecast , user : User): Result<GeminiPrediction,TMDBError>
 
     suspend fun generateAndStoreWeeklyBestMatches(surfboards: List<Surfboard> , weeklyForecast: List<DailyForecast> ): Result<List<GeminiPrediction>, TMDBError>
 

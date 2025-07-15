@@ -25,7 +25,8 @@ class GeminiRepositoryImpl(
      */
     override suspend fun generateSingleDayMatch(
         surfboards: List<Surfboard>,
-        dailyForecast: DailyForecast
+        dailyForecast: DailyForecast,
+        user : User
     ): Result<GeminiPrediction, TMDBError> {
         return try {
 
@@ -93,6 +94,8 @@ class GeminiRepositoryImpl(
                 println("GeminiRepositoryImpl : generateAndStoreWeeklyBestMatches() - Found ${localPredictions.size} predictions for user $userUid")
                 return Result.Success(localPredictions)
             }
+            println("Local predictions for spot (${weeklyForecast.first().latitude}, ${weeklyForecast.first().longitude}) " +
+                    "are not complete, generating new predictions for user $userUid")
             dao.deleteBySpotAndUser(
                 weeklyForecast.first().latitude,
                 weeklyForecast.first().longitude,

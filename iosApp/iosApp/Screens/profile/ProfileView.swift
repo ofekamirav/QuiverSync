@@ -2,7 +2,7 @@
 //  ProfileView.swift
 //  iosApp
 //
-//  Created by gal levi on 20/06/2025.
+//  Created by gal levi on 15/07/2025.
 //  Copyright © 2025 orgName. All rights reserved.
 //
 
@@ -10,43 +10,42 @@
 import SwiftUI
 import Shared
 
-public struct ProfileView: View {
-    
-    let user : User
+struct ProfileView: View {
+    let user: User
+    let boardsCount: Int
     @Binding var isLoggedIn: Bool
-    
 
-    
-    public var body: some View {
-        ScrollView{
-            VStack(spacing: 20){
-                
-                ProfileHeader(user: user)
-                
-                StatRow()
-                
-                UserDetailsList(user: user)
-                
-                Spacer()
-                
-                ProfileActions(onLogout: {
-                    Task {
-                        let sessionManager = SessionManager(context: nil)
-                        try await sessionManager.clearUserData()
-                        isLoggedIn = false
+    var body: some View {
+        GeometryReader { geometry in
+            if geometry.size.width < 600 {
+                // COMPACT WIDTH (Mobile)
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ProfileHeaderView(user: user, boardsCount: boardsCount)
+                        UserDetailsSectionView(user: user)
+                            .frame( maxHeight: .infinity)
                     }
-                }, onEdit: {
-                    print( "Edit pressed")
-                })
-                Spacer(minLength: 10)
-                
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .top)
+                }
+                .background(AppColors.background)
+            } else {
+                // EXPANDED WIDTH (Tablet/Desktop)
+                HStack(alignment: .top, spacing: 16) {
+                    VStack(spacing: 16) {
+                        ProfileHeaderView(user: user, boardsCount: boardsCount)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+
+                    VStack {
+                        UserDetailsSectionView(user: user)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                }
+                .padding(16)
+                .background(AppColors.background)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
-            .background(AppColors.background)
         }
-        .background(AppColors.background)
     }
 }
-
-
-
-
