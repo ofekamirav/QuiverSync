@@ -91,12 +91,8 @@ fun ExpandableSpotCardSkeleton(brush: Brush) {
 
 @Composable
 fun FavoriteSpotsScreenSkeleton(modifier: Modifier = Modifier) {
-    val baseShimmerColor = if (isSystemInDarkTheme()) {
-        OceanPalette.DarkText
-    } else {
-        OceanPalette.TextDark
-    }
-
+    val isDark = isSystemInDarkTheme()
+    val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
     val brush = ShimmerBrush(baseColor = baseShimmerColor)
     val windowInfo = LocalWindowInfo.current
 

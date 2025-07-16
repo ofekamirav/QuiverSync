@@ -1,6 +1,4 @@
-package org.example.quiversync.features.spots.FavSpotMainPage
-
-import org.example.quiversync.domain.model.FavoriteSpot
+package org.example.quiversync.features.spots.fav_spot_main_page
 
 sealed class FavSpotsState{
     object Loading : FavSpotsState()

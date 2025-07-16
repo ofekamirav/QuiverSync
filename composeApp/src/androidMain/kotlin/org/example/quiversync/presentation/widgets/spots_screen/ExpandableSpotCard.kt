@@ -68,11 +68,14 @@ fun ExpandableSpotCard(
     var expanded by remember { mutableStateOf(false) }
     val isDark = isSystemInDarkTheme()
     val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.White
+    val df = DecimalFormat("#.##")
     val waveHeightDisplay = if(isImperial) {
-        UnitConverter.metersToFeet(forecast.waveHeight).toString()
+        val feet = UnitConverter.metersToFeet(forecast.waveHeight)
+        df.format(feet)
     } else {
-        forecast.waveHeight.toString()
+        df.format(forecast.waveHeight)
     }
+    val waveHeightUnit = if (isImperial) "ft" else "m"
 
     Card(
         modifier = Modifier
@@ -156,9 +159,9 @@ fun ExpandableSpotCard(
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            val df = DecimalFormat("##.##")
+                            val df = DecimalFormat("#.##")
                             Text(
-                                text = "${df.format(forecast.waveHeight)} ${waveHeightDisplay}",
+                                text = "${waveHeightDisplay} ${waveHeightUnit}",
                                 color = OceanPalette.DeepBlue,
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -203,7 +206,7 @@ fun ExpandableSpotCardExpandedPreview() {
         id = "2",
         model = "Gun",
         volume = "60L",
-        imageRes = "https://example.com/gun_surfboard.png", // ודא שזה נתיב תקין, אולי R.drawable.hs_shortboard עבור בדיקות
+        imageRes = "https://example.com/gun_surfboard.png",
         ownerId = "user123",
         company = "Channel Islands",
         type = SurfboardType.FUNBOARD,

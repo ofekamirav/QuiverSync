@@ -1,4 +1,4 @@
-package org.example.quiversync.features.spots.AddFavSpot
+package org.example.quiversync.features.spots.add_fav_spot
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

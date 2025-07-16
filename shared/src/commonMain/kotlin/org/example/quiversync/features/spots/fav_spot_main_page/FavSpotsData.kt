@@ -1,4 +1,4 @@
-package org.example.quiversync.features.spots.FavSpotMainPage
+package org.example.quiversync.features.spots.fav_spot_main_page
 
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.domain.model.Surfboard

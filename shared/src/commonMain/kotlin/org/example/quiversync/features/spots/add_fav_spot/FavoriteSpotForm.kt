@@ -1,4 +1,4 @@
-package org.example.quiversync.features.spots.AddFavSpot
+package org.example.quiversync.features.spots.add_fav_spot
 
 data class FavoriteSpotForm(
     val name: String = "",

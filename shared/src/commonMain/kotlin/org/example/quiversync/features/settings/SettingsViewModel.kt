@@ -1,5 +1,6 @@
 package org.example.quiversync.features.settings
 
+import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,30 +19,22 @@ class SettingsViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _isImperialUnits = MutableStateFlow(false)
-    val isImperialUnits: StateFlow<Boolean> = _isImperialUnits
+    private val _isImperial = MutableStateFlow(false)
+    val isImperial: StateFlow<Boolean> = _isImperial
 
     init {
         checkUserAuthMethod()
         scope.launch {
-            _isImperialUnits.value = sessionManager.getUnitsPreference() == "imperial"
+            _isImperial.value = sessionManager.getUnitsPreference() == "imperial"
         }
     }
 
     fun toggleUnits() {
+        val next = !_isImperial.value
         scope.launch {
-            val newPreference = if (_isImperialUnits.value) "metric" else "imperial"
-            sessionManager.setUnitsPreference(newPreference)
-            _isImperialUnits.value = !_isImperialUnits.value
+            sessionManager.setUnitsPreference(if (next) "imperial" else "metric")
         }
-    }
-
-    fun setUnits(isImperial: Boolean) {
-        scope.launch {
-            val newPreference = if (isImperial) "imperial" else "metric"
-            sessionManager.setUnitsPreference(newPreference)
-            _isImperialUnits.value = isImperial
-        }
+        _isImperial.value = next
     }
 
     fun logout(onComplete: () -> Unit) {
