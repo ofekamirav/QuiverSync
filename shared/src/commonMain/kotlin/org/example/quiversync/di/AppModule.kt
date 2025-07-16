@@ -90,8 +90,8 @@ import org.example.quiversync.features.register.RegisterUseCases
 import org.example.quiversync.features.register.RegisterViewModel
 import org.example.quiversync.features.settings.SecurityAndPrivacyViewModel
 import org.example.quiversync.features.settings.SettingsViewModel
-import org.example.quiversync.features.spots.AddFavSpot.AddFavSpotViewModel
-import org.example.quiversync.features.spots.FavSpotMainPage.FavSpotsViewModel
+import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotViewModel
+import org.example.quiversync.features.spots.fav_spot_main_page.FavSpotsViewModel
 import org.example.quiversync.features.spots.FavSpotsUseCases
 import org.example.quiversync.features.spots.SpotEventBus
 import org.example.quiversync.features.user.UserUseCases

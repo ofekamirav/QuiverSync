@@ -3,14 +3,21 @@ package org.example.quiversync.presentation.navigation
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
@@ -29,8 +36,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
+import org.example.quiversync.presentation.components.CustomSnackbar
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.components.LottieSplashScreen
+import org.example.quiversync.presentation.components.SnackbarWithCountdown
 import org.example.quiversync.presentation.screens.login.LoginScreen
 import org.example.quiversync.presentation.screens.profile.ProfileScreen
 import org.example.quiversync.presentation.screens.register.RegisterScreen
@@ -145,7 +154,11 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
         (windowInfo.widthSize == WindowWidthSize.COMPACT) && currentRoute !in hideTopBarRoutes
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                SnackbarWithCountdown(data)
+            }
+        },
         topBar = {
             if (showTopBar) {
                 TopAppBar(
@@ -161,7 +174,6 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                         titleContentColor = MaterialTheme.colorScheme.primary,
                         navigationIconContentColor = MaterialTheme.colorScheme.primary
                     ),
-                    //modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
                     actions = {
                         if (currentRoute == Screen.Profile.route) {
                             IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {

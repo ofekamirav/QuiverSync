@@ -1,7 +1,10 @@
-package org.example.quiversync.features.spots.FavSpotMainPage
+package org.example.quiversync.features.spots.fav_spot_main_page
 
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.example.quiversync.data.local.Result
@@ -27,7 +30,7 @@ class FavSpotsViewModel(
     val isImperialUnits: StateFlow<Boolean> get() = _isImperialUnits
 
     private var lastDismissedSpot: FavoriteSpot? = null
-
+    private var deleteJob: Job? = null //
 
     /**
      * Initializes the ViewModel by deleting outdated forecasts and fetching essential data
@@ -58,7 +61,7 @@ class FavSpotsViewModel(
     fun onEvent(event: FavSpotsEvent) {
         when (event) {
             is FavSpotsEvent.DeleteSpot -> {
-                deleteSpot(event.favoriteSpot)
+                deleteSpot(event.favoriteSpot, event.snackbarDurationMillis)
             }
             is FavSpotsEvent.LoadWeekPredictions -> {
                 weeklyPredictions(event.favoriteSpot)
@@ -79,8 +82,8 @@ class FavSpotsViewModel(
      * Updates UI state with error message if deletion fails.
      * @param favoriteSpot The spot to delete
      */
-    private fun deleteSpot(favoriteSpot:FavoriteSpot) {
-
+    private fun deleteSpot(favoriteSpot:FavoriteSpot,snackbarDurationMillis: Long) {
+        lastDismissedSpot = favoriteSpot
         val currentLoadedState = _uiState.value as? FavSpotsState.Loaded ?: return
         val currentData = currentLoadedState.favSpotsData
 
@@ -92,8 +95,6 @@ class FavSpotsViewModel(
             it.latitude != favoriteSpot.spotLatitude || it.longitude != favoriteSpot.spotLongitude
         }
 
-        lastDismissedSpot = favoriteSpot
-
         _uiState.update {
             FavSpotsState.Loaded(
                 currentData.copy(
@@ -104,7 +105,18 @@ class FavSpotsViewModel(
             )
         }
 
-
+        deleteJob?.cancel()
+        deleteJob?.cancel()
+        deleteJob = scope.launch {
+            delay(snackbarDurationMillis)
+            if (lastDismissedSpot == favoriteSpot) {
+                performPermanentDelete(favoriteSpot)
+            }
+            lastDismissedSpot = null
+            deleteJob = null
+        }
+    }
+    private fun performPermanentDelete(favoriteSpot: FavoriteSpot) {
         scope.launch {
             println("FavSpotsViewModel: Deleting Predictions (${favoriteSpot.spotLatitude}, ${favoriteSpot.spotLongitude})")
             val resPredictionDelete = favSpotsUseCases.deleteAllPredictionsBySpotUseCase(
@@ -418,7 +430,6 @@ class FavSpotsViewModel(
             lastDismissedSpot = null
         }
     }
-
 
 
 }

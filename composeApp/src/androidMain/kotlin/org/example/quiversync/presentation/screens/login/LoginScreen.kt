@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -63,7 +64,8 @@ fun LoginScreen(
             LoginScreenContent(currentState = LoginState.Idle(LoginData()), isLoading = true, onRegisterClick = {}, onEvent = viewModel::onEvent,
                 onForgotPasswordClick = onForgotPasswordClick, onGoogleSignInResult = viewModel::onGoogleSignInResult)
             Box(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+                modifier = Modifier.fillMaxSize()
+                    .blur(16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)

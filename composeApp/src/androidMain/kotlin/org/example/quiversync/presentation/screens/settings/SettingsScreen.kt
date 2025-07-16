@@ -51,7 +51,7 @@ fun SettingsScreen(
 ) {
     val isLoading by viewModel.isLoading.collectAsState()
     val showSecurityAndPrivacyState by viewModel.showSecurityAndPrivacy.collectAsState()
-    val isImperialUnits by viewModel.isImperialUnits.collectAsState()
+    val isImperialUnits by viewModel.isImperial.collectAsState()
 
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {

@@ -128,7 +128,6 @@ private fun SecurityAndPrivacyContent(
 @Composable
 fun SecurityAndPrivacyScreenPreview() {
     QuiverSyncTheme {
-        // Previewing the content directly for easier testing
         SecurityAndPrivacyContent(
             form = SecurityAndPrivacyFormData(isPasswordSignIn = true),
             onEvent = {}

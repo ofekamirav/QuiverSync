@@ -24,9 +24,9 @@ fun LottieSplashScreen(
     val windowInfo = LocalWindowInfo.current
 
     val actualAnimationSize = when (windowInfo.widthSize) {
-        WindowWidthSize.COMPACT -> 400.dp
-        WindowWidthSize.MEDIUM -> 500.dp
-        WindowWidthSize.EXPANDED -> 600.dp
+        WindowWidthSize.COMPACT -> 460.dp
+        WindowWidthSize.MEDIUM -> 600.dp
+        WindowWidthSize.EXPANDED -> 700.dp
     }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(animationFileName))

@@ -10,6 +10,7 @@ import org.example.quiversync.di.initKoin
 import org.example.quiversync.utils.AppConfig
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import java.util.Locale
 
 class MyApplication: Application() {
     override fun onCreate() {
@@ -25,7 +26,7 @@ class MyApplication: Application() {
         )
         MediaManager.init(this, config)
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, AppConfig.googleMapsApiKey)
+            Places.initialize(applicationContext, AppConfig.googleMapsApiKey, Locale.ENGLISH)
         }
     }
 }
