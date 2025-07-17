@@ -11,6 +11,8 @@ import SwiftUI
 import Shared
 
 struct BoardRecommendationCardView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let surfboard: Surfboard
     let prediction: GeminiPrediction
     var onAddBoardTapped: (() -> Void)? = nil
@@ -19,7 +21,7 @@ struct BoardRecommendationCardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Today's Board Recommendation")
                 .font(.headline)
-                .foregroundColor(AppColors.deepBlue)
+                .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
             if surfboard.id != "default" {
                 HStack(spacing: 16) {
@@ -43,7 +45,7 @@ struct BoardRecommendationCardView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(surfboard.type.serverName)
                             .fontWeight(.bold)
-                            .foregroundColor(AppColors.deepBlue)
+                            .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
                         Text("\(surfboard.height) x \(surfboard.width) – \(surfboard.volume)")
                             .font(.caption)
@@ -71,7 +73,7 @@ struct BoardRecommendationCardView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("No boards yet?")
                             .fontWeight(.bold)
-                            .foregroundColor(AppColors.deepBlue)
+                            .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
                         Text("Tap here to add your first board!")
                             .font(.caption)
@@ -85,7 +87,7 @@ struct BoardRecommendationCardView: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(AppColors.foamWhite)
+        .background(AppColors.cardColor(for: colorScheme))
         .cornerRadius(20)
     }
 

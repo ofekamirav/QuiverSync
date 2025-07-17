@@ -21,17 +21,17 @@ struct RegisterScreen: View {
         VStack {
             switch onEnum(of: viewModel.uistate) {
             case .loading:
-                LoadingView(colorName: "background")
-                
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 200)
             case .idle(let idle):
                 RegisterView(
                     state: idle.data,
                     RegViewModel: viewModel.viewModel,
-                    onBackClick: onBackBtn,
-                    onSuccess: onSuccess
+                    onBackClick: onBackBtn
                 )
-            case .loaded(let loaded):
-                MainTabView(isLoggedIn : $isLoggedIn)
+            case .loaded:
+                Color.clear.onAppear {
+                        onSuccess()
+                    }
             case .error(let error):
                 ErrorView(messege: error.message)
             
@@ -40,11 +40,6 @@ struct RegisterScreen: View {
         .onAppear {
             viewModel.startObserving()
         }
-//        .onReceive(viewModel.$uistate) { newState in
-//            if case .loaded(let loaded) = onEnum(of: newState), loaded.data.isWaiting {
-//                onSuccess()
-//            }
-//        }
 
 
     }

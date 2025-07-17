@@ -35,3 +35,33 @@ enum AppColors {
     static let darkBorder = Color(#colorLiteral(red: 0.267, green: 0.267, blue: 0.267, alpha: 1)) // #444444
     static let darkSky = Color(#colorLiteral(red: 0.502, green: 0.796, blue: 0.769, alpha: 1)) // #80cbc4
 }
+
+
+
+
+extension AppColors {
+    static func textPrimary(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? darkFoamWhite : textDark
+    }
+
+    static func cardColor(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? darkCard : foamWhite
+    }
+
+    static func sectionBackground(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? darkBackground : background
+    }
+
+    static func chipText(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? foamWhite : deepBlue
+    }
+
+    static func chipBackground(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? darkSky.opacity(0.2) : skyBlue.opacity(0.1)
+    }
+    
+    static func divider(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? darkBorder.opacity(0.5) : borderGray.opacity(0.4)
+    }
+
+}

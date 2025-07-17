@@ -11,6 +11,8 @@ import SwiftUI
 import Shared
 
 public struct ExtendCard: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let favSpot : FavoriteSpot
     let favSpotData : FavSpotsData
     let favSpotsViewModel : FavSpotsViewModel
@@ -58,7 +60,7 @@ public struct ExtendCard: View {
                         
                         ChipView(
                             text: "\(Int(confidence))% match",
-                            color: AppColors.surfBlue.opacity(0.1)
+                            color: AppColors.chipBackground(for: colorScheme)
                         )
                         .offset(y:5)
                     }
@@ -67,16 +69,16 @@ public struct ExtendCard: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(recommendedBoard.company)
                             .font(.headline)
-                            .foregroundColor(AppColors.deepBlue)
-                        
+                            .foregroundColor(AppColors.textPrimary(for: colorScheme))
+
                         Text(recommendedBoard.model)
                             .font(.subheadline)
-                            .foregroundColor(.gray)
-                        
+                            .foregroundColor(colorScheme == .dark ? AppColors.darkSky : .gray)
+
                         Text(currentDayForecast.date)
                             .font(.caption)
-                            .foregroundColor(.gray)
-                        
+                            .foregroundColor(colorScheme == .dark ? AppColors.darkSky : .gray)
+
                         HStack(spacing: 16) {
                             Label {
                                 Text("\(currentDayForecast.waveHeight, specifier: "%.1f") m")
@@ -91,7 +93,7 @@ public struct ExtendCard: View {
                             }
                         }
                         .font(.subheadline)
-                        .foregroundColor(AppColors.deepBlue)
+                        .foregroundColor(AppColors.textPrimary(for: colorScheme))
                         .padding(.top, 4)
                         .offset(y:9)
                     }
@@ -107,11 +109,13 @@ public struct ExtendCard: View {
                         .font(.subheadline)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(AppColors.surfBlue.opacity(0.2))
-                        .foregroundColor(AppColors.deepBlue)
+                        .background(AppColors.chipBackground(for: colorScheme))
+                        .foregroundColor(AppColors.chipText(for: colorScheme))
                         .cornerRadius(12)
                 }
                 .padding(.top, 4)
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
             }
             .frame(maxWidth: .infinity, alignment: .center)
             
@@ -119,11 +123,11 @@ public struct ExtendCard: View {
             Group{
                 // Fallback content
                 Text("No forecast data available")
-                    .foregroundColor(.gray)
-                
+                    .foregroundColor(colorScheme == .dark ? AppColors.darkSky : .gray)
+
                 // Fallback content
                 Text("No forecast data available")
-                    .foregroundColor(.gray)
+                    .foregroundColor(colorScheme == .dark ? AppColors.darkSky : .gray)
             }
             .onAppear(){
                 favSpotsViewModel.onEvent(event: FavSpotsEventErrorOccurred(

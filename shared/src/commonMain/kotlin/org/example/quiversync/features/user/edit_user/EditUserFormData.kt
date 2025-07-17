@@ -13,4 +13,5 @@ data class EditUserFormData(
     val profilePictureError: String? = null,
     val isUploadingImage: Boolean = false,
     val imageUploadError: String? = null,
-)
+    val uploadFromIOS: Boolean = false,
+    )

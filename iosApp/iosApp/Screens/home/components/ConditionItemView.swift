@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ConditionItemView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let label: String
     let value: String
     let icon: String
@@ -24,7 +26,7 @@ struct ConditionItemView: View {
 
             Text(value)
                 .fontWeight(.bold)
-                .foregroundColor(AppColors.deepBlue)
+                .foregroundColor(AppColors.textPrimary(for: colorScheme))
         }
     }
 }

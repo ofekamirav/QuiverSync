@@ -9,6 +9,8 @@ import SwiftUI
 import Shared
 
 struct QuiverView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let boards: [Surfboard]
     let boardToPublish: Surfboard?
     let boardViewModel: QuiverViewModel
@@ -65,8 +67,8 @@ struct QuiverView: View {
                 Image(systemName: "plus")
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(.white)
-                    .frame(width: 60, height: 60)
-                    .background(Color.blue)
+                    .frame(width: 50, height: 50)
+                    .background(colorScheme == .dark ? AppColors.deepBlue : AppColors.surfBlue)
                     .clipShape(Circle())
                     .shadow(radius: 6)
             }
@@ -120,7 +122,7 @@ struct QuiverView: View {
                 }
             }
         }
-        .background(AppColors.background)
+        .background(AppColors.sectionBackground(for: colorScheme))
         .sheet(isPresented: $showAddBoardScreen) {
             AddBoardScreen(
                 onBackRequested: {

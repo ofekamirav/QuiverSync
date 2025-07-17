@@ -17,6 +17,7 @@ class UpdateProfileDetailsUseCase(
             return Result.Failure(AuthError("Cannot update profile: No user is logged in."))
         }
         val updatedUser = currentUser.copy(
+            name = details.name ?: currentUser.name,
             heightCm = details.height,
             weightKg = details.weight,
             surfLevel = details.surfLevel,

@@ -14,6 +14,7 @@ import Foundation
 struct LoginScreen: View {
     @ObservedObject private(set) var viewModel = LoginViewModelWrapper()
     let onRegisterClick: () -> Void
+    let onForgotPasswordClick: () -> Void
     @Binding var isLoggedIn: Bool
     var body: some View{
         VStack{
@@ -23,16 +24,20 @@ struct LoginScreen: View {
                     onRegisterClick: onRegisterClick,
                     loginData: idle.data,
                     loginViewModel: viewModel.viewModel,
+                    onForgotPasswordClick: onForgotPasswordClick,
                 )
             case .loading:
                 LoadingView(colorName: "background")
             case .loaded:
-                MainTabView(isLoggedIn: $isLoggedIn)
+                Color.clear.onAppear {isLoggedIn = true}
             case .error(let error):
                 ErrorView(messege: error.message)
                 
             case .navigateToOnboarding:
-                MainTabView(isLoggedIn: $isLoggedIn)
+//                Color.clear.onAppear {
+//                    onNavigateToOnboarding()
+//                }
+                Text("Navigate to Onboarding")
             }
         }
         .onAppear{

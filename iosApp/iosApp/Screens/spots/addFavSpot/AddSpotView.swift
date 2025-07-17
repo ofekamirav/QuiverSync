@@ -13,6 +13,8 @@ import Shared
 import MapKit
 
 struct AddSpotView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     
     let addSpotData: FavoriteSpotForm
     let addSpotViewModel: AddFavSpotViewModel
@@ -38,12 +40,15 @@ struct AddSpotView: View {
                 Text("Forecast")
                     .font(.title3)
                     .fontWeight(.bold)
-                    .foregroundColor(AppColors.deepBlue)
-                
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
+
                 // 🧭 Search Input
                 TextField("Search for a surf spot", text: $searchText)
                     .padding()
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(style: StrokeStyle(lineWidth: 1)))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(AppColors.borderGray.opacity(colorScheme == .dark ? 0.3 : 1), lineWidth: 1)
+                    )
                     .onChange(of: searchText) { newValue in
                         print("User typed: \(newValue)")
                         searchDelegateHolder.completer.queryFragment = newValue
@@ -67,7 +72,10 @@ struct AddSpotView: View {
                         } label: {
                             VStack(alignment: .leading) {
                                 Text(result.title).bold()
+                                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
                                 Text(result.subtitle).font(.caption)
+                                    .foregroundColor(colorScheme == .dark ? AppColors.darkSky : .gray)
+
                             }
                         }
                         
@@ -78,7 +86,7 @@ struct AddSpotView: View {
                 
                 // 🌍 MAP
                 Map(coordinateRegion: $region, annotationItems: selectedCoordinate.map { [AnnotatedPlace(coordinate: $0)] } ?? []) { place in
-                    MapMarker(coordinate: place.coordinate, tint: .blue)
+                    MapMarker(coordinate: place.coordinate, tint: colorScheme == .dark ? AppColors.skyBlue : .blue)
                 }
                 .frame(height: 300)
                 .cornerRadius(12)
@@ -95,7 +103,7 @@ struct AddSpotView: View {
                             .font(.headline)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(AppColors.deepBlue)
+                            .background(AppColors.surfBlue)
                             .cornerRadius(12)
                             .shadow(radius: 3)
                     }
@@ -112,7 +120,7 @@ struct AddSpotView: View {
                 self.searchResults = results
             }
         }
-        .background(AppColors.foamWhite)
+        .background(AppColors.sectionBackground(for: colorScheme))
         .overlay(
             Group {
                 if !errorMessage.isEmpty {
@@ -121,7 +129,7 @@ struct AddSpotView: View {
                         Text(errorMessage)
                             .foregroundColor(.white)
                             .padding()
-                            .background(Color.red.opacity(0.9))
+                            .background(Color.red.opacity(colorScheme == .dark ? 0.8 : 0.9))
                             .cornerRadius(12)
                             .padding(.bottom, 30)
                             .transition(.move(edge: .bottom).combined(with: .opacity))

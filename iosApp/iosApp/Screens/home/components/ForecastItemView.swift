@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ForecastItemView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let day: String
     let date: String
     let waveHeight: String
@@ -18,7 +20,7 @@ struct ForecastItemView: View {
             VStack(alignment: .leading) {
                 Text(day)
                     .fontWeight(.bold)
-                    .foregroundColor(AppColors.deepBlue)
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
                 Text(date)
                     .font(.caption)
                     .foregroundColor(.gray)
@@ -29,7 +31,7 @@ struct ForecastItemView: View {
                 Image(systemName: "water.waves")
                 Text(waveHeight)
             }
-            .foregroundColor(AppColors.deepBlue)
+            .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
             Spacer().frame(width: 16)
 
@@ -37,10 +39,10 @@ struct ForecastItemView: View {
                 Image(systemName: "wind")
                 Text(wind)
             }
-            .foregroundColor(AppColors.deepBlue)
+            .foregroundColor(AppColors.textPrimary(for: colorScheme))
         }
         .padding()
-        .background(AppColors.foamWhite)
+        .background(AppColors.cardColor(for: colorScheme))
         .cornerRadius(16)
     }
 }

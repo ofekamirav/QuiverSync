@@ -10,6 +10,8 @@ import SwiftUI
 import Shared
 
 struct ProfileHeaderView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let user: User
     let boardsCount: Int
 
@@ -21,20 +23,20 @@ struct ProfileHeaderView: View {
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(width: 110, height: 110)
+                        .frame(width: 150, height: 150)
                         .clipShape(Circle())
                 } placeholder: {
                     Circle()
                         .fill(Color.gray.opacity(0.3))
-                        .frame(width: 110, height: 110)
+                        .frame(width: 150, height: 150)
                         .overlay(ProgressView())
                 }
             }
 
             // Name
             Text(user.name ?? "")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(AppColors.deepBlue)
+                .font(.system(size: 24, weight: .semibold))
+                .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
 
             // Stats Row
@@ -46,7 +48,7 @@ struct ProfileHeaderView: View {
                 StatItem(label: "Spots", value: "10")
             }
             .padding(.vertical, 16)
-            .background(AppColors.foamWhite)
+            .background(AppColors.cardColor(for: colorScheme))
             .clipShape(RoundedRectangle(cornerRadius: 12))
 
         }

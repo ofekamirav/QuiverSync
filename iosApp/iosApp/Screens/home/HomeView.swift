@@ -14,8 +14,11 @@ import CoreLocation
 
 
 struct HomeView: View {
-    let data : HomePageData
+    
     @Environment(\.colorScheme) var colorScheme
+
+    
+    let data : HomePageData
     @State private var isExpanded = true
     @State private var locationName: String = "Loading..."
 
@@ -34,7 +37,7 @@ struct HomeView: View {
 
                     Text(locationName)
                         .font(.title3)
-                        .foregroundColor(AppColors.deepBlue)
+                        .foregroundColor(AppColors.textPrimary(for: colorScheme))
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -68,7 +71,7 @@ struct HomeView: View {
 
                 Text("Weekly Forecast")
                     .font(.subheadline)
-                    .foregroundColor(AppColors.deepBlue)
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
 
@@ -91,7 +94,7 @@ struct HomeView: View {
             }
             .padding()
         }
-        .background(AppColors.background)
+        .background(AppColors.sectionBackground(for: colorScheme))
         .onAppear {
             let forecast = data.weeklyForecast.first
             print("Forecast Location Coordinates: \(forecast?.latitude ?? 0.0), \(forecast?.longitude ?? 0.0)")

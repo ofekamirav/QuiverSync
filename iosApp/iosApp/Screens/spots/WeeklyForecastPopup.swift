@@ -11,6 +11,8 @@ import SwiftUI
 import Shared
 
 public struct WeeklyForecastPopup: View {
+    @Environment(\.colorScheme) var colorScheme
+
     @Binding var selectedSpot : FavoriteSpot?
     let favSpotsData: FavSpotsData
     let favSpotsViewModel : FavSpotsViewModel
@@ -30,7 +32,7 @@ public struct WeeklyForecastPopup: View {
                         Text("Weekly Forecast")
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(AppColors.deepBlue)
+                            .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
                         Spacer()
 
@@ -39,13 +41,13 @@ public struct WeeklyForecastPopup: View {
                         }) {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.title)
-                                .foregroundColor(.gray)
+                                .foregroundColor(colorScheme == .dark ? AppColors.darkSky : .gray)
                         }
                     }
                     .padding(.bottom, 8)
                     Text("\(spot.name)")
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(colorScheme == .dark ? AppColors.darkSky : .gray)
 
                     Divider()
 
@@ -56,7 +58,7 @@ public struct WeeklyForecastPopup: View {
 
                                 ForecastRow(prediction: prediction)
                                     .padding()
-                                    .background(AppColors.foamWhite)
+                                    .background(AppColors.cardColor(for: colorScheme))
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
                             }
 //                        }

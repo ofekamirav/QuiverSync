@@ -111,6 +111,7 @@ class AuthRepositoryImpl(
     override suspend fun updateUserProfile(user: User): Result<Unit, AuthError> {
         return try {
             val userDto = user.toDto()
+            platformLogger("AuthRepositoryImpl", "Updating user profile for UID: $userDto")
             firestore.collection("users").document(user.uid).set(userDto, merge = true)
             Result.Success(Unit)
         } catch (e: Exception) {
