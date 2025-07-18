@@ -16,12 +16,14 @@ struct RegisterScreen: View {
     let onBackBtn: () -> Void
     let onSuccess: () -> Void
     @Binding var isLoggedIn: Bool
+    let onLoginSuccess: () -> Void
+
     
     var body: some View {
         VStack {
             switch onEnum(of: viewModel.uistate) {
             case .loading:
-                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 200)
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .idle(let idle):
                 RegisterView(
                     state: idle.data,
@@ -30,10 +32,35 @@ struct RegisterScreen: View {
                 )
             case .loaded:
                 Color.clear.onAppear {
+                    Task {
+                            let sessionManager = SessionManager(context: nil)
+                            if let newUid = try? await sessionManager.getUid(), newUid != "" {
+                                print("User logged in successfully: \(newUid)")
+                                onLoginSuccess()
+                            } else {
+                                print("❌ Login attempted, but UID is still nil")
+                            }
+                        viewModel.viewModel.resetState()
+                        }
                         onSuccess()
                     }
             case .error(let error):
-                ErrorView(messege: error.message)
+                AuthErrorView(
+                    title: "Registration Wipeout 🌊",
+                    message: error.message,
+                    primaryButtonText: "Try Again",
+                    onPrimaryTap: {
+                        viewModel.resetState()
+                        viewModel.startObserving()
+                    },
+                    secondaryButtonText: "Back to Login",
+                    onSecondaryTap: {
+                        viewModel.resetState()
+                        onBackBtn()
+                    }
+                )
+
+
             
             }
         }

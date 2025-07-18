@@ -16,6 +16,8 @@ struct LoginScreen: View {
     let onRegisterClick: () -> Void
     let onForgotPasswordClick: () -> Void
     @Binding var isLoggedIn: Bool
+    let onLoginSuccess: () -> Void
+
     var body: some View{
         VStack{
             switch onEnum(of: viewModel.uistate) {
@@ -25,13 +27,41 @@ struct LoginScreen: View {
                     loginData: idle.data,
                     loginViewModel: viewModel.viewModel,
                     onForgotPasswordClick: onForgotPasswordClick,
+                    onLoginSuccess:onLoginSuccess
                 )
             case .loading:
-                LoadingView(colorName: "background")
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .loaded:
-                Color.clear.onAppear {isLoggedIn = true}
+                Color.clear.onAppear {
+                    print("User logged in successfully")
+                    Task {
+                            let sessionManager = SessionManager(context: nil)
+                            if let newUid = try? await sessionManager.getUid(), newUid != "" {
+                                print("User logged in successfully: \(newUid)")
+                                onLoginSuccess()
+                            } else {
+                                print("❌ Login attempted, but UID is still nil")
+                            }
+                        viewModel.viewModel.resetState()
+
+                        }
+                    isLoggedIn = true
+                }
+
             case .error(let error):
-                ErrorView(messege: error.message)
+                AuthErrorView(
+                    title: "Login Failed 🌧️",
+                    message: error.message,
+                    primaryButtonText: "Try Again",
+                    onPrimaryTap: {
+                        viewModel.startObserving()
+                    },
+                    secondaryButtonText: "Back to Welcome",
+                    onSecondaryTap: {
+                        isLoggedIn = false
+                    }
+                )
+
                 
             case .navigateToOnboarding:
 //                Color.clear.onAppear {

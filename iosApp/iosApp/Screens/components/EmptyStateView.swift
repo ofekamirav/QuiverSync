@@ -1,40 +1,35 @@
 //
-//  ErrorView.swift
+//  EmptyStateView.swift
 //  iosApp
 //
-//  Created by gal levi on 20/06/2025.
+//  Created by gal levi on 17/07/2025.
 //  Copyright © 2025 orgName. All rights reserved.
 //
 
-//  ErrorView.swift
-//  iosApp
-
 import SwiftUI
 
-struct ErrorView: View {
+struct EmptyStateView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.dismiss) var dismiss
 
     let title: String
     let message: String
-    let systemImageName: String
     let buttonText: String
-    let onRetry: (() -> Void)?
+    let systemImageName: String
+    let onButtonTap: () -> Void
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             Spacer()
-
             Image(systemName: systemImageName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 80, height: 80)
-                .foregroundColor(AppColors.surfBlue.opacity(0.7))
+                .foregroundColor(AppColors.surfBlue.opacity(0.6))
                 .padding(.bottom, 8)
 
             Text(title)
-                .font(.title2)
-                .fontWeight(.bold)
+                .font(.title)
+                .fontWeight(.semibold)
                 .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
             Text(message)
@@ -43,27 +38,17 @@ struct ErrorView: View {
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 32)
 
-            Button(action: {
-                if let retry = onRetry {
-                    retry()
-                } else {
-                    dismiss()
-                }
-            }) {
+            Button(action: onButtonTap) {
                 Text(buttonText)
                     .fontWeight(.bold)
                     .padding(.vertical, 12)
-                    .padding(.horizontal, 28)
-                    .background(AppColors.sandOrange)
+                    .padding(.horizontal, 24)
+                    .background(AppColors.surfBlue)
                     .foregroundColor(.white)
-                    .cornerRadius(16)
+                    .cornerRadius(12)
             }
-
             Spacer()
         }
         .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.sectionBackground(for: colorScheme))
-        .edgesIgnoringSafeArea(.all)
     }
 }

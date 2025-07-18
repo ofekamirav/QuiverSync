@@ -31,7 +31,19 @@ struct ForgotPasswordScreen: View {
                     }
                 )
             case .error(let error):
-                ErrorView(messege: error.message)
+                AuthErrorView(
+                    title: "Oops, Wave Crash .. Is it a real Mail though ?",
+                    message: error.message,
+                    primaryButtonText: "Try Again",
+                    onPrimaryTap: {
+                        viewModel.startObserving()
+                    },
+                    secondaryButtonText: "Back to Login",
+                    onSecondaryTap: {
+                        isLoggedIn = false
+                    }
+                )
+
             }
         }
         .onAppear{

@@ -17,11 +17,21 @@ struct HomeScreen: View {
         VStack{
             switch onEnum(of: viewModel.uistate) {
             case .loading:
-                LoadingView(colorName: "background")
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 200)
             case .loaded(let loaded):
                 HomeView(data:loaded.homePageData)
             case .error(let error):
-                ErrorView(messege: error.message)
+                ErrorView(
+                    title: "Tide’s Out on the Home Feed",
+                    message: error.message,
+                    systemImageName: "house.slash",
+                    buttonText: "Retry",
+                    onRetry: {
+                        viewModel.retryHomeScreen()
+                    }
+                )
+
+
                 
             }
         }

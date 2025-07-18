@@ -33,7 +33,17 @@ public struct QuiverScreen: View {
                         selectedBoard: $selectedBoard,
                         boardToDelete: $boardToDelete
                     )
-            case .error(let error): ErrorView(messege: error.message)
+            case .error(let error):
+                ErrorView(
+                    title: "Your Quiver Got Washed Away ",
+                    message: error.message,
+                    systemImageName: "shippingbox.fill",
+                    buttonText: "Retry",
+                    onRetry: {
+                        ViewModel.startObserving()
+                    }
+                )
+
             }
         }
         .onAppear(){

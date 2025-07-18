@@ -63,10 +63,13 @@ struct HomeView: View {
                     )
                 }
 
-                BoardRecommendationCardView(
-                    surfboard: data.surfboard,
-                    prediction: data.predictionForToday
-                )
+                if let surfboard = data.surfboard, let prediction = data.predictionForToday {
+                    BoardRecommendationCardView(
+                        surfboard: surfboard,
+                        prediction: prediction
+                    )
+                }
+
 
 
                 Text("Weekly Forecast")

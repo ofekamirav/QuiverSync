@@ -24,7 +24,16 @@ public struct FavSpotsScreen: View {
                     favSpots: loaded.favSpotsData,
                     favSpotsViewModel: viewModel.viewModel,
                 )
-            case .error(let error): ErrorView(messege: error.message)
+            case .error(let error):
+                ErrorView(
+                    title: "Can’t Load Your Spots 📍",
+                    message: error.message,
+                    systemImageName: "map.fill",
+                    buttonText: "Retry",
+                    onRetry: {
+                        viewModel.startObserving()
+                    }
+                )
             }
         }
         .onAppear(){

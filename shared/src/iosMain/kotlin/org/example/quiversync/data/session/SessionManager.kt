@@ -10,9 +10,6 @@ actual class SessionManager actual constructor(context: Any?) {
 
     actual suspend fun clearUserData(){
         defaults.removeObjectForKey("uid")
-        defaults.removeObjectForKey("latitude")
-        defaults.removeObjectForKey("longitude")
-        defaults.removeObjectForKey("lastRefresh")
     }
 
     actual suspend fun getUid(): String? {

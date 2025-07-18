@@ -26,13 +26,15 @@ public struct FavSpotsView: View {
                 .ignoresSafeArea()
 
             if favSpots.spots.isEmpty {
-                VStack {
-                    Spacer()
-                    Text("No favorite spots found")
-                        .foregroundColor(AppColors.textPrimary(for: colorScheme))
-                        .padding()
-                    Spacer()
-                }
+                EmptyStateView(
+                    title: "No Favorite Spots Yet",
+                    message: "Save your favorite surf spots to quickly access forecasts and plan your sessions.",
+                    buttonText: "Add Spot",
+                    systemImageName: "mappin.and.ellipse",
+                    onButtonTap: {
+                        showAddSpotScreen = true
+                    }
+                )
             } else {
                 // 🔹 Main List
                 List {
@@ -133,7 +135,7 @@ public struct FavSpotsView: View {
 
                             Button("Delete") {
                                 withAnimation {
-                                    favSpotsViewModel.onEvent(event: FavSpotsEventDeleteSpot(favoriteSpot: spot))
+                                    favSpotsViewModel.onEvent(event: FavSpotsEventDeleteSpot(favoriteSpot: spot, snackBarDurationMillis: 30))
                                     spotToDelete = nil
                                 }
                             }

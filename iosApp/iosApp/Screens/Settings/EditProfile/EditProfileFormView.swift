@@ -16,6 +16,7 @@ struct EditProfileFormView: View {
     let onEvent: (EditUserDetailsEvent) -> Void
     @Binding var showToast: Bool
     @Binding var navigateToProfile: Bool
+    let loading: Bool
 
     @State private var showImageOptions = false
     @State private var showCamera = false
@@ -176,6 +177,11 @@ struct EditProfileFormView: View {
             if form.isUploadingImage {
                 Color.black.opacity(0.5).ignoresSafeArea()
                 LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 200)
+            }
+            
+            if loading{
+                Color.black.opacity(0.5).ignoresSafeArea()
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             }
 
             // ✅ Toast overlay

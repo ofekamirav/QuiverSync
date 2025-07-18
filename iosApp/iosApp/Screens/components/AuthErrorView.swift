@@ -1,36 +1,33 @@
 //
-//  ErrorView.swift
+//  AuthErrorView.swift
 //  iosApp
 //
-//  Created by gal levi on 20/06/2025.
+//  Created by gal levi on 17/07/2025.
 //  Copyright © 2025 orgName. All rights reserved.
 //
 
-//  ErrorView.swift
-//  iosApp
-
 import SwiftUI
 
-struct ErrorView: View {
+struct AuthErrorView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.dismiss) var dismiss
 
     let title: String
     let message: String
-    let systemImageName: String
-    let buttonText: String
-    let onRetry: (() -> Void)?
+    let primaryButtonText: String
+    let onPrimaryTap: () -> Void
+    let secondaryButtonText: String?
+    let onSecondaryTap: (() -> Void)?
 
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
 
-            Image(systemName: systemImageName)
+            Image(systemName: "exclamationmark.shield.fill")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 80, height: 80)
-                .foregroundColor(AppColors.surfBlue.opacity(0.7))
-                .padding(.bottom, 8)
+                .foregroundColor(AppColors.sandOrange)
+                .padding(.bottom, 4)
 
             Text(title)
                 .font(.title2)
@@ -38,25 +35,28 @@ struct ErrorView: View {
                 .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
             Text(message)
-                .font(.body)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 32)
 
-            Button(action: {
-                if let retry = onRetry {
-                    retry()
-                } else {
-                    dismiss()
-                }
-            }) {
-                Text(buttonText)
+            // Primary button
+            Button(action: onPrimaryTap) {
+                Text(primaryButtonText)
                     .fontWeight(.bold)
                     .padding(.vertical, 12)
                     .padding(.horizontal, 28)
-                    .background(AppColors.sandOrange)
+                    .background(AppColors.surfBlue)
                     .foregroundColor(.white)
                     .cornerRadius(16)
+            }
+
+            // Secondary button
+            if let secondaryText = secondaryButtonText, let onTap = onSecondaryTap {
+                Button(action: onTap) {
+                    Text(secondaryText)
+                        .foregroundColor(AppColors.textPrimary(for: colorScheme))
+                        .underline()
+                }
             }
 
             Spacer()

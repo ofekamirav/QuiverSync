@@ -10,13 +10,15 @@ import kotlin.coroutines.resumeWithException
 import platform.CoreLocation.CLLocation
 import kotlinx.cinterop.useContents
 
-
 @OptIn(ExperimentalForeignApi::class)
 class IOSLocationProvider : LocationProvider {
     private val manager = CLLocationManager().apply {
         desiredAccuracy = kCLLocationAccuracyBest
         requestWhenInUseAuthorization()
     }
+
+//     👇 Store the delegate so it persists
+    private var locationDelegate: CLLocationManagerDelegateProtocol? = null
 
     override suspend fun getCurrentLocation(): Location? =
         suspendCancellableCoroutine { cont ->
@@ -25,25 +27,40 @@ class IOSLocationProvider : LocationProvider {
                     manager: CLLocationManager,
                     didUpdateLocations: List<*>
                 ) {
-                    val loc = (didUpdateLocations.lastOrNull() as? CLLocation) ?: run {
-                        cont.resume(null)
+                    val loc = (didUpdateLocations.lastOrNull() as? CLLocation)
+                    if (loc == null) {
+                        if (cont.isActive) cont.resume(null)
+                        manager.stopUpdatingLocation()
                         return
                     }
-                    loc.coordinate.useContents {
-                        cont.resume(Location(this.latitude, this.longitude))
+
+                    if (cont.isActive) {
+                        loc.coordinate.useContents {
+                            cont.resume(Location(latitude, longitude))
+                        }
+                        manager.stopUpdatingLocation()
                     }
-                    manager.stopUpdatingLocation()
                 }
+
                 override fun locationManager(
                     manager: CLLocationManager,
                     didFailWithError: NSError
                 ) {
-                    cont.resumeWithException(Throwable(didFailWithError.localizedDescription))
-                    manager.stopUpdatingLocation()
+                    if (cont.isActive) {
+                        cont.resumeWithException(Throwable(didFailWithError.localizedDescription))
+                        manager.stopUpdatingLocation()
+                    }
                 }
             }
+
+            locationDelegate = delegate // 👈 persist the delegate
+
             manager.delegate = delegate
             manager.requestLocation()
-            cont.invokeOnCancellation { manager.stopUpdatingLocation() }
+
+            cont.invokeOnCancellation {
+                manager.stopUpdatingLocation()
+                locationDelegate = null // ✅ clean up
+            }
         }
 }

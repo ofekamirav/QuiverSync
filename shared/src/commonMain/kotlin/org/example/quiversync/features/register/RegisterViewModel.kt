@@ -24,10 +24,19 @@ class RegisterViewModel(
             is RegisterEvent.PasswordChanged -> {
                 updateState { it.copy(password = event.value, passwordError = null) }
             }
+            RegisterEvent.ResetState -> {
+                resetState()
+            }
             RegisterEvent.SignUpClicked -> {
                 validateAndRegister()
             }
         }
+    }
+
+
+
+    fun resetState(){
+        _registerState.value = RegisterState.Idle(RegisterFormData())
     }
 
 
@@ -66,11 +75,6 @@ class RegisterViewModel(
                 }
             }
         }
-    }
-
-
-    fun resetState() {
-        _registerState.value = RegisterState.Idle()
     }
 
     private fun isEmailValid(email: String): Boolean {

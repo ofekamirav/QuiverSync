@@ -20,6 +20,7 @@ struct QuiverView: View {
     @Binding var boardToDelete: Surfboard?
     
     @State private var showAddBoardScreen = false
+    @State private var showAddBtn = false
 
     
 
@@ -27,18 +28,15 @@ struct QuiverView: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             if boards.isEmpty {
-                VStack(spacing: 12) {
-                    Spacer()
-                    Text("No Surfboards Found")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                    Text("Add your first surfboard by clicking the button below.")
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 32)
-                    Spacer()
-                }
+                    EmptyStateView(
+                        title: "No Surfboards Yet",
+                        message: "Add your first surfboard to start building your quiver.",
+                        buttonText: "Add Surfboard",
+                        systemImageName: "surfboard.fill",
+                        onButtonTap: {
+                            showAddBoardScreen = true
+                        }
+                    )
             } else {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 16)], spacing: 16) {
@@ -58,21 +56,26 @@ struct QuiverView: View {
                     }
                     .padding(16)
                 }
+                .onAppear(){
+                    showAddBtn = true
+                }
             }
 
             // ➕ Add button
-            Button(action: {
-                showAddBoardScreen = true
-            }) {
-                Image(systemName: "plus")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(width: 50, height: 50)
-                    .background(colorScheme == .dark ? AppColors.deepBlue : AppColors.surfBlue)
-                    .clipShape(Circle())
-                    .shadow(radius: 6)
+            if(showAddBtn) {
+                Button(action: {
+                    showAddBoardScreen = true
+                }) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(width: 50, height: 50)
+                        .background(colorScheme == .dark ? AppColors.deepBlue : AppColors.surfBlue)
+                        .clipShape(Circle())
+                        .shadow(radius: 6)
+                }
+                .padding(24)
             }
-            .padding(24)
 
             // 📋 Detail Dialog
             if let selected = selectedBoard {

@@ -33,6 +33,11 @@ extension HomeScreen {
                 }
             }
         }
+        
+        func retryHomeScreen() {
+            self.startObserving()
+        }
+
     }
 }
     

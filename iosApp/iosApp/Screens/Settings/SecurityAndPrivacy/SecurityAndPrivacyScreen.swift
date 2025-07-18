@@ -27,7 +27,16 @@ public struct SecurityAndPrivacyScreen: View {
                 )
 
             case .error(let error):
-                ErrorView(messege: error.message)
+                ErrorView(
+                    title: "Settings Failed to Save 🔒",
+                    message: error.message,
+                    systemImageName: "lock.shield.fill",
+                    buttonText: "Try Again",
+                    onRetry: {
+                        viewModel.startObserving()
+                    }
+                )
+
             case .loading:
                 LoadingView(colorName: "foamwhite")
             case .success:

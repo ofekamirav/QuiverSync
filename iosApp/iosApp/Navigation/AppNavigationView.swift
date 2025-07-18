@@ -15,19 +15,44 @@ struct AppNavigationView: View {
     @State private var isLoggedIn: Bool? = nil
     @State private var path = NavigationPath()
     @State private var selectedTab: AppRoute = .home
+    @State private var showSplash = true
+    @State private var uid: String? = nil
+
+
 
     var body: some View {
         NavigationStack(path: $path) {
             ZStack {
-                if isLoggedIn == nil {
-                    ProgressView("Loading...") // Replace with animation if needed
-                } else if isLoggedIn == false {
+                if showSplash && uid == nil {
+                    ZStack {
+                        LinearGradient(
+                            colors: colorScheme == .dark ? AppColors.loginGradientDark : AppColors.loginGradientLight,
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+
+                        LottieView(animationName: "splash_intro_animation", loopMode: .playOnce , size : 500)
+                            .frame(width: 200, height: 200)
+                    }
+
+                }
+                else if uid == nil {
                     LoginScreen(
                         onRegisterClick: { path.append(AppRoute.register) },
-                        onForgotPasswordClick: { path.append(AppRoute.forgotPassword) }, isLoggedIn: Binding(
+                        onForgotPasswordClick: { path.append(AppRoute.forgotPassword) },
+                        isLoggedIn: Binding(
                             get: { isLoggedIn ?? false },
                             set: { isLoggedIn = $0 }
-                        )
+                        ),
+                        onLoginSuccess: {
+                                Task {
+                                    let sessionManager = SessionManager(context: nil)
+                                    uid = try? await sessionManager.getUid()
+                                    print("🔁 onLoginSuccess triggered — this is the uid after login: \(String(describing: uid) )")
+
+                                }
+                            },
                     )
                 } else {
                     VStack(spacing: 0) {
@@ -83,7 +108,15 @@ struct AppNavigationView: View {
                     RegisterScreen(
                         onBackBtn: { path.removeLast(path.count) },
                         onSuccess: { path.append(AppRoute.completeRegister) },
-                        isLoggedIn: Binding(get: { isLoggedIn ?? false }, set: { isLoggedIn = $0 })
+                        isLoggedIn: Binding(get: { isLoggedIn ?? false }, set: { isLoggedIn = $0 }),
+                        onLoginSuccess: {
+                                Task {
+                                    let sessionManager = SessionManager(context: nil)
+                                    uid = try? await sessionManager.getUid()
+                                    print("🔁 onLoginSuccess triggered — this is the uid after login: \(String(describing: uid) )")
+
+                                }
+                            }
                     )
 
 
@@ -94,16 +127,23 @@ struct AppNavigationView: View {
                         onNotificationsSettings: {},
                         onHelpSupport: {},
                         onLogout: {
-                            isLoggedIn = false
+                            print("🔁 onLogout triggered — resetting navigation and state")
                             path.removeLast(path.count)
+                            isLoggedIn = false
+                            uid = nil
                         }
+
                     )
 
 
                 case .editProfile:
                     EditProfileScreen(
-                        isLoggedIn: Binding(get: { isLoggedIn ?? false }, set: { isLoggedIn = $0 })
+                        onSucsess: {
+                            selectedTab = .profile
+                            path.removeLast(path.count)
+                        }
                     )
+
 
                 case .securityAndPrivacy:
                     SecurityAndPrivacyScreen()
@@ -138,9 +178,16 @@ struct AppNavigationView: View {
             .onAppear {
                 Task {
                     let sessionManager = SessionManager(context: nil)
-                    let uid = try? await sessionManager.getUid()
+                    uid = try? await sessionManager.getUid()
                     isLoggedIn = uid != nil
                 }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                        showSplash = false
+                }
+            }
+            .onChange(of: uid) { user in
+                print("User has logged in: \(String(describing: user))")
             }
         }
     }

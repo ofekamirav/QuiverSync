@@ -36,7 +36,20 @@ struct OnBoardingScreen: View {
                 }
 
             case .error(let error):
-                ErrorView(messege: error.message)
+                AuthErrorView(
+                    title: "Coudlnt complete your Profile unfortntely. Please try again later.",
+                    message: error.message,
+                    primaryButtonText: "Try Again",
+                    onPrimaryTap: {
+                        viewModel.startObserving()
+                    },
+                    secondaryButtonText: "Back to Welcome",
+                    onSecondaryTap: {
+                        isLoggedIn = false
+                        onCompleteClick()
+                    }
+                )
+
             }
         }
         .onAppear {

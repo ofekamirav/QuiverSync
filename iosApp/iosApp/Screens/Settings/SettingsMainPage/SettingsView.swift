@@ -96,6 +96,7 @@ struct SettingsView: View {
                         isLoading = true
                         viewModel.logout {
                             isLoading = false
+                            
                             onLogout()
                         }
                     },

@@ -12,9 +12,8 @@ import Shared
 public struct EditProfileScreen: View {
     
     @ObservedObject private(set) var viewModel = EditProfileViewModelWrapper()
-    @Binding var isLoggedIn: Bool
 
-    
+    let onSucsess : () -> Void
     @State private var showToast = false
     @State private var navigateToProfile = false
 
@@ -24,15 +23,32 @@ public struct EditProfileScreen: View {
         VStack{
             switch onEnum(of: viewModel.uiState){
             case .editing(let editing):
-                EditProfileFormView(form: editing.form, onEvent: viewModel.viewModel.onEvent , showToast: $showToast, navigateToProfile: $navigateToProfile)
+                EditProfileFormView(
+                    form: editing.form,
+                    onEvent: viewModel.viewModel.onEvent,
+                    showToast: $showToast,
+                    navigateToProfile: $navigateToProfile,
+                    loading: viewModel.isLoading
+                )
                     
                     
             case .error(let error):
-                ErrorView(messege: error.message)
+                ErrorView(
+                    title: "Couldn’t Update Your Profile ",
+                    message: error.message,
+                    systemImageName: "person.crop.circle.badge.exclam",
+                    buttonText: "Try Again",
+                    onRetry: {
+                        viewModel.startObserving()
+                    }
+                )
+
             case .loading:
-                LoadingView(colorName: "foamwhite")
-            case .success:
                 LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 200)
+            case .success:
+                Color.clear.onAppear(){
+                    onSucsess()
+                }
             }
         }
         .onAppear(){

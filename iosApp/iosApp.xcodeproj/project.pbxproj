@@ -37,6 +37,9 @@
 		6953D4712E2928FB005C54F5 /* OnBoardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6953D4702E2928F5005C54F5 /* OnBoardingView.swift */; };
 		6953D4732E29350E005C54F5 /* CustomDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6953D4722E293506005C54F5 /* CustomDatePickerView.swift */; };
 		6953D4752E29351B005C54F5 /* SurfLevelSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6953D4742E29351A005C54F5 /* SurfLevelSelectorView.swift */; };
+		6953D4772E296284005C54F5 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6953D4762E296283005C54F5 /* EmptyStateView.swift */; };
+		6953D4792E2966EF005C54F5 /* AuthErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6953D4782E2966EE005C54F5 /* AuthErrorView.swift */; };
+		6953D47B2E29705F005C54F5 /* splash_intro_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 6953D47A2E29705F005C54F5 /* splash_intro_animation.json */; };
 		6963055B2E211FA600018B65 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6963055A2E211FA600018B65 /* FirebaseAnalytics */; };
 		6963055D2E211FA600018B65 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6963055C2E211FA600018B65 /* FirebaseAuth */; };
 		6963055F2E211FA600018B65 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6963055E2E211FA600018B65 /* FirebaseCore */; };
@@ -147,6 +150,9 @@
 		6953D4702E2928F5005C54F5 /* OnBoardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnBoardingView.swift; sourceTree = "<group>"; };
 		6953D4722E293506005C54F5 /* CustomDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDatePickerView.swift; sourceTree = "<group>"; };
 		6953D4742E29351A005C54F5 /* SurfLevelSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfLevelSelectorView.swift; sourceTree = "<group>"; };
+		6953D4762E296283005C54F5 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		6953D4782E2966EE005C54F5 /* AuthErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthErrorView.swift; sourceTree = "<group>"; };
+		6953D47A2E29705F005C54F5 /* splash_intro_animation.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = splash_intro_animation.json; sourceTree = "<group>"; };
 		6975DFA12E04B6AD00D14119 /* QuiverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuiverView.swift; sourceTree = "<group>"; };
 		697E7CAC2E0561B60030392F /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		697E7CAE2E05656B0030392F /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -458,6 +464,7 @@
 			isa = PBXGroup;
 			children = (
 				69D02A192E27C92F0074E2E9 /* quiver_sync_loading_animation.json */,
+				6953D47A2E29705F005C54F5 /* splash_intro_animation.json */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -571,6 +578,8 @@
 		69E55ADA2E02EE5000B530D3 /* components */ = {
 			isa = PBXGroup;
 			children = (
+				6953D4782E2966EE005C54F5 /* AuthErrorView.swift */,
+				6953D4762E296283005C54F5 /* EmptyStateView.swift */,
 				69DB83DF2E265072005489FD /* ImageUploader.swift */,
 				69A923952E23D06E001EB624 /* ImagePicker.swift */,
 				69A923932E23C572001EB624 /* ImageSourceSelectorSheet.swift */,
@@ -729,6 +738,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6953D47B2E29705F005C54F5 /* splash_intro_animation.json in Resources */,
 				69D02A1A2E27C92F0074E2E9 /* quiver_sync_loading_animation.json in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
 				69DAB07C2E118BB800D83C51 /* GoogleService-Info.plist in Resources */,
@@ -821,6 +831,7 @@
 				69D02A222E27EFC90074E2E9 /* EditProfileFormView.swift in Sources */,
 				6904CA712E0BFB180039C9D9 /* WeeklyForecastPopup.swift in Sources */,
 				69EAE8272E05CA1E004E31CD /* FavSpotsView.swift in Sources */,
+				6953D4792E2966EF005C54F5 /* AuthErrorView.swift in Sources */,
 				69DB83EF2E2681F7005489FD /* VerticalDivider.swift in Sources */,
 				69E55ACF2E02DED300B530D3 /* QuiverScreen.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
@@ -841,6 +852,7 @@
 				69E55AD12E02DEE100B530D3 /* HomeView.swift in Sources */,
 				69EAE8252E05B683004E31CD /* FavSpotsScreen.swift in Sources */,
 				69E55AEF2E033BA400B530D3 /* ConditionItemView.swift in Sources */,
+				6953D4772E296284005C54F5 /* EmptyStateView.swift in Sources */,
 				6953D4662E29146E005C54F5 /* ForgotPasswordWrapper.swift in Sources */,
 				694F85572E26E6F600C2322F /* AppRoute.swift in Sources */,
 				69A9237F2E23B7E7001EB624 /* AddBoardScreen.swift in Sources */,

@@ -20,6 +20,8 @@ struct LoginView: View {
     
     let onForgotPasswordClick: () -> Void
     
+    let onLoginSuccess: () -> Void
+    
     @State private var email: String = ""
     @State private var password: String = ""
 

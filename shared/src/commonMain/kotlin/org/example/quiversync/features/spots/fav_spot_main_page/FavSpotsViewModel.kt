@@ -61,7 +61,7 @@ class FavSpotsViewModel(
     fun onEvent(event: FavSpotsEvent) {
         when (event) {
             is FavSpotsEvent.DeleteSpot -> {
-                deleteSpot(event.favoriteSpot, event.snackbarDurationMillis)
+                deleteSpot(event.favoriteSpot, event.snackBarDurationMillis)
             }
             is FavSpotsEvent.LoadWeekPredictions -> {
                 weeklyPredictions(event.favoriteSpot)
@@ -82,7 +82,7 @@ class FavSpotsViewModel(
      * Updates UI state with error message if deletion fails.
      * @param favoriteSpot The spot to delete
      */
-    private fun deleteSpot(favoriteSpot:FavoriteSpot,snackbarDurationMillis: Long) {
+    private fun deleteSpot(favoriteSpot:FavoriteSpot,snackBarDurationMillis: Long) {
         lastDismissedSpot = favoriteSpot
         val currentLoadedState = _uiState.value as? FavSpotsState.Loaded ?: return
         val currentData = currentLoadedState.favSpotsData
@@ -108,7 +108,7 @@ class FavSpotsViewModel(
         deleteJob?.cancel()
         deleteJob?.cancel()
         deleteJob = scope.launch {
-            delay(snackbarDurationMillis)
+            delay(snackBarDurationMillis)
             if (lastDismissedSpot == favoriteSpot) {
                 performPermanentDelete(favoriteSpot)
             }

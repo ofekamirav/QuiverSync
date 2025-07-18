@@ -38,7 +38,17 @@ public struct AddBoardScreen: View {
                         }
                     }
 
-            case .error(let error): ErrorView(messege: error.message)
+            case .error(let error):
+                ErrorView(
+                    title: "Couldn’t Add Your Board 🛹",
+                    message: error.message,
+                    systemImageName: "xmark.octagon.fill",
+                    buttonText: "Go Back",
+                    onRetry: {
+                        onBackRequested()
+                    }
+                )
+
             }
         }
         .onAppear(){

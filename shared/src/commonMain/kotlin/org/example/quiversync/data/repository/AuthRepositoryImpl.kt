@@ -19,13 +19,15 @@ import org.example.quiversync.domain.repository.AuthRepository
 import org.example.quiversync.utils.extensions.toDomain
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.Error
+import org.example.quiversync.data.local.dao.UserDao
 import org.example.quiversync.data.remote.dto.AuthResult
 import org.example.quiversync.utils.extensions.platformLogger
 
 class AuthRepositoryImpl(
     private val sessionManager: SessionManager,
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val userDao: UserDao
 ): AuthRepository  {
 
     override suspend fun register(
@@ -105,6 +107,7 @@ class AuthRepositoryImpl(
 
     override suspend fun logout() {
         auth.signOut()
+        userDao.deleteProfile(sessionManager.getUid() ?: "")
         sessionManager.clearUserData()
     }
 
@@ -113,6 +116,7 @@ class AuthRepositoryImpl(
             val userDto = user.toDto()
             platformLogger("AuthRepositoryImpl", "Updating user profile for UID: $userDto")
             firestore.collection("users").document(user.uid).set(userDto, merge = true)
+            userDao.updateUserProfile(user, user.uid)
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Failure(AuthError("Failed to update user profile: ${e.message}"))
