@@ -47,6 +47,7 @@ import org.example.quiversync.features.user.edit_user.EditUserDetailsEvent
 import org.example.quiversync.features.user.edit_user.EditUserFormData
 import org.example.quiversync.features.user.edit_user.EditUserState
 import org.example.quiversync.presentation.components.CustomTextField
+import org.example.quiversync.presentation.components.GradientButton
 import org.example.quiversync.presentation.components.ImageSourceSelectorSheet
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.screens.skeletons.EditProfileSkeleton
@@ -194,18 +195,16 @@ fun EditProfileDetailsScreenContent(
         }
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(
+
+        GradientButton(
+            text = "Save Changes",
             onClick = {
                 onEvent(EditUserDetailsEvent.onSubmit)
                 onSave()
-                      },
-            modifier = Modifier.fillMaxWidth(),
+            },
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-        ) {
-            Text("Save", color = Color.White)
-        }
-
+            modifier = Modifier.fillMaxWidth(),
+        )
         if (showImageOptions) {
             ImageSourceSelectorSheet(
                 onDismiss = { showImageOptions = false },

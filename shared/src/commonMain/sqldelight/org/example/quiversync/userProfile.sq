@@ -2,6 +2,7 @@ CREATE TABLE UserProfileEntity (
     uid TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT NOT NULL,
+    phoneNumber TEXT,
     dateOfBirth TEXT,
     heightCm REAL,
     weightKg REAL,
@@ -15,8 +16,9 @@ SELECT * FROM UserProfileEntity WHERE uid = ? LIMIT 1;
 insertOrReplaceProfile:
 INSERT OR REPLACE INTO UserProfileEntity (
     uid, name, email,
+    phoneNumber,
     dateOfBirth, heightCm, weightKg, surfLevel, profilePicture
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 deleteProfile:
 DELETE FROM UserProfileEntity WHERE uid = ?;
