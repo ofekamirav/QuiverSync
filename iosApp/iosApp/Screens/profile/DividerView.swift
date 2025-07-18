@@ -9,9 +9,11 @@
 import SwiftUI
 
 struct DividerView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         Rectangle()
-            .fill(AppColors.borderGray.opacity(0.4))
+            .fill(colorScheme == .dark ? AppColors.darkBorder.opacity(0.5) : AppColors.borderGray.opacity(0.4))
             .frame(height: 1)
             .padding(.horizontal, 20)
     }

@@ -8,6 +8,8 @@ import SwiftUI
 import Shared
 
 struct ForecastRow: View {
+    @Environment(\.colorScheme) var colorScheme
+
 
     let prediction: DailyPrediction
 
@@ -40,7 +42,7 @@ struct ForecastRow: View {
 
                 ChipView(
                     text: "\(prediction.prediction.score)% match",
-                    color: AppColors.surfBlue.opacity(0.1)
+                    color: AppColors.chipBackground(for: colorScheme)
                 )
                 .padding(.top, 4)
             }
@@ -48,22 +50,22 @@ struct ForecastRow: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(prediction.surfboard.company)
                     .font(.system(.headline, design: .rounded))
-                    .foregroundColor(AppColors.deepBlue)
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
                 Text(prediction.surfboard.model)
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(colorScheme == .dark ? AppColors.darkSky : .gray)
 
                 Text(prediction.dailyForecast.date)
                     .font(.caption)
-                    .foregroundColor(.gray.opacity(0.8))
+                    .foregroundColor(colorScheme == .dark ? AppColors.darkSky.opacity(0.7) : .gray.opacity(0.8))
 
                 HStack(spacing: 16) {
                     Label("\(prediction.dailyForecast.waveHeight, specifier: "%.1f") m", systemImage: "water.waves")
                     Label("\(prediction.dailyForecast.windSpeed, specifier: "%.1f") m/s", systemImage: "wind")
                 }
                 .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundColor(AppColors.deepBlue)
+                .foregroundColor(AppColors.textPrimary(for: colorScheme))
                 .padding(.top, 6)
             }
             Spacer()

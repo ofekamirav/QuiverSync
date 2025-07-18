@@ -11,6 +11,8 @@ import SwiftUI
 import Shared
 
 struct ProfileView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let user: User
     let boardsCount: Int
     @Binding var isLoggedIn: Bool
@@ -28,7 +30,7 @@ struct ProfileView: View {
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .top)
                 }
-                .background(AppColors.background)
+                .background(AppColors.sectionBackground(for: colorScheme))
             } else {
                 // EXPANDED WIDTH (Tablet/Desktop)
                 HStack(alignment: .top, spacing: 16) {
@@ -43,7 +45,7 @@ struct ProfileView: View {
                     .frame(maxWidth: .infinity, alignment: .topLeading)
                 }
                 .padding(16)
-                .background(AppColors.background)
+                .background(AppColors.sectionBackground(for: colorScheme))
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             }
         }

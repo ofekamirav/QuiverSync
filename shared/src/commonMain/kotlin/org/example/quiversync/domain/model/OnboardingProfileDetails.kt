@@ -13,5 +13,9 @@ data class OnboardingProfileDetails(
 enum class SurfLevel(val label: String) {
     BEGINNER("Beginner"),
     INTERMEDIATE("Intermediate"),
-    PRO("Pro")
+    PRO("Pro");
+
+    companion object {
+        val all: List<SurfLevel> = entries
+    }
 }

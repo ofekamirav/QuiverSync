@@ -135,7 +135,7 @@ val commonModule= module {
 
 
    //-----------------------------------------------------Repositories---------------------------------------------
-   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
+   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get() , get()) }
    single<FavSpotRepository>{FavSpotRepositoryImpl(get(), get(), get())}
    single<GeminiRepository>{GeminiRepositoryImpl(get(), get(), get() , get())}
    single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get() , get()) }
@@ -282,18 +282,18 @@ val commonModule= module {
    // --------------------------------------------ViewModels--------------------------------------------------
    single { RegisterViewModel(get()) }
    single { OnboardingViewModel(get(), get(),get()) }
-   single { UserViewModel(get(), get()) }
-   single { HomeViewModel(get()) }
+   factory { UserViewModel(get(), get()) }
+   factory { HomeViewModel(get()) }
    single { LoginViewModel(get(), get()) }
    single { OnboardingViewModel(get(), get(), get()) }
-   single { QuiverViewModel(get()) }
+   factory { QuiverViewModel(get()) }
    single { AddBoardViewModel(get(), get()) }
    single { SettingsViewModel(get(), get()) }
    single { EditProfileDetailsViewModel(get()) }
    single { SecurityAndPrivacyViewModel(get()) }
-    single { FavSpotsViewModel(get(),get()) }
-    single { AddFavSpotViewModel(get() , get())}
-    single { ForgotPasswordViewModel(get()) }
+   factory { FavSpotsViewModel(get(),get()) }
+   single { AddFavSpotViewModel(get() , get())}
+   single { ForgotPasswordViewModel(get()) }
 
 
 

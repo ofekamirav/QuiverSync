@@ -16,35 +16,57 @@ struct RegisterScreen: View {
     let onBackBtn: () -> Void
     let onSuccess: () -> Void
     @Binding var isLoggedIn: Bool
+    let onLoginSuccess: () -> Void
+
     
     var body: some View {
         VStack {
             switch onEnum(of: viewModel.uistate) {
             case .loading:
-                LoadingView(colorName: "background")
-                
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .idle(let idle):
                 RegisterView(
                     state: idle.data,
                     RegViewModel: viewModel.viewModel,
-                    onBackClick: onBackBtn,
-                    onSuccess: onSuccess
+                    onBackClick: onBackBtn
                 )
-            case .loaded(let loaded):
-                MainTabView(isLoggedIn : $isLoggedIn)
+            case .loaded:
+                Color.clear.onAppear {
+                    Task {
+                            let sessionManager = SessionManager(context: nil)
+                            if let newUid = try? await sessionManager.getUid(), newUid != "" {
+                                print("User logged in successfully: \(newUid)")
+                                onLoginSuccess()
+                            } else {
+                                print("❌ Login attempted, but UID is still nil")
+                            }
+                        viewModel.viewModel.resetState()
+                        }
+                        onSuccess()
+                    }
             case .error(let error):
-                ErrorView(messege: error.message)
+                AuthErrorView(
+                    title: "Registration Wipeout 🌊",
+                    message: error.message,
+                    primaryButtonText: "Try Again",
+                    onPrimaryTap: {
+                        viewModel.resetState()
+                        viewModel.startObserving()
+                    },
+                    secondaryButtonText: "Back to Login",
+                    onSecondaryTap: {
+                        viewModel.resetState()
+                        onBackBtn()
+                    }
+                )
+
+
             
             }
         }
         .onAppear {
             viewModel.startObserving()
         }
-//        .onReceive(viewModel.$uistate) { newState in
-//            if case .loaded(let loaded) = onEnum(of: newState), loaded.data.isWaiting {
-//                onSuccess()
-//            }
-//        }
 
 
     }

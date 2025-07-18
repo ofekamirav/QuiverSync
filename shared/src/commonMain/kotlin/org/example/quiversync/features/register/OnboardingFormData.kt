@@ -17,5 +17,7 @@ data class OnboardingFormData(
     val weightError: String? = null,
     val surfLevelError: String? = null,
     val profileImageError: String? = null,
-    val imageUploadError: String? = null
-)
+    val imageUploadError: String? = null,
+    val uploadFromIOS: Boolean = false,
+
+    )

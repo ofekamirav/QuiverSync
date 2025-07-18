@@ -27,6 +27,19 @@ class UserDao(
 
     }
 
+    fun updateUserProfile(user: User, uid: String) {
+        queries.updateProfile(
+            uid = uid,
+            name = user.name,
+            email = user.email,
+            dateOfBirth = user.dateOfBirth,
+            heightCm = user.heightCm,
+            weightKg = user.weightKg,
+            surfLevel = user.surfLevel,
+            profilePicture = user.profilePicture
+        )
+    }
+
     fun insertOrReplaceProfile(user: User , uid: String) {
         queries.insertOrReplaceProfile(
             uid = uid,

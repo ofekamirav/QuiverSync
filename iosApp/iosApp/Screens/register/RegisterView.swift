@@ -18,7 +18,6 @@ struct RegisterView: View {
 
     // MARK: - Actions
     let onBackClick: () -> Void
-    let onSuccess: () -> Void
     
     @State private var name: String = ""
     @State private var email: String = ""
@@ -83,7 +82,6 @@ struct RegisterView: View {
                     CustomInputField(label: "Email", text: $email, systemImage: "envelope")
                         .onChange(of: email) { newValue in
                             RegViewModel.onEvent(event: RegisterEventEmailChanged(value: newValue))
-                            print(state)
                         }
                     if let emailError = state.emailError {
                         Text(emailError)
@@ -97,7 +95,6 @@ struct RegisterView: View {
                     CustomInputField(label: "Password", text: $password, systemImage: "lock", isSecure: true)
                         .onChange(of: password) { newValue in
                             RegViewModel.onEvent(event: RegisterEventPasswordChanged(value: newValue))
-                            print(state)
                         }
                     if let passwordError = state.passwordError {
                         Text(passwordError)
@@ -108,7 +105,7 @@ struct RegisterView: View {
                     }
 
                     // MARK: - Upload & Submit
-                    ProfileImageUpload()
+//                    ProfileImageUpload()
 
                     GradientButton(text: "Sign Up") {
                         RegViewModel.onEvent(event: RegisterEventSignUpClicked())

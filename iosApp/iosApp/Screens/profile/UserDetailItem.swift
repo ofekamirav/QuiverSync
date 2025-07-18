@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct UserDetailItem: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let iconName: String
     let label: String
     let value: String
@@ -16,7 +18,7 @@ struct UserDetailItem: View {
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             Image(systemName: iconName)
-                .foregroundColor(AppColors.deepBlue)
+                .foregroundColor(AppColors.textPrimary(for: colorScheme)) 
                 .frame(width: 20, height: 20)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -30,7 +32,7 @@ struct UserDetailItem: View {
                         ? .system(size: 16, weight: .bold)
                         : .system(size: 16, weight: .medium)
                     )
-                    .foregroundColor(AppColors.textDark)
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
             }
 
             Spacer()

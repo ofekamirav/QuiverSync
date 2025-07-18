@@ -23,3 +23,14 @@ DELETE FROM UserProfileEntity WHERE uid = ?;
 
 getAllProfiles:
 SELECT * FROM UserProfileEntity;
+
+updateProfile:
+UPDATE UserProfileEntity SET
+    name = ?,
+    email = ?,
+    dateOfBirth = ?,
+    heightCm = ?,
+    weightKg = ?,
+    surfLevel = ?,
+    profilePicture = ?
+WHERE uid = ?;

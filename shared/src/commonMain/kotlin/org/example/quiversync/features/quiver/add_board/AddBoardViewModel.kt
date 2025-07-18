@@ -33,7 +33,7 @@ class AddBoardViewModel(
             is AddBoardEvent.WidthChanged -> updateState { it.copy(data = it.data.copy(width = event.value, widthError = null)) }
             is AddBoardEvent.VolumeChanged -> updateState { it.copy(data = it.data.copy(volume = event.value, volumeError = null)) }
             is AddBoardEvent.FinsSetupChanged -> updateState { it.copy(data = it.data.copy(finSetup = event.value)) }
-            is AddBoardEvent.surfboardImageIOSChanged -> updateState { it.copy(data = it.data.copy(imageUrl = event.imageURL)) }
+            is AddBoardEvent.surfboardImageIOSChanged -> updateState { it.copy(data = it.data.copy(imageUrl = event.imageURL , uploadFromIOS = false)) }
             is AddBoardEvent.surfboardImageSelected -> onSurfboardImageSelected(event.bytes)
             AddBoardEvent.NextStepClicked -> {
                 if ((_uiState.value as? AddBoardState.Idle)?.data?.currentStep == 1) {

@@ -2,11 +2,13 @@ import SwiftUI
 import Shared
 
 public struct SpotCard: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let favSpot: FavoriteSpot
     let favSpotsData: FavSpotsData
     let favSpotsViewModel: FavSpotsViewModel
     @Binding var selectedSpot: FavoriteSpot?
-    let onRequestDelete: () -> Void
+//    let onRequestDelete: () -> Void
 
     @State private var isExpanded = false
     @State private var isShowingPopup = false
@@ -18,7 +20,7 @@ public struct SpotCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(favSpot.name)
                             .font(.system(.headline, design: .rounded))
-                            .foregroundColor(AppColors.deepBlue)
+                            .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
                         Text(favSpot.name)
                             .font(.caption)
@@ -29,22 +31,14 @@ public struct SpotCard: View {
                     Spacer()
 
                     Button(action: {
-                        onRequestDelete()
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.red)
-                            .font(.system(size: 18, weight: .bold))
-                            .padding(.trailing, 4)
-                    }
-
-                    Button(action: {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             isExpanded.toggle()
                         }
                     }) {
                         Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                            .foregroundColor(.gray)
+                            .foregroundColor(AppColors.textPrimary(for: colorScheme).opacity(0.6))
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
                 .padding(.top, 12)
                 .padding(.horizontal)
@@ -62,14 +56,29 @@ public struct SpotCard: View {
                         },
                         selectedSpot: $selectedSpot
                     )
-                    .transition(.opacity.combined(with: .slide))
+                    .opacity(isExpanded ? 1 : 0)
+                    .frame(height: isExpanded ? nil : 0)
+                    .clipped()
                     .padding(.horizontal)
-                    .padding(.bottom, 20) // prevent content under bottom bar
+                    .padding(.bottom, 20)
+
                 }
             }
-
+            .background(AppColors.cardColor(for: colorScheme)) // 💡 ensure it's always colored
         }
         .padding()
-        .blur(radius: selectedSpot != nil ? 6 : 0)
+        .background(AppColors.cardColor(for: colorScheme))
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(colorScheme == .dark ? AppColors.darkBorder : AppColors.borderGray, lineWidth: 1)
+        )
+        .background(
+            Color.clear
+                .contentShape(Rectangle())
+                .allowsHitTesting(false) // prevent card's background from hijacking touches
+        )
+
+
     }
 }

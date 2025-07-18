@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct CurrentConditionsView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let waveHeight: String
     let wind: String
     let swellPeriod: String
@@ -18,7 +20,7 @@ struct CurrentConditionsView: View {
             HStack(spacing:12){
                 Text("Current Conditions")
                     .font(.headline)
-                    .foregroundColor(AppColors.deepBlue)
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
                 Spacer()
             }
             
@@ -32,7 +34,7 @@ struct CurrentConditionsView: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(AppColors.foamWhite)
+        .background(AppColors.cardColor(for: colorScheme))
         .cornerRadius(20)
     }
 }

@@ -2,6 +2,9 @@ package org.example.quiversync.features.register
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.example.quiversync.domain.model.OnboardingProfileDetails
@@ -66,6 +69,7 @@ class OnboardingViewModel(
             is OnboardingEvent.WeightChanged -> updateForm { it.copy(weightKg = event.value) }
             is OnboardingEvent.SurfLevelChanged -> updateForm { it.copy(selectedSurfLevel = event.level) }
             is OnboardingEvent.ProfileImageSelected -> onProfileImageSelected(event.bytes)
+            is OnboardingEvent.ProfileImageIOSChanged -> updateForm { it.copy(profileImageUrl = event.imageURL , uploadFromIOS = false) }
             OnboardingEvent.ContinueClicked -> validateAndComplete()
         }
     }
@@ -80,11 +84,24 @@ class OnboardingViewModel(
     }
 
 
-    fun onProfileImageSelected(imageBytes: ByteArray) {
-        val currentIdleState = _onboardingState.value as? OnboardingState.Idle ?: return
+    private fun onProfileImageSelected(imageBytes: ByteArray) {
+        val currentIdleState = _onboardingState.value as? OnboardingState.Idle
+        if (currentIdleState == null) {
+            platformLogger("OnboardingViewModel", "❌ onProfileImageSelected: current state is not Idle")
+            return
+        }
+
+        platformLogger("OnboardingViewModel", "📤 Image upload started (Android or iOS)")
+
+        platformLogger( "OnboardingViewModel", "state before upload : ${_onboardingState.value}")
 
         scope.launch {
-            updateForm { it.copy(isUploadingImage = true, imageUploadError = null) }
+            _onboardingState.value = currentIdleState.copy(
+                data = currentIdleState.data.copy(
+                    isUploadingImage = true,
+                    imageUploadError = null
+                )
+            )
 
             try {
                 val result = uploadImageUseCase(
@@ -92,23 +109,94 @@ class OnboardingViewModel(
                     folder = UploadImageUseCase.Folder.PROFILES
                 )
 
-                val updatedIdleState = _onboardingState.value as? OnboardingState.Idle ?: return@launch
+                val updatedIdleState = _onboardingState.value as? OnboardingState.Idle
+                if (updatedIdleState == null) {
+                    platformLogger("OnboardingViewModel", "❌ State changed unexpectedly during image upload")
+                    return@launch
+                }
+
+                var finalUrl: String? = null
 
                 when (result) {
                     is Result.Success -> {
-                        updateForm { it.copy(isUploadingImage = false, profileImageUrl = result.data) }
-                        platformLogger("OnboardingViewModel", "Image uploaded successfully: ${result.data}")
+                        platformLogger("OnboardingViewModel", "✅ uploadImageUseCase success: ${result.data}")
+
+                        if (result.data == "IOS uploader is been activated") {
+                            platformLogger("OnboardingViewModel", "📱 iOS flow activated — waiting for SwiftUI upload")
+
+                            _onboardingState.value = currentIdleState.copy(
+                                data = currentIdleState.data.copy(
+                                    uploadFromIOS = true
+                                )
+                            )
+
+                            platformLogger( "OnboardingViewModel", "state that waiting : ${_onboardingState.value}")
+
+
+                            finalUrl = onboardingState
+                                .filterIsInstance<OnboardingState.Idle>()
+                                .map { it.data }
+                                .first { form -> !form.uploadFromIOS }
+                                .profileImageUrl
+
+                            platformLogger("OnboardingViewModel", "📥 iOS uploaded URL received: $finalUrl")
+
+                            if (finalUrl == "failed to upload") {
+                                _onboardingState.value = currentIdleState.copy(
+                                    data = currentIdleState.data.copy(
+                                        imageUploadError = "Upload failed on iOS",
+                                        isUploadingImage = false,
+                                        uploadFromIOS = false
+                                    )
+                                )
+
+                                platformLogger("OnboardingViewModel", "❌ iOS upload failed (URL = failed to upload)")
+                                return@launch
+                            }
+                        } else {
+                            // Android upload
+                            finalUrl = result.data
+                        }
+
+
+                        _onboardingState.value = currentIdleState.copy(
+                            data = currentIdleState.data.copy(
+                                profileImageUrl = finalUrl,
+                                isUploadingImage = false,
+                                uploadFromIOS = false,
+                                imageUploadError = null
+                            )
+                        )
+
+
+                        platformLogger("OnboardingViewModel", "✅ Final profileImageUrl set: $finalUrl")
                     }
+
                     is Result.Failure -> {
-                        platformLogger("OnboardingViewModel", "Image upload failed: ${result.error?.message}")
-                        updateForm { it.copy(isUploadingImage = false, imageUploadError = result.error?.message) }
-                        return@launch
+                        updateForm {
+                            it.copy(
+                                imageUploadError = "Upload failed: ${result.error?.message}",
+                                isUploadingImage = false,
+                                uploadFromIOS = false
+                            )
+                        }
+                        platformLogger("OnboardingViewModel", "❌ Upload failed: ${result.error?.message}")
                     }
                 }
 
             } catch (e: Exception) {
-                val fallbackIdle = _onboardingState.value as? OnboardingState.Idle ?: return@launch
-                updateForm { it.copy(isUploadingImage = false, imageUploadError = e.message) }
+                val fallbackIdle = _onboardingState.value as? OnboardingState.Idle
+                if (fallbackIdle != null) {
+
+                    _onboardingState.value = currentIdleState.copy(
+                        data = currentIdleState.data.copy(
+                            imageUploadError = "Unexpected error: ${e.message}",
+                            isUploadingImage = false,
+                            uploadFromIOS = false
+                        )
+                    )
+                    platformLogger("OnboardingViewModel", "❌ Exception during upload: ${e.message}")
+                }
             }
         }
     }

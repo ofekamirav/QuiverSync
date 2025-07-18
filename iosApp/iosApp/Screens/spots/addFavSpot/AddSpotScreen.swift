@@ -34,7 +34,17 @@ public struct AddSpotScreen: View {
                     case .loaded:
                         LoadingView(colorName: "background")
 //                        FavSpotsScreen()
-                    case .error(let error): ErrorView(messege: error.message)
+                    case .error(let error):
+                        ErrorView(
+                        title: "Couldn’t Save That Spot",
+                        message: error.message,
+                        systemImageName: "mappin.slash",
+                        buttonText: "Go Back",
+                        onRetry: {
+                            showAddSpotScreen = false
+                        }
+                    )
+
                     }
                 }
                 .onAppear(){

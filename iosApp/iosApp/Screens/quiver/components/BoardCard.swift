@@ -10,6 +10,8 @@ import SwiftUI
 import Shared
 
 struct BoardCard: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let board: Surfboard
     let onClick: () -> Void
     let onPublishToggle: (Surfboard, Bool) -> Void
@@ -45,13 +47,13 @@ struct BoardCard: View {
 
                 Text(board.model)
                     .font(.headline)
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
                     .lineLimit(1)
 
                 HStack {
                     Text("For Rent")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.chipText(for: colorScheme).opacity(0.8))
 
                     Spacer()
 
@@ -65,11 +67,11 @@ struct BoardCard: View {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.white)
-                    .shadow(color: .black.opacity(toggleValue ? 0.1 : 0.05), radius: toggleValue ? 6 : 3)
+                    .fill(AppColors.cardColor(for: colorScheme))
+                    .shadow(color: colorScheme == .dark ? .clear : .black.opacity(toggleValue ? 0.1 : 0.05), radius: toggleValue ? 6 : 3)
                     .overlay(
                         RoundedRectangle(cornerRadius: 20)
-                            .stroke(toggleValue ? Color.orange : Color.clear, lineWidth: 2)
+                            .stroke(toggleValue ? AppColors.sandOrange : Color.clear, lineWidth: 2)
                     )
             )
         }

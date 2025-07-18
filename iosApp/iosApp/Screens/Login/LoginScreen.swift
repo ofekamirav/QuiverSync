@@ -14,7 +14,10 @@ import Foundation
 struct LoginScreen: View {
     @ObservedObject private(set) var viewModel = LoginViewModelWrapper()
     let onRegisterClick: () -> Void
+    let onForgotPasswordClick: () -> Void
     @Binding var isLoggedIn: Bool
+    let onLoginSuccess: () -> Void
+
     var body: some View{
         VStack{
             switch onEnum(of: viewModel.uistate) {
@@ -23,16 +26,48 @@ struct LoginScreen: View {
                     onRegisterClick: onRegisterClick,
                     loginData: idle.data,
                     loginViewModel: viewModel.viewModel,
+                    onForgotPasswordClick: onForgotPasswordClick,
+                    onLoginSuccess:onLoginSuccess
                 )
             case .loading:
-                LoadingView(colorName: "background")
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .loaded:
-                MainTabView(isLoggedIn: $isLoggedIn)
+                Color.clear.onAppear {
+                    print("User logged in successfully")
+                    Task {
+                            let sessionManager = SessionManager(context: nil)
+                            if let newUid = try? await sessionManager.getUid(), newUid != "" {
+                                print("User logged in successfully: \(newUid)")
+                                onLoginSuccess()
+                            } else {
+                                print("❌ Login attempted, but UID is still nil")
+                            }
+                        viewModel.viewModel.resetState()
+
+                        }
+                    isLoggedIn = true
+                }
+
             case .error(let error):
-                ErrorView(messege: error.message)
+                AuthErrorView(
+                    title: "Login Failed 🌧️",
+                    message: error.message,
+                    primaryButtonText: "Try Again",
+                    onPrimaryTap: {
+                        viewModel.startObserving()
+                    },
+                    secondaryButtonText: "Back to Welcome",
+                    onSecondaryTap: {
+                        isLoggedIn = false
+                    }
+                )
+
                 
             case .navigateToOnboarding:
-                MainTabView(isLoggedIn: $isLoggedIn)
+//                Color.clear.onAppear {
+//                    onNavigateToOnboarding()
+//                }
+                Text("Navigate to Onboarding")
             }
         }
         .onAppear{

@@ -22,7 +22,17 @@ public struct ProfileScreen: View {
                 ProfileView(user: loaded.user,
                             boardsCount: Int(loaded.boards),
                             isLoggedIn: $isLoggedIn)
-            case .error(let error): ErrorView(messege: error.message)
+            case .error(let error):
+                ErrorView(
+                    title: "Couldn’t Load Your Profile 🧢",
+                    message: error.message,
+                    systemImageName: "person.crop.circle.badge.exclamationmark",
+                    buttonText: "Retry",
+                    onRetry: {
+                        viewModel.startObserving()
+                    }
+                )
+
             }
         }
         .onAppear(){

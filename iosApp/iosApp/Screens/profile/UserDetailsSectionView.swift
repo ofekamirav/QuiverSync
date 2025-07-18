@@ -10,6 +10,8 @@ import SwiftUI
 import Shared
 
 struct UserDetailsSectionView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let user: User
 
     var body: some View {
@@ -35,7 +37,7 @@ struct UserDetailsSectionView: View {
         .padding(.vertical, 8)
         .padding(.horizontal, 0)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.white.opacity(0.8))
+        .background(AppColors.cardColor(for: colorScheme))
         .clipShape(RoundedRectangle(cornerRadius: 12))
 
     }

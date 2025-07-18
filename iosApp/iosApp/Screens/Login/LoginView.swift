@@ -18,6 +18,10 @@ struct LoginView: View {
     
     let loginViewModel: LoginViewModel
     
+    let onForgotPasswordClick: () -> Void
+    
+    let onLoginSuccess: () -> Void
+    
     @State private var email: String = ""
     @State private var password: String = ""
 
@@ -69,10 +73,8 @@ struct LoginView: View {
                         systemImage: "envelope"
                     )
                     .onChange(of: email){ newValue in
-                        print("this is the state before the event \(loginData)")
                         loginViewModel.onEvent(event:
                                                 LoginEventEmailChanged(value: newValue))
-                        print("this is the state after the event \(loginData)")
                     }
                     if let emailError = loginData.emailError {
                         Text(emailError)
@@ -89,14 +91,10 @@ struct LoginView: View {
                         isSecure: true
                     )
                     .onChange(of: password) { newValue in
-                        print("this is the state before the event \(loginData)")
-                        print("this is the newValue \(newValue)")
 
 
                         loginViewModel.onEvent(event:
                                                 LoginEventPasswordChanged(value: newValue))
-                        print("this is the state after the event \(loginData)")
-//                        print(loginData)
 
                     }
                     
@@ -110,18 +108,18 @@ struct LoginView: View {
 
                     HStack {
                         Spacer()
-                        Button("Forgot Password?") {
-                            // Add action
+                        Button(action: onForgotPasswordClick) {
+                            Text("Forgot Password?")
+                                .font(.caption)
+                                .foregroundColor(logoTint)
                         }
                         .font(.caption)
                         .foregroundColor(.gray)
                     }
 
                     GradientButton(text: "Sign In"){
-                        print("this is the state now \(loginData)")
                         loginViewModel.onEvent(event:
                                                 LoginEventSignInClicked())
-                        print("this is the state after the event \(loginData)")
 
                                                 
                     }

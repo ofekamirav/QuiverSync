@@ -33,6 +33,11 @@ extension RegisterScreen {
                 }
             }
         }
+        
+        func resetState() {
+            viewModel.onEvent(event: RegisterEventResetState())
+        }
+
          
 
 
