@@ -19,6 +19,7 @@ import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.ShimmerBrush
 import org.example.quiversync.utils.WindowWidthSize
+import org.example.quiversync.utils.rememberShimmerBrush
 
 @Composable
 private fun EditProfileHeaderSkeleton(brush: Brush) {
@@ -103,10 +104,8 @@ private fun EditProfileFormSkeleton(brush: Brush, modifier: Modifier = Modifier)
 
 @Composable
 fun EditProfileSkeleton(modifier: Modifier = Modifier) {
-    val isDark = isSystemInDarkTheme()
-    val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
-    val brush = ShimmerBrush(baseColor = baseShimmerColor)
-    val backgroundColor = if (isDark) OceanPalette.DarkBackground else OceanPalette.background
+    val brush = rememberShimmerBrush()
+    val backgroundColor = MaterialTheme.colorScheme.background
 
     val windowInfo = LocalWindowInfo.current
     when (windowInfo.widthSize) {

@@ -37,6 +37,7 @@ import org.example.quiversync.features.login.LoginData
 import org.example.quiversync.features.login.LoginEvent
 import org.example.quiversync.features.login.LoginState
 import org.example.quiversync.features.login.LoginViewModel
+import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotState
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.presentation.components.CustomTextField
 import org.example.quiversync.presentation.components.GradientButton
@@ -58,14 +59,19 @@ fun LoginScreen(
     ) {
     val uiState by viewModel.loginState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val contentModifier = if (uiState is LoginState.Loading) {
+        Modifier.blur(radius = 8.dp)
+    } else {
+        Modifier
+    }
 
     when (val currentState = uiState) {
         is LoginState.Loading -> {
             LoginScreenContent(currentState = LoginState.Idle(LoginData()), isLoading = true, onRegisterClick = {}, onEvent = viewModel::onEvent,
-                onForgotPasswordClick = onForgotPasswordClick, onGoogleSignInResult = viewModel::onGoogleSignInResult)
+                onForgotPasswordClick = onForgotPasswordClick, onGoogleSignInResult = viewModel::onGoogleSignInResult, modifier = contentModifier)
             Box(
                 modifier = Modifier.fillMaxSize()
-                    .blur(16.dp),
+                    .background(Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
                 LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
@@ -108,7 +114,8 @@ fun LoginScreenContent(
     onForgotPasswordClick: () -> Unit = {},
     onEvent: (LoginEvent) -> Unit = {},
     isLoading: Boolean = false,
-    onGoogleSignInResult: (String?) -> Unit
+    onGoogleSignInResult: (String?) -> Unit,
+    modifier: Modifier = Modifier
 ) {
      val isDark = isSystemInDarkTheme()
      val context = LocalContext.current
@@ -141,7 +148,7 @@ fun LoginScreenContent(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(backgroundBrush),
         contentAlignment = Alignment.Center

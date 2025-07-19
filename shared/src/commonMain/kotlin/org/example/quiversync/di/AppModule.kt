@@ -20,6 +20,8 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.IO
 import org.example.quiversync.QuiverSyncDatabase
 import org.example.quiversync.data.local.dao.FavSpotDao
 import org.example.quiversync.data.local.dao.GeminiPredictionDao
@@ -93,11 +95,11 @@ import org.example.quiversync.features.settings.SettingsViewModel
 import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotViewModel
 import org.example.quiversync.features.spots.fav_spot_main_page.FavSpotsViewModel
 import org.example.quiversync.features.spots.FavSpotsUseCases
-import org.example.quiversync.features.spots.SpotEventBus
 import org.example.quiversync.features.user.UserUseCases
 import org.example.quiversync.features.user.UserViewModel
 import org.example.quiversync.features.user.edit_user.EditProfileDetailsViewModel
-import org.example.quiversync.utils.event.EventBus
+import org.example.quiversync.data.remote.datasource.user.UserRemoteSource
+import org.example.quiversync.data.remote.datasource.user.UserRemoteSourceService
 
 
 fun initKoin(config: KoinAppDeclaration? = null) {
@@ -111,9 +113,15 @@ fun initKoin(config: KoinAppDeclaration? = null) {
 fun initKoin() = initKoin { }
 
 //Common App Definitions
-fun appModules() = listOf(commonModule, platformModule)
+fun appModules() = listOf(commonModule, platformModule, coroutineModule)
 
 expect val platformModule: Module
+
+val coroutineModule = module {
+    single<CoroutineScope> {
+        CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO)
+    }
+}
 
 val commonModule= module {
    // Core
@@ -129,22 +137,19 @@ val commonModule= module {
 
    single<SessionManager> { SessionManager(get()) }
 
-   // SharedFlow / Event Bus
-   single { EventBus }
-   single { SpotEventBus }
-
 
    //-----------------------------------------------------Repositories---------------------------------------------
-   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get() , get()) }
-   single<FavSpotRepository>{FavSpotRepositoryImpl(get(), get(), get())}
+   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get() , get(), get(), get()) }
+   single<FavSpotRepository>{FavSpotRepositoryImpl(get(), get(), get(), get())}
    single<GeminiRepository>{GeminiRepositoryImpl(get(), get(), get() , get())}
    single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get() , get()) }
-   single<UserRepository> { UserRepositoryImpl(get(), get(),get()) }
-   single<QuiverRepository> { QuiverRepositoryImpl(get(), get(), get()) }
+   single<UserRepository> { UserRepositoryImpl(get(), get(),get(), get()) }
+   single<QuiverRepository> { QuiverRepositoryImpl(get(), get(), get(), get()) }
 
    //----------------------------------------------------- Firebase- Remote Data Source----------------------------------
    single<QuiverRemoteDataSource>{ QuiverRemoteDataSourceService(get()) }
    single<FavSpotRemoteSource> { FavSpotRemoteSourceService(get()) }
+   single<UserRemoteSource> { UserRemoteSourceService(get()) }
 
 
    //---------------------------------------------------SqlDelight + Dao----------------------------------------
@@ -169,7 +174,7 @@ val commonModule= module {
     single { GetWeeklyForecastByLocationUseCase(get(),get()) }
     single { GetWeeklyForecastBySpotUseCase(get()) }
     single { GetUserProfileUseCase(get()) }
-    single { LogoutUseCase(get()) }
+    single { LogoutUseCase(get(), get(), get(), get()) }
     single { LoginUserUseCase(get()) }
     single { CheckUserAuthMethodUseCase(get()) }
     single { UpdatePasswordUseCase(get()) }
@@ -282,8 +287,8 @@ val commonModule= module {
    // --------------------------------------------ViewModels--------------------------------------------------
    single { RegisterViewModel(get()) }
    single { OnboardingViewModel(get(), get(),get()) }
-   factory { UserViewModel(get(), get()) }
-   factory { HomeViewModel(get()) }
+   factory { UserViewModel(get()) }
+   single { HomeViewModel(get()) }
    single { LoginViewModel(get(), get()) }
    single { OnboardingViewModel(get(), get(), get()) }
    factory { QuiverViewModel(get()) }
@@ -291,8 +296,8 @@ val commonModule= module {
    single { SettingsViewModel(get(), get()) }
    single { EditProfileDetailsViewModel(get()) }
    single { SecurityAndPrivacyViewModel(get()) }
-   factory { FavSpotsViewModel(get(),get()) }
-   single { AddFavSpotViewModel(get() , get())}
+   factory { FavSpotsViewModel(get()) }
+   single { AddFavSpotViewModel(get())}
    single { ForgotPasswordViewModel(get()) }
 
 

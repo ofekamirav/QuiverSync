@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +53,11 @@ fun SettingsScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val showSecurityAndPrivacyState by viewModel.showSecurityAndPrivacy.collectAsState()
     val isImperialUnits by viewModel.isImperial.collectAsState()
+    val contentModifier = if( isLoading) {
+        modifier.blur(8.dp)
+    } else {
+        modifier
+    }
 
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
@@ -66,7 +72,7 @@ fun SettingsScreen(
         )
     }
     Column(
-        modifier = modifier
+        modifier = contentModifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp),
@@ -127,7 +133,7 @@ fun SettingsScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f)),
+                .background(Color.Transparent),
             contentAlignment = Alignment.Center
         ) {
             LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)

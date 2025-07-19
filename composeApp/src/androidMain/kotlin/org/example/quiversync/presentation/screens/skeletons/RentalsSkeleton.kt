@@ -31,19 +31,19 @@ import androidx.compose.ui.unit.dp
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.ShimmerBrush
-
+import org.example.quiversync.utils.rememberShimmerBrush
 
 
 @Composable
 fun RentalRequestListSkeleton(modifier: Modifier = Modifier) {
-    val shimmer = ShimmerBrush(baseColor = MaterialTheme.colorScheme.background)
+    val brush = rememberShimmerBrush()
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(5) {
-            RentalRequestSkeletonCard(brush = shimmer)
+            RentalRequestSkeletonCard(brush = brush)
         }
     }
 }
@@ -94,9 +94,7 @@ private fun RentalRequestSkeletonCard(brush: Brush) {
 
 @Composable
 fun ExploreTabSkeleton(modifier: Modifier = Modifier) {
-    val isDark = isSystemInDarkTheme()
-    val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
-    val brush = ShimmerBrush(baseColor = baseShimmerColor)
+    val brush = rememberShimmerBrush()
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 320.dp),
@@ -112,7 +110,7 @@ fun ExploreTabSkeleton(modifier: Modifier = Modifier) {
 }
 @Composable
 fun RentalRequestSkeletonCard(modifier: Modifier = Modifier) {
-    val shimmer = ShimmerBrush(baseColor = MaterialTheme.colorScheme.background)
+    val brush = rememberShimmerBrush()
     val cardColor = if(isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.LightGray
     Card(
         modifier = modifier
@@ -132,19 +130,19 @@ fun RentalRequestSkeletonCard(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
                     .height(16.dp)
-                    .background(brush = shimmer, shape = RoundedCornerShape(4.dp))
+                    .background(brush = brush, shape = RoundedCornerShape(4.dp))
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
                     .height(16.dp)
-                    .background(brush = shimmer, shape = RoundedCornerShape(4.dp))
+                    .background(brush = brush, shape = RoundedCornerShape(4.dp))
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
                     .height(14.dp)
-                    .background(brush = shimmer, shape = RoundedCornerShape(4.dp))
+                    .background(brush = brush, shape = RoundedCornerShape(4.dp))
             )
         }
     }

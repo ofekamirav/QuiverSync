@@ -8,8 +8,6 @@ import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.remote.dto.RentalPublishDetails
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.features.BaseViewModel
-import org.example.quiversync.utils.event.AppEvent
-import org.example.quiversync.utils.event.EventBus
 import org.example.quiversync.utils.extensions.platformLogger
 
 
@@ -23,15 +21,20 @@ class QuiverViewModel(
     val boardToPublish: StateFlow<Surfboard?> get() = _boardToPublish
 
     init {
-        fetchQuiver()
+        observeQuiver()
+    }
+
+    private fun observeQuiver() {
         scope.launch {
-            EventBus.events.collect { event ->
-                if (event is AppEvent.BoardAdded) {
-                    platformLogger(
-                        "QuiverViewModel",
-                        "Received BoardAdded event, refreshing quiver."
-                    )
-                    fetchQuiver() // Refresh the quiver when a board is added
+            _uiState.value = QuiverState.Loading
+            quiverUseCases.getMyQuiverUseCase().collect { result ->
+                when(result) {
+                    is Result.Success -> {
+                        _uiState.value = QuiverState.Loaded(result.data ?: emptyList())
+                    }
+                    is Result.Failure -> {
+                        _uiState.value = QuiverState.Error(result.error.toString())
+                    }
                 }
             }
         }
@@ -56,21 +59,6 @@ class QuiverViewModel(
         }
     }
 
-    private fun fetchQuiver(){
-        scope.launch {
-            val result = quiverUseCases.getMyQuiverUseCase()
-            when(result){
-                is Result.Success -> {
-                    result.data?.let { _uiState.emit(QuiverState.Loaded(it)) }
-                }
-                is Result.Failure -> {
-                    _uiState.emit(QuiverState.Error(result.error.toString()))
-                }
-            }
-
-        }
-    }
-
     private fun dismissPublishDialog() {
         scope.launch {
             _boardToPublish.emit(null)
@@ -82,8 +70,6 @@ class QuiverViewModel(
             val result = quiverUseCases.deleteSurfboardUseCase(surfboardId)
             when(result) {
                 is Result.Success -> {
-                    _uiState.emit(QuiverState.Loading)
-                    fetchQuiver() // Refresh the quiver after deletion
                 }
                 is Result.Failure -> {
                     _uiState.emit(QuiverState.Error(result.error.toString()))
@@ -104,12 +90,10 @@ class QuiverViewModel(
             when(result) {
                 is Result.Success -> {
                     dismissPublishDialog()
-                    fetchQuiver() // Refresh the quiver after publishing
                 }
                 is Result.Failure -> {
                     _uiState.emit(QuiverState.Error(result.error?.message ?: "Failed to publish surfboard for rental."))
                     dismissPublishDialog()
-                    fetchQuiver()
                 }
             }
         }
@@ -120,11 +104,9 @@ class QuiverViewModel(
             val result = quiverUseCases.unpublishForRentalUseCase(surfboardId)
             when(result) {
                 is Result.Success -> {
-                    fetchQuiver() // Refresh the quiver after unpublishing
                 }
                 is Result.Failure -> {
                     _uiState.emit(QuiverState.Error(result.error.toString()))
-                    fetchQuiver()
                 }
             }
         }

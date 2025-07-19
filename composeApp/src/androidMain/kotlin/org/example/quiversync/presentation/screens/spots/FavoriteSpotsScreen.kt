@@ -183,7 +183,7 @@ fun FavoriteSpotsContent(
                                             coroutineScope.launch {
                                                 snackbarHostState.currentSnackbarData?.dismiss()
                                                 val result = snackbarHostState.showSnackbar(
-                                                    message = "Spot deleted: ${spot.name}",
+                                                    message = "Spot Deleted",
                                                     actionLabel = "Undo",
                                                     duration = SnackbarDuration.Long
                                                 )
@@ -191,7 +191,7 @@ fun FavoriteSpotsContent(
                                                     onUndoDeleteSpot()
                                                 }
                                             }
-                                            val snackbarDurationMillis = 4000L // 4 seconds
+                                            val snackbarDurationMillis = 3000L // 3 seconds
                                             onEvent(
                                                 FavSpotsEvent.DeleteSpot(
                                                     spot,

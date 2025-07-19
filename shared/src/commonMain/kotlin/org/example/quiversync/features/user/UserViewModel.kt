@@ -9,51 +9,37 @@ import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.features.BaseViewModel
-import org.example.quiversync.utils.event.AppEvent
-import org.example.quiversync.utils.event.EventBus
 
 
 class UserViewModel(
-    private val userUseCases: UserUseCases,
-    private val sessionManager: SessionManager
+    private val userUseCases: UserUseCases
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
     val uiState: StateFlow<UserState> get() = _uiState
 
     init {
-        fetchUser()
-        listenForProfileUpdates()
+        observeUserProfile()
     }
-
-    fun fetchUser() {
+    private fun observeUserProfile() {
         scope.launch {
-            _uiState.value = UserState.Loading
-            val result = userUseCases.getUserProfileUseCase()
-            val userId = sessionManager.getUid().toString()
-            val boardsNumber: Int = userUseCases.getBoardsNumberUseCase(userId)
-            val spotsNumber: Int = userUseCases.getSpotsNumberUseCase(userId)
-            when (result) {
-                is Result.Success -> {
-                    if(boardsNumber!= null && spotsNumber != null) {
-                        result.data?.let { _uiState.emit(UserState.Loaded(it,boardsNumber, spotsNumber)) }
+            userUseCases.getUserProfileUseCase().collect { userResult ->
+                when (userResult) {
+                    is Result.Success -> {
+                        val user = userResult.data
+                        if (user != null) {
+                            val boardsNumber = userUseCases.getBoardsNumberUseCase(user.uid)
+                            val spotsNumber = userUseCases.getSpotsNumberUseCase(user.uid)
+                            _uiState.emit(UserState.Loaded(user, boardsNumber, spotsNumber))
+                        } else {
+                            _uiState.emit(UserState.Error("User profile not found."))
+                        }
+                    }
+                    is Result.Failure -> {
+                        _uiState.emit(UserState.Error(userResult.error?.message ?: "Failed to load profile."))
                     }
                 }
-                is Result.Failure -> {
-                    _uiState.emit(UserState.Error(result.error?.message ?: "Unknown error"))
-                }
             }
         }
     }
-
-    private fun listenForProfileUpdates() {
-        scope.launch {
-            EventBus.events.collect { event ->
-                if (event is AppEvent.ProfileUpdated) {
-                    fetchUser()
-                }
-            }
-        }
-    }
-
 }

@@ -8,11 +8,9 @@ import org.example.quiversync.data.local.Result
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.features.spots.FavSpotsUseCases
-import org.example.quiversync.features.spots.SpotEventBus
 
 class AddFavSpotViewModel(
-    private val favSpotUseCases: FavSpotsUseCases,
-    private val spotEventBus: SpotEventBus
+    private val favSpotUseCases: FavSpotsUseCases
 ) :BaseViewModel() {
     private val _addFavSpotState = MutableStateFlow<AddFavSpotState>(AddFavSpotState.Idle(FavoriteSpotForm()))
     val addFavSpotState : StateFlow<AddFavSpotState> get() = _addFavSpotState
@@ -60,6 +58,7 @@ class AddFavSpotViewModel(
         if (hasErrors) return
 
         scope.launch {
+            _addFavSpotState.emit(AddFavSpotState.Loading)
             val spot = FavoriteSpot(
                 spotID = "",
                 userID = "", // Assuming userID is set elsewhere or not needed for this operation
@@ -87,12 +86,10 @@ class AddFavSpotViewModel(
                     return@launch
                 }
             }
-            _addFavSpotState.emit(AddFavSpotState.Loading)
 
             val result = favSpotUseCases.addFavSpotUseCase(spot)
             if( result is Result.Success ) {
                 _addFavSpotState.value = AddFavSpotState.Loaded
-                spotEventBus.emitBoardAdded()
                 _addFavSpotState.value = AddFavSpotState.Idle(FavoriteSpotForm())
             } else {
                 _addFavSpotState.value = AddFavSpotState.Error("Failed to add favorite spot")

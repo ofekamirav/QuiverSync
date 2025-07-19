@@ -3,8 +3,8 @@ package org.example.quiversync.features.user.edit_user
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.example.quiversync.domain.usecase.UploadImageUseCase
@@ -12,9 +12,6 @@ import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.features.user.UserUseCases
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.data.local.Result
-import org.example.quiversync.features.quiver.add_board.AddBoardEvent
-import org.example.quiversync.utils.event.AppEvent
-import org.example.quiversync.utils.event.EventBus
 
 
 class EditProfileDetailsViewModel(
@@ -35,7 +32,7 @@ class EditProfileDetailsViewModel(
         scope.launch {
             _uiState.value = EditUserState.Loading
 
-            val result = userUseCases.getUserProfileUseCase()
+            val result = userUseCases.getUserProfileUseCase().firstOrNull()
 
 
             when (result) {
@@ -47,12 +44,16 @@ class EditProfileDetailsViewModel(
                                 weight = result.data?.weightKg ?: 0.0,
                                 surfLevel = result.data?.surfLevel,
                                 profilePicture = result.data?.profilePicture ?: "",
+                                phoneNumber = result.data?.phoneNumber ?: "",
                             )
                         )
                     }
                 is Result.Failure -> {
                     _uiState.value =
                         EditUserState.Error(result.error?.message ?: "Unknown error")
+                }
+                null -> {
+                    _uiState.value = EditUserState.Error("User data not found.")
                 }
             }
         }
@@ -66,6 +67,7 @@ class EditProfileDetailsViewModel(
             is EditUserDetailsEvent.onWeightChange -> updateWeight(event.weight)
             is EditUserDetailsEvent.ProfileImageSelected -> onProfileImageSelected(event.bytes)
             is EditUserDetailsEvent.profileImageIOSChanged -> updateImgUrlIOS(event.imageURL)
+            is EditUserDetailsEvent.onPhoneNumberChange -> updatePhoneNumber(event.phoneNumber)
             EditUserDetailsEvent.onSubmit -> submitChanges()
             is EditUserDetailsEvent.onSurfLevelChange -> updateSurfLevel(event.surfLevel)
 
@@ -84,6 +86,13 @@ class EditProfileDetailsViewModel(
         if (currentState is EditUserState.Editing) {
             _uiState.value =
                 currentState.copy(form = currentState.form.copy(surfLevel = surfLevel))
+        }
+    }
+
+    private fun updatePhoneNumber(phoneNumber: String) {
+        val currentState = _uiState.value
+        if (currentState is EditUserState.Editing) {
+            _uiState.value = currentState.copy(form = currentState.form.copy(phoneNumber = phoneNumber))
         }
     }
 
@@ -242,7 +251,6 @@ class EditProfileDetailsViewModel(
                             "EditProfileDetailsViewModel",
                             "Profile updated successfully"
                         )
-                        EventBus.postEvent(AppEvent.ProfileUpdated)
                         _uiState.emit(EditUserState.Success)
                         _saveLoading.value = false
                     }

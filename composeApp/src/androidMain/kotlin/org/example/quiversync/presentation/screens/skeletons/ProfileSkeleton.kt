@@ -31,6 +31,7 @@ import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.ShimmerBrush
 import org.example.quiversync.utils.WindowWidthSize
+import org.example.quiversync.utils.rememberShimmerBrush
 
 
 @Composable
@@ -170,9 +171,8 @@ private fun StatItemSkeleton(brush: Brush) {
 
 @Composable
 fun ProfileSkeleton(modifier: Modifier = Modifier) {
+    val brush = rememberShimmerBrush()
     val isDark = isSystemInDarkTheme()
-    val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
-    val brush = ShimmerBrush(baseColor = baseShimmerColor)
 
     val backgroundColor = if (isDark) OceanPalette.DarkBackground else OceanPalette.background
     val cardColor = if (isDark) OceanPalette.DarkSurface else Color.White

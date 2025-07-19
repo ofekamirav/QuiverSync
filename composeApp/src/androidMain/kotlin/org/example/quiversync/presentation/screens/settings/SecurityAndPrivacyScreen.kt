@@ -25,6 +25,7 @@ import org.example.quiversync.features.settings.SecurityAndPrivacyFormData
 import org.example.quiversync.features.settings.SecurityAndPrivacyState
 import org.example.quiversync.features.settings.SecurityAndPrivacyViewModel
 import org.example.quiversync.presentation.components.CustomTextField
+import org.example.quiversync.presentation.components.GradientButton
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.koin.androidx.compose.koinViewModel
@@ -112,15 +113,13 @@ private fun SecurityAndPrivacyContent(
                 errorMessage = form.error
             )
             Spacer(modifier = Modifier.weight(1f))
-            Button(
+            GradientButton(
+                text = "Change Password",
                 onClick = { onEvent(SecurityAndPrivacyEvent.OnChangePasswordClicked) },
                 enabled = !form.isPasswordLoading,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text("Save New Password", color = Color.White,fontWeight = FontWeight.SemiBold)
-            }
+                shape = RoundedCornerShape(12.dp)
+            )
     }
 }
 

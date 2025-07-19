@@ -1,11 +1,14 @@
 package org.example.quiversync.data.repository
 
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.toLocalDateTime
 import org.example.quiversync.data.local.Result
+import org.example.quiversync.data.local.Error
 import org.example.quiversync.data.local.dao.GeminiPredictionDao
 import org.example.quiversync.data.local.dao.UserDao
 import org.example.quiversync.data.remote.api.GeminiApi
 import org.example.quiversync.data.session.SessionManager
+import org.example.quiversync.domain.model.GeminiError
 import org.example.quiversync.domain.model.prediction.GeminiPrediction
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.User
@@ -28,13 +31,12 @@ class GeminiRepositoryImpl(
         surfboards: List<Surfboard>,
         dailyForecast: DailyForecast,
         user : User
-    ): Result<GeminiPrediction, TMDBError> {
+    ): Result<GeminiPrediction, Error> {
         return try {
-
             val uid = sessionManager.getUid()
-                ?: return Result.Failure(TMDBError("User UID is null, cannot generate match"))
-            val user = userDao.getUserProfile(uid)
-                ?: return Result.Failure(TMDBError("User not found for UID: $uid"))
+                ?: return Result.Failure(GeminiError("User UID is null, cannot generate match"))
+            val user = userDao.getUserProfile(uid).firstOrNull()
+                ?: return Result.Failure(GeminiError("User not found for UID: $uid"))
             val existingPrediction = dao.getMatch(
                 dailyForecast.date,
                 dailyForecast.latitude,
@@ -52,19 +54,19 @@ class GeminiRepositoryImpl(
                 is Result.Success -> {
                     val prediction = result.data
                     println("GeminiRepo : " +
-                            "this is the prediction generated for user ${user.uid}" +
+                            "this is the prediction generated for user ${uid}" +
                             "${result.data}")
                     if (prediction != null) {
 //                        println("GeminiRepositoryImpl : generateSingleDayMatch() - Prediction generated :  $prediction on date ${dailyForecast.date}")
-                        dao.insert(prediction, user.uid)
+                        dao.insert(prediction, uid)
                         Result.Success(prediction)
                     } else {
-                        Result.Failure(TMDBError("Prediction returned null"))
+                        Result.Failure(GeminiError("Prediction returned null"))
                     }
                 }
             }
         } catch (e: Exception) {
-            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+            Result.Failure(GeminiError(e.message ?: "Unknown error"))
         }
     }
 
@@ -80,10 +82,10 @@ class GeminiRepositoryImpl(
     override suspend fun generateAndStoreWeeklyBestMatches(
         surfboards: List<Surfboard>,
         weeklyForecast: List<DailyForecast>
-    ): Result<List<GeminiPrediction>, TMDBError> {
+    ): Result<List<GeminiPrediction>, Error> {
         return try {
             val userUid = sessionManager.getUid()
-                ?: return Result.Failure(TMDBError("User UID is null, cannot generate weekly matches"))
+                ?: return Result.Failure(GeminiError("User UID is null, cannot generate weekly matches"))
             // clear all predictions for the spot before generating new ones
             val localPredictions = dao.getPredictionsBySpot(
                 userUid,
@@ -101,8 +103,8 @@ class GeminiRepositoryImpl(
                 weeklyForecast.first().longitude,
                 userUid
             )
-            val user = userDao.getUserProfile(userUid)
-                ?: return Result.Failure(TMDBError("User not found for UID: $userUid"))
+            val user = userDao.getUserProfile(userUid).firstOrNull()
+                ?: return Result.Failure(GeminiError("User not found for UID: $userUid"))
             val predictions = mutableListOf<GeminiPrediction>()
             when (val result = api.predictionForWeek( surfboards, weeklyForecast, user)) {
                 is Result.Failure -> return Result.Failure(result.error)
@@ -116,7 +118,7 @@ class GeminiRepositoryImpl(
             }
             Result.Success(predictions)
         } catch (e: Exception) {
-            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+            Result.Failure(GeminiError(e.message ?: "Unknown error"))
         }
     }
 
@@ -128,7 +130,7 @@ class GeminiRepositoryImpl(
     override suspend fun getBestBoardMatchForWeek(
         latitude: Double,
         longitude: Double
-    ): Result<List<GeminiPrediction>, TMDBError> {
+    ): Result<List<GeminiPrediction>, Error> {
         // Optional: You can implement logic to query matches by spot for the week
         TODO("Implement weekly fetch using DAO if needed")
     }
@@ -139,18 +141,18 @@ class GeminiRepositoryImpl(
     override suspend fun deleteAllPredictionsBySpot(
         latitude: Double,
         longitude: Double
-    ): Result<Unit, TMDBError> {
+    ): Result<Unit, Error> {
         return try {
             // Clear all predictions for the specified latitude and longitude
             val userUid = sessionManager.getUid()
             if (userUid != null) {
                 dao.deleteBySpotAndUser(latitude, latitude, userUid)
             }else{
-                return Result.Failure(TMDBError("User UID is null, cannot clear predictions"))
+                return Result.Failure(GeminiError("User UID is null, cannot clear predictions"))
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+            Result.Failure(GeminiError(e.message ?: "Unknown error"))
         }
     }
 
@@ -158,7 +160,7 @@ class GeminiRepositoryImpl(
         user: User,
         surfboards: List<Surfboard>,
         dailyForecasts: List<DailyForecast>
-    ): Result<List<GeminiPrediction>, TMDBError> {
+    ): Result<List<GeminiPrediction>, Error> {
         return try {
             println("🌀 Starting prediction generation for all spots (User: ${user.uid})")
             println("📆 Received ${dailyForecasts.size} forecasts for today:\n" +
@@ -170,7 +172,7 @@ class GeminiRepositoryImpl(
             val predictions = mutableListOf<GeminiPrediction>()
             val forecastsForProcess = mutableListOf<DailyForecast>()
             val userUid = sessionManager.getUid()
-                ?: return Result.Failure(TMDBError("User UID is null, cannot generate predictions"))
+                ?: return Result.Failure(GeminiError("User UID is null, cannot generate predictions"))
 
             dailyForecasts.forEach { forecast ->
                 val existingPrediction = dao.getMatch(
@@ -221,7 +223,7 @@ class GeminiRepositoryImpl(
 
         } catch (e: Exception) {
             println("🔥 Exception during prediction generation: ${e.message}")
-            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+            Result.Failure(GeminiError(e.message ?: "Unknown error"))
         }
     }
 
@@ -229,7 +231,7 @@ class GeminiRepositoryImpl(
     /**
      * Retrieves all predictions stored for the current date.
      */
-    override suspend fun getPredictionsForToday(): Result<List<GeminiPrediction>, TMDBError> {
+    override suspend fun getPredictionsForToday(): Result<List<GeminiPrediction>, Error> {
         return try {
             val userUid = sessionManager.getUid()
             val currentDate = kotlinx.datetime.Clock.System.now()
@@ -237,13 +239,13 @@ class GeminiRepositoryImpl(
                 .date
                 .toString()
             if( userUid == null) {
-                return Result.Failure(TMDBError("User UID is null, cannot fetch predictions"))
+                return Result.Failure(GeminiError("User UID is null, cannot fetch predictions"))
             }
             val predictions = dao.getPredictionsForToday(currentDate,userUid)
             if (predictions.isNotEmpty()) Result.Success(predictions)
-            else Result.Failure(TMDBError("No predictions found for today"))
+            else Result.Failure(GeminiError("No predictions found for today"))
         } catch (e: Exception) {
-            Result.Failure(TMDBError(e.message ?: "Unknown error"))
+            Result.Failure(GeminiError(e.message ?: "Unknown error"))
         }
     }
 }

@@ -60,7 +60,7 @@ import java.text.DecimalFormat
 fun ExpandableSpotCard(
     spot: FavoriteSpot,
     score: String,
-    surfboard: Surfboard,
+    surfboard: Surfboard?,
     forecast: DailyForecast,
     onWeeklyForecastClick: () -> Unit,
     isImperial: Boolean = true,
@@ -127,30 +127,48 @@ fun ExpandableSpotCard(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            AsyncImage(
-                                model = surfboard.imageRes,
-                                placeholder = painterResource(id = R.drawable.hs_shortboard),
-                                contentDescription = "Board",
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .padding(end = 8.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                            )
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                verticalArrangement = Arrangement.Center
-                            ) {
+                        if (surfboard!=null){
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                AsyncImage(
+                                    model = surfboard.imageRes,
+                                    placeholder = painterResource(id = R.drawable.hs_shortboard),
+                                    contentDescription = "Board",
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .padding(end = 8.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                )
+                                Column(
+                                    horizontalAlignment = Alignment.Start,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = surfboard.model,
+                                        fontWeight = FontWeight.Bold,
+                                        color = OceanPalette.DeepBlue
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    MatchBadge(score.toInt())
+                                }
+                            }
+                        } else{
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Image(
+                                    painter = painterResource(id = R.drawable.hs_shortboard),
+                                    contentDescription = "No Board",
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+
+                                )
                                 Text(
-                                    text = surfboard.model,
-                                    fontWeight = FontWeight.Bold,
+                                    text = "No Recommended Board is available",
+                                    style = MaterialTheme.typography.bodyMedium,
                                     color = OceanPalette.DeepBlue
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                MatchBadge(score.toInt())
                             }
                         }
-
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_waves),

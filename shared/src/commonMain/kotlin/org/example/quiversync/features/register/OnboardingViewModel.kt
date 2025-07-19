@@ -4,9 +4,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import org.example.quiversync.domain.model.OnboardingProfileDetails
 import org.example.quiversync.domain.usecase.UploadImageUseCase
 import org.example.quiversync.features.BaseViewModel
@@ -30,7 +32,7 @@ class OnboardingViewModel(
 
     private fun loadInitialUserDetails() {
         scope.launch {
-            val userProfile = userUseCases.getUserProfileUseCase()
+            val userProfile = userUseCases.getUserProfileUseCase().firstOrNull()
             when (userProfile) {
                 is Result.Success ->{
                     val profile = userProfile.data
@@ -42,13 +44,18 @@ class OnboardingViewModel(
                                 weightKg = profile?.weightKg?.toString() ?: "",
                                 selectedSurfLevel = profile?.surfLevel?.toSurfLevel(),
                                 profileImageUrl = profile?.profilePicture,
+                                phoneNumber = profile?.phoneNumber ?: "",
+                                agreedToTerms = profile?.agreedToTerms ?: false,
+                                agreementTimestamp = profile?.agreementTimestamp,
                                 isUploadingImage = false,
                                 dateOfBirthError = null,
                                 heightError = null,
                                 weightError = null,
                                 surfLevelError = null,
                                 profileImageError = null,
-                                imageUploadError = null
+                                imageUploadError = null,
+                                phoneNumberError = null,
+                                termsError = null
                             )
                         )
                     )
@@ -57,6 +64,10 @@ class OnboardingViewModel(
                     platformLogger("OnboardingViewModel", "Failed to load user profile: ${userProfile.error?.message}")
                     _onboardingState.emit(OnboardingState.Error(userProfile.error?.message ?: "Unknown error"))
                 }
+                else ->{
+                    platformLogger("OnboardingViewModel", "No user profile found, initializing empty form")
+                    _onboardingState.emit(OnboardingState.Error( "Unknown error"))
+                }
             }
         }
     }
@@ -64,12 +75,18 @@ class OnboardingViewModel(
 
     fun onEvent(event: OnboardingEvent) {
         when (event) {
+            is OnboardingEvent.PhoneNumberChanged -> updateForm { it.copy(phoneNumber = event.value) }
             is OnboardingEvent.DateOfBirthChanged -> updateForm { it.copy(dateOfBirth = event.value) }
             is OnboardingEvent.HeightChanged -> updateForm { it.copy(heightCm = event.value) }
             is OnboardingEvent.WeightChanged -> updateForm { it.copy(weightKg = event.value) }
             is OnboardingEvent.SurfLevelChanged -> updateForm { it.copy(selectedSurfLevel = event.level) }
             is OnboardingEvent.ProfileImageSelected -> onProfileImageSelected(event.bytes)
             is OnboardingEvent.ProfileImageIOSChanged -> updateForm { it.copy(profileImageUrl = event.imageURL , uploadFromIOS = false) }
+            is OnboardingEvent.OnAgreementChange -> updateForm { it.copy(
+                agreedToTerms = event.isAgreed,
+                agreementTimestamp = if (event.isAgreed) Clock.System.now().toString() else null,
+                termsError = null
+            ) }
             OnboardingEvent.ContinueClicked -> validateAndComplete()
         }
     }
@@ -171,7 +188,6 @@ class OnboardingViewModel(
 
                         platformLogger("OnboardingViewModel", "✅ Final profileImageUrl set: $finalUrl")
                     }
-
                     is Result.Failure -> {
                         updateForm {
                             it.copy(
@@ -204,10 +220,13 @@ class OnboardingViewModel(
     fun resetStateToIdle() {
         _onboardingState.value = OnboardingState.Idle(
             data = OnboardingFormData(
+                phoneNumber = "",
                 dateOfBirth = "",
                 heightCm = "",
                 weightKg = "",
                 selectedSurfLevel = null,
+                agreedToTerms = false,
+                agreementTimestamp = null,
                 profileImageUrl = null,
                 isUploadingImage = false,
                 dateOfBirthError = null,
@@ -215,7 +234,9 @@ class OnboardingViewModel(
                 weightError = null,
                 surfLevelError = null,
                 profileImageError = null,
-                imageUploadError = null
+                imageUploadError = null,
+                phoneNumberError = null,
+                termsError = null
             )
         )
     }
@@ -226,6 +247,18 @@ class OnboardingViewModel(
         val formData = currentState.data
         val height = formData.heightCm.toDoubleOrNull()
         val weight = formData.weightKg.toDoubleOrNull()
+
+        val phoneError = when {
+            formData.phoneNumber.isBlank() -> "Phone number is required"
+            formData.phoneNumber.length < 10 -> "Enter a valid phone number"
+            else -> null
+        }
+
+        val agreementError = when {
+            !formData.agreedToTerms -> "You must agree to the terms and conditions"
+            formData.agreementTimestamp == null -> "Agreement timestamp is missing"
+            else -> null
+        }
 
         val heightError = when {
                 formData.heightCm.isBlank() -> "Height is required"
@@ -244,15 +277,17 @@ class OnboardingViewModel(
         val surfLevelError = if (formData.selectedSurfLevel == null) "Select your surf level" else null
         val imageError = if (formData.profileImageUrl == null) "Please upload a profile picture" else null
 
-        val hasErrors = listOf(dateError, heightError, weightError, surfLevelError, imageError).any { it != null }
+        val hasErrors = listOf(dateError, heightError, weightError, surfLevelError, imageError, phoneError, agreementError).any { it != null }
 
         updateForm {
             it.copy(
+                phoneNumberError = phoneError,
                 dateOfBirthError = dateError,
                 heightError = heightError,
                 weightError = weightError,
                 surfLevelError = surfLevelError,
-                profileImageError = imageError
+                profileImageError = imageError,
+                termsError = agreementError
             )
         }
 
@@ -262,11 +297,14 @@ class OnboardingViewModel(
             _onboardingState.value = OnboardingState.Loading
             val details = formData.selectedSurfLevel?.let {
                 OnboardingProfileDetails(
+                    phoneNumber = formData.phoneNumber,
                     dateOfBirth = formData.dateOfBirth,
                     heightCm = height ?: 0.0,
                     weightKg = weight ?: 0.0,
                     surfLevel = it.label,
-                    profilePicture = formData.profileImageUrl
+                    profilePicture = formData.profileImageUrl,
+                    agreedToTerms = formData.agreedToTerms,
+                    agreementTimestamp = formData.agreementTimestamp ?: Clock.System.now().toString()
                 )
             }
 

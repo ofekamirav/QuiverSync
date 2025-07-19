@@ -2,6 +2,10 @@ package org.example.quiversync.data.remote.datasource.favSpot
 
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.where
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.remote.dto.FavSpotDto
 import org.example.quiversync.data.repository.TMDBError
@@ -11,6 +15,33 @@ import org.example.quiversync.utils.extensions.platformLogger
 data class FavSpotRemoteSourceService(
     private val firebase: FirebaseFirestore,
 ) : FavSpotRemoteSource {
+
+    override fun observeFavSpots(userId: String): Flow<List<FavoriteSpot>> {
+        val query = firebase
+            .collection("favSpot")
+            .where { "userID" equalTo userId }
+
+        return query.snapshots()
+            .map { snapshot ->
+                snapshot.documents.mapNotNull { doc ->
+                    try {
+                        val dto = doc.data<FavSpotDto>()
+                        FavoriteSpot(
+                            spotID = doc.id,
+                            userID = dto.userID,
+                            name = dto.name,
+                            spotLatitude = dto.spotLatitude,
+                            spotLongitude = dto.spotLongitude
+                        )
+                    } catch (e: Exception) {
+                        platformLogger("FirestoreFavSpotSource", "Failed to parse spot ID: ${doc.id}. Error: ${e.message}")
+                        null
+                    }
+                }
+            }
+    }
+
+
     override suspend fun getFavSpotsRemote(
         userId: String
     ): Result<List<FavoriteSpot>, TMDBError> {

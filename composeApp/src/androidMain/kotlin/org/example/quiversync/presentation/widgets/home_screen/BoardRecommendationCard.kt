@@ -36,6 +36,11 @@ import org.example.quiversync.presentation.theme.OceanPalette
 fun BoardRecommendationCard(surfboard: Surfboard, score: String) {
     val isDark = isSystemInDarkTheme()
     val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.White
+    val scoreDescription = when {
+        (score.toIntOrNull() ?: 0) >= 80 -> "Perfect Match"
+        (score.toIntOrNull() ?: 0) >= 50 -> "Good Match"
+        else -> "Consider Renting"
+    }
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -54,10 +59,10 @@ fun BoardRecommendationCard(surfboard: Surfboard, score: String) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(surfboard.type.name, fontWeight = FontWeight.Bold, color = OceanPalette.DeepBlue)
-                    Text("${surfboard.height} \" x ${surfboard.width} \" x ${surfboard.volume}L\"", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                    Text("${surfboard.height} x ${surfboard.width} x ${surfboard.volume}L", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Chip("Perfect Match", OceanPalette.SkyBlue.copy(alpha = 0.1f))
+                        Chip(scoreDescription, OceanPalette.SkyBlue.copy(alpha = 0.1f))
                         Chip("${score}% Confidence", Color(0xFFDFFFEF))
                     }
                 }

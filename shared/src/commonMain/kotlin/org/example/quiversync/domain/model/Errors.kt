@@ -24,3 +24,13 @@ data class UserError(
 data class CloudinaryError(
     override val message: String
 ): Error
+
+@Serializable
+data class GeminiError(
+    override val message: String
+): Error
+
+@Serializable
+data class SpotsError(
+    override val message: String
+): Error

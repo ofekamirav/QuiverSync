@@ -1,5 +1,6 @@
 package org.example.quiversync.domain.usecase.gemini
 
+import org.example.quiversync.data.local.Error
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.repository.TMDBError
 import org.example.quiversync.domain.model.Surfboard
@@ -11,7 +12,7 @@ import org.example.quiversync.domain.repository.GeminiRepository
 data class GenerateSingleDayMatchUseCase(
     private val repository: GeminiRepository,
 ) {
-    suspend operator fun invoke(surfboards: List<Surfboard>, dailyForecast: DailyForecast , user : User): Result<GeminiPrediction,TMDBError> {
+    suspend operator fun invoke(surfboards: List<Surfboard>, dailyForecast: DailyForecast , user : User): Result<GeminiPrediction, Error> {
         return repository.generateSingleDayMatch(
             surfboards = surfboards,
             dailyForecast = dailyForecast,
