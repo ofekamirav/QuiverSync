@@ -139,7 +139,7 @@ val commonModule= module {
 
 
    //-----------------------------------------------------Repositories---------------------------------------------
-   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get() , get(), get(), get()) }
+   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get() , get(), get(), get(), get()) }
    single<FavSpotRepository>{FavSpotRepositoryImpl(get(), get(), get(), get())}
    single<GeminiRepository>{GeminiRepositoryImpl(get(), get(), get() , get())}
    single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get() , get()) }
