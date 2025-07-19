@@ -61,13 +61,13 @@ fun AddSpotScreen(
     val cameraState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(defaultLocation, 10f)
     }
-
-    LaunchedEffect(formState) {
-        if (formState is AddFavSpotState.Loaded) {
-            Toast.makeText(context, "New spot added to favorites", Toast.LENGTH_SHORT).show()
-            onSpotAdded()
-        }
+    val contentModifier = if (formState is AddFavSpotState.Loading) {
+        modifier.blur(radius = 8.dp)
+    } else {
+        modifier
     }
+
+
 
     Box(modifier = modifier.fillMaxSize()) {
         when (formState) {
@@ -80,10 +80,14 @@ fun AddSpotScreen(
                         .padding(16.dp)
                 )
             }
-            is AddFavSpotState.Idle, is AddFavSpotState.Loading, is AddFavSpotState.Loaded -> {
+            is AddFavSpotState.Loaded -> {
+                Toast.makeText(context, "New spot added to favorites", Toast.LENGTH_SHORT).show()
+                onSpotAdded()
+            }
+            is AddFavSpotState.Idle, is AddFavSpotState.Loading-> {
                 val form = (formState as? AddFavSpotState.Idle)?.data
                 Column(
-                    Modifier
+                    contentModifier
                         .fillMaxSize()
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -199,8 +203,7 @@ fun AddSpotScreen(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .blur(16.dp)
-                    .background(Color.Black.copy(alpha = 0.3f)),
+                    .background(Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
                 LoadingAnimation(

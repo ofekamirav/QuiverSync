@@ -2,6 +2,7 @@ package org.example.quiversync.features.home
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.data.local.Result
@@ -11,6 +12,7 @@ import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.prediction.GeminiPrediction
+import org.example.quiversync.features.home.HomeState.*
 import org.example.quiversync.utils.extensions.platformLogger
 
 class HomeViewModel(
@@ -46,7 +48,7 @@ class HomeViewModel(
             platformLogger("HomeViewModel", "Fetching weekly forecast and best board match")
             val forecastResult = homeUseCases.getWeeklyForecastByLocationUseCase()
             platformLogger("HomeViewModel", "forecast for the week by your location: $forecastResult")
-            val userResult = homeUseCases.getUser()
+            val userResult = homeUseCases.getUser().firstOrNull()
             val forecast: List<DailyForecast>
             val user : User
             when (userResult){
@@ -54,13 +56,18 @@ class HomeViewModel(
                     if (userResult.data != null){
                         user = userResult.data
                     }else{
-                        _uiState.value = HomeState.Error("User not found")
+                        _uiState.value = Error("User not found")
                         return@launch
                     }
                 }
 
-                is Result.Failure<*> -> {
-                    _uiState.value = HomeState.Error("User not found")
+                is Result.Failure -> {
+                    _uiState.value = Error("User not found")
+                    return@launch
+                }
+
+                null -> {
+                    _uiState.value = Error("User not found")
                     return@launch
                 }
             }
@@ -79,7 +86,7 @@ class HomeViewModel(
                     return@launch
                 }
             }
-            val quiverResult = homeUseCases.getQuiverUseCase()
+            val quiverResult = homeUseCases.getQuiverUseCase().firstOrNull()
             platformLogger("HomeViewModel", "quiver result: $quiverResult")
             var quiver  = emptyList<Surfboard>()
             when(quiverResult){
@@ -90,6 +97,9 @@ class HomeViewModel(
                     if (quiverResult.data != null ){
                         quiver = quiverResult.data
                     }
+                }
+                else -> {
+                    platformLogger("HomeViewModel", "Quiver result is null or empty")
                 }
             }
             if (quiver.isEmpty()) {

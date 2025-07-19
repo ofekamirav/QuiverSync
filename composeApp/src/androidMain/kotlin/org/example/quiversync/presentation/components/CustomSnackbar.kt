@@ -23,6 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.example.quiversync.presentation.theme.QuiverSyncTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun CustomSnackbar(
@@ -34,7 +36,7 @@ fun CustomSnackbar(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(8.dp),
         shape = RoundedCornerShape(12.dp),
         tonalElevation = 6.dp,
         color = MaterialTheme.colorScheme.surface
@@ -60,8 +62,7 @@ fun CustomSnackbar(
             LinearProgressIndicator(
                 progress = progress,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .fillMaxWidth(),
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
             )
@@ -76,7 +77,7 @@ fun SnackbarWithCountdown(data: SnackbarData) {
 
     val durationMillis = when (data.visuals.duration) {
         SnackbarDuration.Short      -> 2_000
-        SnackbarDuration.Long       -> 4_000
+        SnackbarDuration.Long       -> 3_000
         SnackbarDuration.Indefinite -> Int.MAX_VALUE
     }
 
@@ -99,4 +100,17 @@ fun SnackbarWithCountdown(data: SnackbarData) {
         onAction    = { data.performAction() },
         progress    = progress.value
     )
+}
+
+@Preview
+@Composable
+fun CustomSnackbarPreview() {
+    QuiverSyncTheme {
+        CustomSnackbar(
+            message     = "This is a custom snackbar message.",
+            actionLabel = "Action",
+            onAction    = { /* Handle action */ },
+            progress    = 0.5f
+        )
+    }
 }

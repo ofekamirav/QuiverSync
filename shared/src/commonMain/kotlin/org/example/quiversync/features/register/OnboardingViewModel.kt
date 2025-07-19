@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,7 +32,7 @@ class OnboardingViewModel(
 
     private fun loadInitialUserDetails() {
         scope.launch {
-            val userProfile = userUseCases.getUserProfileUseCase()
+            val userProfile = userUseCases.getUserProfileUseCase().firstOrNull()
             when (userProfile) {
                 is Result.Success ->{
                     val profile = userProfile.data
@@ -62,6 +63,10 @@ class OnboardingViewModel(
                 is Result.Failure -> {
                     platformLogger("OnboardingViewModel", "Failed to load user profile: ${userProfile.error?.message}")
                     _onboardingState.emit(OnboardingState.Error(userProfile.error?.message ?: "Unknown error"))
+                }
+                else ->{
+                    platformLogger("OnboardingViewModel", "No user profile found, initializing empty form")
+                    _onboardingState.emit(OnboardingState.Error( "Unknown error"))
                 }
             }
         }

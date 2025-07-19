@@ -5,20 +5,20 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 
 @Composable
-fun ShimmerBrush(baseColor: Color, showShimmer: Boolean = true, targetValue: Float = 1000f): Brush {
-    return if (showShimmer) {
-        val shimmerColors = listOf(
-            baseColor.copy(alpha = 0.3f),
-            baseColor.copy(alpha = 0.1f),
-            baseColor.copy(alpha = 0.3f),
-        )
-
+fun ShimmerBrush(
+    shimmerColors: List<Color>,
+    showShimmer: Boolean = true,
+    targetValue: Float = 1000f
+): Brush {
+    return if (showShimmer && shimmerColors.isNotEmpty()) {
         val transition = rememberInfiniteTransition(label = "ShimmerTransition")
         val translateAnimation = transition.animateFloat(
             initialValue = 0f,
@@ -36,8 +36,16 @@ fun ShimmerBrush(baseColor: Color, showShimmer: Boolean = true, targetValue: Flo
             end = Offset(x = translateAnimation.value, y = translateAnimation.value)
         )
     } else {
-        Brush.linearGradient(
-            colors = listOf(Color.Transparent, Color.Transparent)
-        )
+        SolidColor(Color.Transparent)
     }
+}
+
+@Composable
+fun rememberShimmerBrush(): Brush {
+    val shimmerColors = listOf(
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+    )
+    return ShimmerBrush(shimmerColors = shimmerColors)
 }

@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -53,19 +54,24 @@ fun RegisterScreen(
 ) {
     val state by viewModel.registerState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val contentModifier = if(state is RegisterState.Loading) {
+        Modifier.fillMaxSize().blur(8.dp)
+    } else {
+        Modifier.fillMaxSize()
+    }
 
     when (val currentState = state) {
         is RegisterState.Idle -> {
             RegisterScreenContent(
+                modifier = contentModifier,
                 currentState = currentState,
                 onEvent = viewModel::onEvent,
                 onLoginClick = onLoginClick
             )
         }
         is RegisterState.Loading -> {
-            RegisterScreenContent(currentState = RegisterState.Idle(), onEvent = {}, onLoginClick = {}, isLoading = true)
             Box(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+                modifier = Modifier.fillMaxSize().background(Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
                 LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
@@ -74,7 +80,6 @@ fun RegisterScreen(
         is RegisterState.Loaded -> {
             LaunchedEffect(Unit) {
                 onSignUpSuccess()
-                Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
                 viewModel.resetState()
             }
         }
@@ -91,6 +96,7 @@ fun RegisterScreen(
 
 @Composable
 fun RegisterScreenContent(
+    modifier: Modifier = Modifier,
     currentState: RegisterState.Idle,
     onEvent: (RegisterEvent) -> Unit,
     onLoginClick: () -> Unit,
@@ -107,7 +113,7 @@ fun RegisterScreenContent(
     val state = currentState.data
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(backgroundBrush),
         contentAlignment = Alignment.Center

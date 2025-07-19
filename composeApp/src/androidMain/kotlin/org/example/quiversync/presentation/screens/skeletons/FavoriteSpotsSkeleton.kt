@@ -37,7 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
-//import org.example.quiversync.presentation.widgets.spots_screen.ExpandableSpotCard
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.ShimmerBrush
 import org.example.quiversync.utils.WindowWidthSize
@@ -45,13 +44,13 @@ import org.example.quiversync.utils.WindowWidthSize
 @Composable
 fun ExpandableSpotCardSkeleton(brush: Brush) {
     val isDark = isSystemInDarkTheme()
-    val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.LightGray
+    val cardColor = if(isDark) MaterialTheme.colorScheme.surface else Color.White.copy(alpha = 0.8f)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
@@ -92,8 +91,12 @@ fun ExpandableSpotCardSkeleton(brush: Brush) {
 @Composable
 fun FavoriteSpotsScreenSkeleton(modifier: Modifier = Modifier) {
     val isDark = isSystemInDarkTheme()
-    val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
-    val brush = ShimmerBrush(baseColor = baseShimmerColor)
+    val shimmerColors = listOf(
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+    )
+    val brush = ShimmerBrush(shimmerColors  = shimmerColors)
     val windowInfo = LocalWindowInfo.current
 
     when (windowInfo.widthSize) {
@@ -132,6 +135,14 @@ fun FavoriteSpotsScreenSkeleton(modifier: Modifier = Modifier) {
 @Composable
 fun PreviewFavoriteSpotsScreenSkeleton() {
     QuiverSyncTheme(darkTheme = true) {
+        FavoriteSpotsScreenSkeleton()
+    }
+}
+
+@Preview(showBackground = true, name = "Favorite Spots Skeleton - Light", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_NO)
+@Composable
+fun PreviewFavoriteSpotsScreenSkeletonLight() {
+    QuiverSyncTheme(darkTheme = false) {
         FavoriteSpotsScreenSkeleton()
     }
 }

@@ -2,6 +2,15 @@ package org.example.quiversync.data.repository
 
 import androidx.compose.ui.geometry.Rect
 import dev.gitlive.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -15,7 +24,6 @@ import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.SurfboardError
 import org.example.quiversync.domain.repository.QuiverRepository
 import org.example.quiversync.utils.extensions.platformLogger
-import org.example.quiversync.utils.extensions.toDomain
 import org.example.quiversync.utils.extensions.toDto
 
 
@@ -23,48 +31,61 @@ import org.example.quiversync.utils.extensions.toDto
 class QuiverRepositoryImpl(
     private val remoteDataSource: QuiverRemoteDataSource,
     private val localDataSource: QuiverDao,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val applicationScope: CoroutineScope
 ): QuiverRepository {
-    override suspend fun getMyQuiver(): Result<List<Surfboard>, Error> {
-        return try {
-            val userId = sessionManager.getUid() ?: return Result.Failure(SurfboardError("User not logged in"))
+    private var quiverSyncJob: Job? = null
 
-            val localResult = localDataSource.getMyQuiver(userId)
-            if (localResult.isEmpty()) {
-                platformLogger("QuiverRepositoryImpl", "Local quiver is empty, fetching from remote source")
-            } else {
-                val localBoardsDomain = localResult.map { it.toDomain() }
-                return Result.Success(localBoardsDomain)
-            }
+    override suspend fun getMyQuiver(): Flow<Result<List<Surfboard>, Error>> {
+        return flow {
+            val userId = sessionManager.getUid()
+                ?: return@flow emit(Result.Failure(SurfboardError("User not logged in")))
 
-            val remoteResult = remoteDataSource.getSurfboardsRemote(userId)
+            startQuiverSync()
 
-            return when (remoteResult) {
-                is Result.Success -> {
-                    val remoteBoards = remoteResult.data.orEmpty()
-                    platformLogger("QuiverRepositoryImpl", "Fetched ${remoteBoards.size} surfboards from remote source")
-                remoteBoards.forEach { board ->
-                        try {
-                            localDataSource.addSurfboard(board)
-                        } catch (e: Exception) {
-                            platformLogger("QuiverRepositoryImpl", "Warning: Failed to save surfboard to local DB: ${e.message}")
-                        }
+            emitAll(
+                localDataSource.getMyQuiver(userId)
+                    .map<List<Surfboard>, Result<List<Surfboard>, Error>> { boards ->
+                        Result.Success(boards)
                     }
-                    Result.Success(remoteBoards)
-                }
-                is Result.Failure -> {
-                    platformLogger("QuiverRepositoryImpl", "Failed to fetch from remote: ${remoteResult.error?.message}")
-                    Result.Failure(remoteResult.error ?: SurfboardError("Remote fetch failed with no specific error."))
-                }
-            }
-        } catch (e: FirebaseFirestoreException) {
-            platformLogger("QuiverRepositoryImpl", "Firebase Firestore exception in getMyQuiver: ${e.message}")
-            Result.Failure(SurfboardError("Firebase error: ${e.message}"))
-        } catch (e: Exception) {
-            platformLogger("QuiverRepositoryImpl", "Unknown exception in getMyQuiver: ${e.message}")
-            Result.Failure(SurfboardError(e.message ?: "An unknown error occurred while fetching the quiver"))
+                    .catch { e ->
+                        emit(Result.Failure(SurfboardError("DB Error: ${e.message}")))
+                    }
+            )
         }
     }
+
+    private suspend fun startQuiverSync() {
+        if (quiverSyncJob?.isActive == true) return
+
+        val userId = sessionManager.getUid() ?: return
+        quiverSyncJob = applicationScope.launch {
+            remoteDataSource.observeQuiver(userId)
+                .catch { e -> platformLogger("QuiverRepo", "Quiver sync error: ${e.message}") }
+                .collect { remoteBoards ->
+                    syncRemoteToLocal(userId, remoteBoards)
+                }
+        }
+    }
+
+    private suspend fun syncRemoteToLocal(userId: String, remoteBoards: List<Surfboard>) {
+        val localBoards = localDataSource.getMyQuiver(userId).firstOrNull().orEmpty()
+        val remoteBoardIds = remoteBoards.map { it.id }.toSet()
+        val localBoardIds = localBoards.map { it.id }.toSet()
+
+        localDataSource.transaction {
+            val boardsToDelete = localBoardIds - remoteBoardIds
+            boardsToDelete.forEach { localDataSource.deleteSurfboard(it) }
+            remoteBoards.forEach { localDataSource.addSurfboard(it) }
+        }
+        platformLogger("QuiverRepo", "Quiver sync complete.")
+    }
+
+    override suspend fun stopQuiverSync() {
+        quiverSyncJob?.cancel()
+        quiverSyncJob = null
+    }
+
 
 
     override suspend fun addSurfboard(surfboard: Surfboard): Result<Boolean, Error> {
@@ -77,7 +98,6 @@ class QuiverRepositoryImpl(
             when (result) {
                 is Result.Success -> {
                     platformLogger("QuiverRepositoryImpl", "Surfboard added remotely: ${surfboard.model} by ${surfboard.company}")
-                    result.data?.let { localDataSource.addSurfboard(it) }
                     return Result.Success(true)
                 }
                 is Result.Failure -> {
@@ -95,7 +115,6 @@ class QuiverRepositoryImpl(
             val result = remoteDataSource.deleteSurfboardRemote(surfboardId)
             when (result) {
                 is Result.Success -> {
-                    localDataSource.deleteSurfboard(surfboardId)
                     platformLogger("QuiverRepositoryImpl", "Surfboard deleted successfully: $surfboardId")
                     Result.Success(true)
                 }
@@ -125,7 +144,6 @@ class QuiverRepositoryImpl(
                         "QuiverRepositoryImpl",
                         "Surfboard published for rental remotely: $surfboardId"
                     )
-                    localDataSource.publishForRental(surfboardId, rentalsDetails)
                     Result.Success(true)
 
                 }
@@ -140,7 +158,6 @@ class QuiverRepositoryImpl(
             val result = remoteDataSource.unpublishForRentalRemote(surfboardId)
             when (result) {
                 is Result.Success -> {
-                    localDataSource.unpublishForRental(surfboardId)
                     platformLogger("QuiverRepositoryImpl", "Surfboard unpublished from rental successfully: $surfboardId")
                     Result.Success(true)
                 }
@@ -159,7 +176,6 @@ class QuiverRepositoryImpl(
             val result = remoteDataSource.setSurfboardAsRentalAvailableRemote(surfboardId)
             when (result) {
                 is Result.Success -> {
-                    localDataSource.setSurfboardAsAvailableForRental(surfboardId)
                     platformLogger("QuiverRepositoryImpl", "Surfboard set as available for rental successfully: $surfboardId")
                     Result.Success(true)
                 }
@@ -178,7 +194,6 @@ class QuiverRepositoryImpl(
             val result = remoteDataSource.setSurfboardAsRentalUnavailableRemote(surfboardId)
             when (result) {
                 is Result.Success -> {
-                    localDataSource.setSurfboardAsUnavailableForRental(surfboardId)
                     platformLogger("QuiverRepositoryImpl", "Surfboard set as unavailable for rental successfully: $surfboardId")
                     Result.Success(true)
                 }

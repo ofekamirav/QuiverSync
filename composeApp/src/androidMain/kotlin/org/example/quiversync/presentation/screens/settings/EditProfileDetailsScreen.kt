@@ -5,6 +5,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -33,13 +34,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.delay
 import org.example.quiversync.R
 import org.example.quiversync.features.register.OnboardingEvent
 import org.example.quiversync.features.user.edit_user.EditProfileDetailsViewModel
@@ -65,6 +69,12 @@ fun EditProfileDetailsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val saveLoading by viewModel.saveLoading.collectAsState()
+    val context = LocalContext.current
+    val contentModifier = if (saveLoading) {
+        modifier.fillMaxSize().blur(8.dp)
+    } else {
+        modifier
+    }
 
     when (uiState) {
         is EditUserState.Loading -> {
@@ -72,14 +82,14 @@ fun EditProfileDetailsScreen(
         }
         is EditUserState.Editing -> {
             EditProfileDetailsScreenContent(
-                modifier = modifier,
+                modifier = contentModifier,
                 data = (uiState as EditUserState.Editing).form,
                 onSave = onSave,
                 onEvent = viewModel::onEvent,
             )
             if (saveLoading) {
                 Box(
-                    modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+                    modifier = Modifier.fillMaxSize().background(Color.Transparent),
                     contentAlignment = Alignment.Center
                 ) {
                     LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
@@ -88,6 +98,7 @@ fun EditProfileDetailsScreen(
         }
         is EditUserState.Success -> {
             onSave()
+            Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show()
         }
         is EditUserState.Error -> {
             Box(
@@ -139,7 +150,7 @@ fun EditProfileDetailsScreenContent(
                 ImageDecoder.decodeBitmap(source)
             }
             onEvent(EditUserDetailsEvent.ProfileImageSelected(bitmap.toCompressedByteArray()))
-            Log.d("OnboardingScreen", "Image URI: $uri")
+            Log.d("EditProfileScreen", "Image URI: $uri")
         }
     }
 
@@ -148,7 +159,7 @@ fun EditProfileDetailsScreenContent(
     ) { bitmap ->
         bitmap?.let {
             onEvent(EditUserDetailsEvent.ProfileImageSelected(bitmap.toCompressedByteArray()))
-            Log.d("OnboardingScreen", "Image URI: $it")
+            Log.d("EditProfileScreen", "Image URI: $it")
         }
     }
 
@@ -171,21 +182,32 @@ fun EditProfileDetailsScreenContent(
             value = data.name ?: "",
             onValueChange = { onEvent(EditUserDetailsEvent.onNameChange(it)) },
             label = "Name",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            imeAction = ImeAction.Next
+        )
+        CustomTextField(
+            value = data.phoneNumber ?: "",
+            onValueChange = { onEvent(EditUserDetailsEvent.onPhoneNumberChange(it)) },
+            label = "Phone",
+            modifier = Modifier.fillMaxWidth(),
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next,
         )
         CustomTextField(
             value = data.height.toString(),
             onValueChange = { onEvent(EditUserDetailsEvent.onHeightChange(it.toDouble())) },
             label = "Height(In)",
             modifier = Modifier.fillMaxWidth(),
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next
         )
         CustomTextField(
             value = data.weight.toString(),
             onValueChange = { onEvent(EditUserDetailsEvent.onWeightChange(it.toDouble())) },
             label = "Weight(kg)",
             keyboardType = KeyboardType.Number,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            imeAction = ImeAction.Done
         )
         data.surfLevel?.let {
             SurfLevelSelector(
@@ -214,6 +236,7 @@ fun EditProfileDetailsScreenContent(
                         cameraLauncher.launch(null)
                     } else {
                         cameraPermissionState.launchPermissionRequest()
+                        if (cameraPermissionState.status.isGranted) cameraLauncher.launch(null)
                     }
                 },
                 onChooseFromGallery = {
@@ -222,6 +245,7 @@ fun EditProfileDetailsScreenContent(
                         galleryLauncher.launch("image/*")
                     } else {
                         storagePermissionState.launchPermissionRequest()
+                        if (storagePermissionState.status.isGranted) galleryLauncher.launch("image/*")
                     }
                 }
             )

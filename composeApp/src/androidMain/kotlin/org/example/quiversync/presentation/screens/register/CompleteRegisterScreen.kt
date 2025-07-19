@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,6 +68,7 @@ fun OnboardingScreen(
     onCompleteClick:  () -> Unit,
 ) {
     val uiState by viewModel.onboardingState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     when (val currentState = uiState) {
         is OnboardingState.Idle -> {
@@ -86,6 +89,7 @@ fun OnboardingScreen(
         is OnboardingState.Success -> {
             LaunchedEffect(Unit) {
                 onCompleteClick()
+                Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
                 viewModel.resetStateToIdle()
             }
         }
@@ -110,6 +114,7 @@ fun CompleteRegisterScreen(
     formData: OnboardingFormData,
     onEvent: (OnboardingEvent) -> Unit
 ) {
+    val primaryColor = MaterialTheme.colorScheme.primary
     val isDark = isSystemInDarkTheme()
     val placeholderRes = if (isDark) R.drawable.placeholder_dark else R.drawable.placeholder_light
     val coroutineScope = rememberCoroutineScope()
@@ -119,18 +124,18 @@ fun CompleteRegisterScreen(
         context.resources.openRawResource(R.raw.terms_of_service)
             .bufferedReader().use { it.readText() }
     }
-    val annotatedText = buildAnnotatedString {
-        append("I agree to the ")
-        pushStringAnnotation(tag = "TERMS", annotation = "terms")
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-            append("Terms of Service and Privacy Policy")
+
+    val termsAnnotatedString = remember {
+        buildAnnotatedString {
+            append("I agree to the ")
+            pushStringAnnotation(tag = "TERMS_CLICKABLE", annotation = "terms_url_or_action")
+            withStyle(style = SpanStyle(color = primaryColor)) {
+                append("Terms of Service and Privacy Policy")
+            }
+            pop()
         }
-        pop()
     }
 
-
-
-    val context = LocalContext.current
     var showImageOptions by remember { mutableStateOf(false) }
 
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
@@ -300,30 +305,40 @@ fun CompleteRegisterScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-                ){
-                Checkbox(
-                    checked = formData.agreedToTerms,
-                    onCheckedChange = { onEvent(OnboardingEvent.OnAgreementChange(it)) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = Color.Gray
+                ) {
+                    Checkbox(
+                        checked = formData.agreedToTerms,
+                        onCheckedChange = { onEvent(OnboardingEvent.OnAgreementChange(it)) },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = MaterialTheme.colorScheme.primary,
+                            uncheckedColor = Color.Gray
+                        )
                     )
-                )
                     ClickableText(
                         text = termsAnnotatedString,
                         onClick = { offset ->
                             termsAnnotatedString.getStringAnnotations(
-                                tag = "TERMS", start = offset, end = offset
+                                tag = "TERMS_CLICKABLE",
+                                start = offset,
+                                end = offset
                             ).firstOrNull()?.let {
                                 showTermsDialog = true
-                            } ?: onEvent(OnboardingEvent.OnAgreementChange(!formData.agreedToTerms))
+                            } ?: run {
+                                onEvent(OnboardingEvent.OnAgreementChange(!formData.agreedToTerms))
+                            }
                         },
                         modifier = Modifier
                             .padding(start = 8.dp)
                             .weight(1f)
                     )
-
-
+                    formData.termsError?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
+                    }
                 }
             }
             if (showTermsDialog) {
@@ -380,4 +395,3 @@ fun CompleteRegisterScreen(
         }
     )
 }
-

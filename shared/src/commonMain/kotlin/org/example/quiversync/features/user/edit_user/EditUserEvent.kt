@@ -9,5 +9,6 @@ sealed interface EditUserDetailsEvent {
     data class onSurfLevelChange(val surfLevel: String) : EditUserDetailsEvent
     data class ProfileImageSelected(val bytes: ByteArray) : EditUserDetailsEvent
     data class profileImageIOSChanged(val imageURL : String) : EditUserDetailsEvent
+    data class onPhoneNumberChange(val phoneNumber: String) : EditUserDetailsEvent
     object onSubmit : EditUserDetailsEvent
 }

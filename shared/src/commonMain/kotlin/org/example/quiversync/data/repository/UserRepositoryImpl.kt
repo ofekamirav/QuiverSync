@@ -1,62 +1,92 @@
 package org.example.quiversync.data.repository
 
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import org.example.quiversync.data.local.dao.UserDao
 import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.domain.repository.UserRepository
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.Error
+import org.example.quiversync.data.remote.datasource.user.UserRemoteSource
 import org.example.quiversync.domain.model.UserError
 import org.example.quiversync.utils.Location
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.utils.extensions.toDto
+import kotlin.onFailure
+import kotlin.onSuccess
 
 class UserRepositoryImpl(
-    private val firestore: FirebaseFirestore,
+    private val userRemoteSource: UserRemoteSource,
+    private val userDao: UserDao,
     private val sessionManager: SessionManager,
-    private val userDao: UserDao
+    private val applicationScope: CoroutineScope
 ) : UserRepository {
+    private var syncJob: Job? = null
 
-    override suspend fun getUserProfile(): Result<User, Error> {
-        val uid = sessionManager.getUid() ?: return Result.Failure<Error>(UserError("No UID"))
-        println( "Fetching user profile for UID: $uid")
+    override suspend fun getUserProfile(): Flow<Result<User, Error>> {
+        val uid = sessionManager.getUid() ?: return flowOf(Result.Failure(UserError("No UID")))
 
-        val local = userDao.getUserProfile(uid)
-        if (local != null) {
-            println("Found local user profile for UID: $local")
-            return Result.Success(local)
-        }
+        startUserProfileSync(uid)
 
-        val snapshot = firestore.collection("users").document(uid).get()
-        if (snapshot.exists) {
-            val user = snapshot.data<User>()
-            println("Fetched user profile from Firestore: $user")
-
-            userDao.insertOrReplaceProfile(user, uid)
-            return Result.Success(user)
-        }
-        return Result.Failure<UserError>(UserError("User profile not found"))
+        return userDao.getUserProfile(uid)
+            .map { user ->
+                if (user != null) {
+                    Result.Success(user)
+                } else {
+                    Result.Failure(UserError("User profile not available locally."))
+                }
+            }
+            .catch { e ->
+                emit(Result.Failure(UserError("DB error: ${e.message}")))
+            }
     }
 
+    private fun startUserProfileSync(uid: String) {
+        if (syncJob?.isActive == true) {
+            platformLogger("UserRepository", "User profile sync already in progress for UID: $uid")
+            return
+        }
+        syncJob = applicationScope.launch {
+            userRemoteSource.observeUserProfile(uid)
+                .catch { e -> platformLogger("UserRepository", "User sync error: ${e.message}") }
+                .collect { userFromFirestore ->
+                    if (userFromFirestore != null) {
+                        userDao.insertOrReplaceProfile(userFromFirestore, uid)
+                    } else {
+                        userDao.deleteProfile(uid)
+                    }
+                }
+        }
+    }
     override suspend fun updateUserProfile(user: User): Result<Unit, Error> {
-        val uid = sessionManager.getUid() ?: return Result.Failure(UserError("No UID"))
-
         return try {
-            firestore.collection("users").document(uid).set(user.toDto(), merge = true)
-
-            userDao.insertOrReplaceProfile(user , uid)
-
-            Result.Success(Unit)
+            val user = userRemoteSource.updateUserProfile(user)
+            when(user){
+                is Result.Success ->{
+                    Result.Success(Unit)
+                }
+                is Result.Failure -> {
+                    platformLogger("UserRepository", "Failed to update user profile: ${user.error?.message}")
+                    Result.Failure(UserError("Update failed: ${user.error?.message}"))
+                }
+            }
         } catch (e: Exception) {
-            platformLogger("UserRepository", "Failed to update user profile: ${e.message}")
+            platformLogger("UserRepository", "Error updating user profile: ${e.message}")
             Result.Failure(UserError("Update failed: ${e.message}"))
         }
     }
+
 
     override suspend fun deleteProfileLocal(uid: String) {
         userDao.deleteProfile(uid)
@@ -80,6 +110,12 @@ class UserRepositoryImpl(
             platformLogger("UserRepository", "Failed to update user location: ${e.message}")
             Result.Failure(UserError("Update failed: ${e.message}"))
         }
+    }
+
+    override suspend fun stopUserSync() {
+        syncJob?.cancel()
+        syncJob = null
+        platformLogger("UserRepository", "User sync stopped.")
     }
 
 }

@@ -1,21 +1,29 @@
 package org.example.quiversync.data.local.dao
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.example.quiversync.SurfboardEntity
 import org.example.quiversync.SurfboardQueries
 import org.example.quiversync.data.remote.dto.RentalPublishDetails
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.utils.extensions.platformLogger
+import org.example.quiversync.utils.extensions.toDomain
 import org.example.quiversync.utils.extensions.toLong
 
 class QuiverDao(
     private val queries: SurfboardQueries
 ) {
-    fun getMyQuiver(userId: String): List<SurfboardEntity> {
-        return try {
-            queries.getSurfboardsByOwnerId(userId).executeAsList()
-        } catch (e: Exception) {
-            emptyList()
-        }
+    fun getMyQuiver(userId: String): Flow<List<Surfboard>> {
+        return queries.getSurfboardsByOwnerId(userId)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }
     }
 
     fun addSurfboard(surfboard: Surfboard): Boolean {
@@ -51,6 +59,16 @@ class QuiverDao(
             return true
         } catch (e: Exception) {
             platformLogger("QuiverDao", "Error deleting surfboard: ${e.message}")
+            return false
+        }
+    }
+
+    fun deleteAllSurfboardsByOwnerId(ownerId: String): Boolean {
+        try {
+            queries.deleteAllSurfboardsByOwnerId(ownerId)
+            return true
+        } catch (e: Exception) {
+            platformLogger("QuiverDao", "Error deleting all surfboards by owner ID: ${e.message}")
             return false
         }
     }
@@ -114,5 +132,9 @@ class QuiverDao(
             0
         }
     }
-
+    fun transaction(block: () -> Unit) {
+        queries.transaction {
+            block()
+        }
+    }
 }

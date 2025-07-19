@@ -33,8 +33,8 @@ fun MapWithCustomSvgMarker(
 ) {
     val context = LocalContext.current
     var bitmapDescriptor: BitmapDescriptor? by remember { mutableStateOf(null) }
-    val desiredWidth = 80
-    val desiredHeight = 102
+    val desiredWidth = 140
+    val desiredHeight = 160
 
     LaunchedEffect(context, markerSvgRes) {
         val drawable = ContextCompat.getDrawable(context, markerSvgRes)

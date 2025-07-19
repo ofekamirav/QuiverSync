@@ -1,6 +1,8 @@
     package org.example.quiversync.data.remote.datasource.quiver
 
     import dev.gitlive.firebase.firestore.FirebaseFirestore
+    import kotlinx.coroutines.flow.Flow
+    import kotlinx.coroutines.flow.map
     import org.example.quiversync.data.remote.dto.RentalPublishDetails
     import org.example.quiversync.data.remote.dto.SurfboardDto
     import org.example.quiversync.domain.model.Surfboard
@@ -14,22 +16,21 @@
     class QuiverRemoteDataSourceService(
         private val firebase: FirebaseFirestore,
     ): QuiverRemoteDataSource {
-        override suspend fun getSurfboardsRemote(userId: String): Result<List<Surfboard>, Error> {
-            return try {
-                val querySnapshot = firebase.collection("surfboards").where {
-                    "ownerId" equalTo userId
-                }.get()
-                val surfboardsWithIds = querySnapshot.documents.map { document ->
-                    document.data<SurfboardDto>().toDomain(document.id)
+        override fun observeQuiver(userId: String): Flow<List<Surfboard>> {
+            return firebase.collection("surfboards")
+                .where { "ownerId" equalTo userId }
+                .snapshots()
+                .map { snapshot ->
+                    snapshot.documents.mapNotNull { doc ->
+                        try {
+                            doc.data<SurfboardDto>().toDomain(doc.id)
+                        } catch (e: Exception) {
+                            platformLogger("QuiverRemote", "Failed to parse surfboard ${doc.id}")
+                            null
+                        }
+                    }
                 }
-                platformLogger("QuiverRemoteDataSourceService", "Fetched ${surfboardsWithIds.size} surfboards for user $userId")
-                Result.Success(surfboardsWithIds)
-            } catch (e: Exception) {
-                platformLogger("QuiverRemoteDataSourceService", "Error fetching surfboards: ${e.message}")
-                Result.Failure(SurfboardError(e.message ?: "Unknown error"))
-            }
         }
-
         override suspend fun addSurfboardRemote(surfboard: SurfboardDto): Result<Surfboard,Error> {
             return try {
                 val documentRef = firebase.collection("surfboards").add(surfboard)

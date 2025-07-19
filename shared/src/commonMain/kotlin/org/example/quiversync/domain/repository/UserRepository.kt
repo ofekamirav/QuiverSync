@@ -7,9 +7,10 @@ import org.example.quiversync.data.local.Result
 import org.example.quiversync.utils.Location
 
 interface UserRepository {
-    suspend fun getUserProfile(): Result<User, Error>
+    suspend fun getUserProfile(): Flow<Result<User, Error>>
     suspend fun updateUserProfile(user: User):Result<Unit, Error>
     suspend fun deleteProfileLocal(uid:String)
     suspend fun getUserCurrentLocation(): Result<Location, Error>
     suspend fun updateUserCurrentLocation(location: Location): Result<Unit, Error>
+    suspend fun stopUserSync()
 }

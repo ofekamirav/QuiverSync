@@ -22,6 +22,7 @@ class UpdateProfileDetailsUseCase(
             weightKg = details.weight,
             surfLevel = details.surfLevel,
             profilePicture = details.profilePicture ?: currentUser.profilePicture,
+            phoneNumber = details.phoneNumber ?: currentUser.phoneNumber,
         )
         return authRepository.updateUserProfile(updatedUser)
     }

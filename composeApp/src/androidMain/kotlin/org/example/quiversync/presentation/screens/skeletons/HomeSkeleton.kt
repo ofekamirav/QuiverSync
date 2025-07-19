@@ -16,6 +16,7 @@ import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.ShimmerBrush
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
+import org.example.quiversync.utils.rememberShimmerBrush
 
 @Composable
 private fun MainContentSkeleton(brush: Brush) {
@@ -63,10 +64,7 @@ private fun ForecastPanelSkeleton(brush: Brush) {
 
 @Composable
 fun HomeSkeleton(modifier: Modifier = Modifier) {
-    val isDark = isSystemInDarkTheme()
-    val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
-    val brush = ShimmerBrush(baseColor = baseShimmerColor)
-
+    val brush = rememberShimmerBrush()
     val windowInfo = LocalWindowInfo.current
 
     when (windowInfo.widthSize) {

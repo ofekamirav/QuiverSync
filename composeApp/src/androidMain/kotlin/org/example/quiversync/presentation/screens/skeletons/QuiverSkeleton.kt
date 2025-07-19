@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.ShimmerBrush
+import org.example.quiversync.utils.rememberShimmerBrush
 
 @Composable
 fun BoardCardSkeleton(shimmerBrush: Brush) {
@@ -74,8 +75,7 @@ fun BoardCardSkeleton(shimmerBrush: Brush) {
 @Composable
 fun QuiverScreenSkeleton(modifier: Modifier = Modifier) {
     val isDark = isSystemInDarkTheme()
-    val baseShimmerColor = if (isDark) OceanPalette.DarkText else OceanPalette.TextDark
-    val brush = ShimmerBrush(baseColor = baseShimmerColor)
+    val brush = rememberShimmerBrush()
     Column(
         modifier = modifier
             .fillMaxSize()

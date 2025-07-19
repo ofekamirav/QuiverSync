@@ -14,8 +14,6 @@ import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.data.local.Result
-import org.example.quiversync.utils.event.AppEvent
-import org.example.quiversync.utils.event.EventBus
 
 class AddBoardViewModel(
     private val addBoardUseCase: AddBoardUseCase,
@@ -88,7 +86,6 @@ class AddBoardViewModel(
                         when(result){
                             is Result.Success -> {
                                 result.data?.let { _uiState.emit(AddBoardState.Loaded) }
-                                EventBus.postEvent(AppEvent.BoardAdded)
                                 platformLogger("AddBoardViewModel", "Surfboard added successfully")
                             }
                             is Result.Failure -> {

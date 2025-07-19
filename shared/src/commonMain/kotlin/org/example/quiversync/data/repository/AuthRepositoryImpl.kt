@@ -19,6 +19,9 @@ import org.example.quiversync.domain.repository.AuthRepository
 import org.example.quiversync.utils.extensions.toDomain
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.Error
+import org.example.quiversync.data.local.dao.FavSpotDao
+import org.example.quiversync.data.local.dao.GeminiPredictionDao
+import org.example.quiversync.data.local.dao.QuiverDao
 import org.example.quiversync.data.local.dao.UserDao
 import org.example.quiversync.data.remote.dto.AuthResult
 import org.example.quiversync.utils.extensions.platformLogger
@@ -27,7 +30,10 @@ class AuthRepositoryImpl(
     private val sessionManager: SessionManager,
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val favSpotDao: FavSpotDao,
+    private val quiverDao: QuiverDao,
+    private val predictionDao: GeminiPredictionDao
 ): AuthRepository  {
 
     override suspend fun register(
@@ -107,8 +113,18 @@ class AuthRepositoryImpl(
 
     override suspend fun logout() {
         auth.signOut()
-        userDao.deleteProfile(sessionManager.getUid() ?: "")
+        clearLocalData()
+    }
+
+    private suspend fun clearLocalData(){
+        val uid = sessionManager.getUid()
         sessionManager.clearUserData()
+        if (uid != null) {
+            userDao.deleteProfile(uid)
+            favSpotDao.deleteAllFavSpots(uid)
+            quiverDao.deleteAllSurfboardsByOwnerId(uid)
+            predictionDao.deleteAllPredictions()
+        }
     }
 
     override suspend fun updateUserProfile(user: User): Result<Unit, AuthError> {

@@ -52,3 +52,6 @@ setSurfboardAsAvailableForRental:
 UPDATE SurfboardEntity SET isRentalAvailable = 1
 WHERE id = ?;
 
+deleteAllSurfboardsByOwnerId:
+DELETE FROM SurfboardEntity WHERE ownerId = ?;
+
