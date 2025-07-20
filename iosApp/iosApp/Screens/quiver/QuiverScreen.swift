@@ -21,7 +21,7 @@ public struct QuiverScreen: View {
         VStack{
             switch onEnum(of: ViewModel.uiState){
             case .loading:
-                LoadingView(colorName: "background")
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .loaded(let loaded):
                 QuiverView(
                         boards: loaded.boards,

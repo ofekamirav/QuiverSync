@@ -12,6 +12,8 @@ import SwiftUI
 import Shared
 
 struct AddBoardStep1View: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let data: AddBoardFormData
     let onEvent: (AddBoardEvent) -> Void
     
@@ -54,6 +56,7 @@ struct AddBoardStep1View: View {
             )
         }
         .padding()
+        .background(AppColors.sectionBackground(for: colorScheme))
         .animation(.easeInOut, value: data.modelError)
         .animation(.easeInOut, value: data.companyError)
     }

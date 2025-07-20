@@ -30,10 +30,34 @@ public struct AddSpotScreen: View {
                             errorMessage: $errorMessage
                         )
                     case .loading:
-                        LoadingView(colorName: "background")
+                        LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
                     case .loaded:
-                        LoadingView(colorName: "background")
-//                        FavSpotsScreen()
+                        VStack {
+                            Spacer()
+
+                            SuccessMessageView(
+                                title: "Spot Added!",
+                                subtitle: "Your favorite surf spot is now saved.",
+                                systemIconName: "mappin.circle.fill",
+                                iconColor: .blue,
+                                backgroundColor: .blue,
+                                onDismiss: {
+                                    showAddSpotScreen = false
+                                }
+                            )
+                            .padding(.top, 80)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .animation(.easeInOut, value: UUID())
+
+                            Spacer()
+                        }
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                showAddSpotScreen = false
+                            }
+                            print("Spot added successfully")
+                        }
+
                     case .error(let error):
                         ErrorView(
                         title: "Couldn’t Save That Spot",

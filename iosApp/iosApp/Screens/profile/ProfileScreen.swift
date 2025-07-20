@@ -17,7 +17,7 @@ public struct ProfileScreen: View {
         VStack{
             switch onEnum(of: viewModel.uiState){
             case .loading:
-                LoadingView(colorName: "background")
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .loaded(let loaded):
                 ProfileView(user: loaded.user,
                             boardsCount: Int(loaded.boards),

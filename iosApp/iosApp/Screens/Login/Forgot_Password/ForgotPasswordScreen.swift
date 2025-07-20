@@ -22,7 +22,7 @@ struct ForgotPasswordScreen: View {
                 ForgotPasswordView(formData: idle.data,
                                    onEvent: viewModel.viewModel.onEvent)
             case .loading:
-                LoadingView(colorName: "background")
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .success:
                 ForgotPasswordSuccessView(
                     message: "A password reset link has been sent. Please check your inbox (and spam folder).",

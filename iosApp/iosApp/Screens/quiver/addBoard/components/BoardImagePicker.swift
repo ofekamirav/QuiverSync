@@ -16,6 +16,7 @@ struct BoardImagePicker: View {
     let onClick: () -> Void
     let errorMessage: String?
     var modifier: some ViewModifier = EmptyModifier()
+    let frameSize : CGFloat
 
     var body: some View {
         VStack(spacing: 8) {
@@ -32,9 +33,8 @@ struct BoardImagePicker: View {
                         ProgressView()
                     }
                     .id(imageURL.absoluteString) 
-                    .frame(width: 120, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-
+                    .frame(width: frameSize, height: frameSize)
+                    .clipShape(Circle())
                 } else {
                     RoundedRectangle(cornerRadius: 16)
                         .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
@@ -42,6 +42,7 @@ struct BoardImagePicker: View {
                         .overlay(
                             Image(systemName: "plus")
                                 .foregroundColor(.gray)
+                            
                         )
                 }
             }

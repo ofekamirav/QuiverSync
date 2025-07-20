@@ -6,6 +6,7 @@ import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseAuthException
 import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 import dev.gitlive.firebase.auth.GoogleAuthProvider
+import dev.gitlive.firebase.auth.OAuthProvider
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.FirebaseFirestoreException
@@ -233,4 +234,38 @@ class AuthRepositoryImpl(
             Result.Failure(AuthError("Google Sign-In failed: ${e.message}"))
         }
     }
+
+    override suspend fun signInWithApple(idToken: String): Result<AuthResult, Error> {
+        return try {
+            val credential = OAuthProvider.credential("apple.com" , idToken = idToken , accessToken = null)
+
+            val authResult = auth.signInWithCredential(credential)
+            val firebaseUser = authResult.user
+                ?: return Result.Failure(AuthError("Failed to get user info after Apple sign-in."))
+
+            sessionManager.setUid(firebaseUser.uid)
+            val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
+
+            if (isNewUser) {
+                val newUser = User(
+                    uid = firebaseUser.uid,
+                    email = firebaseUser.email ?: "",
+                    name = firebaseUser.displayName ?: "",
+                    profilePicture = firebaseUser.photoURL,
+                    heightCm = null,
+                    weightKg = null,
+                    surfLevel = null,
+                    dateOfBirth = null
+                )
+                updateUserProfile(newUser)
+            }
+
+            Result.Success(AuthResult(isNewUser = isNewUser))
+        } catch (e: Exception) {
+            platformLogger("AuthRepositoryImpl", "Apple Sign-In failed: ${e.message}")
+            Result.Failure(AuthError("Apple Sign-In failed: ${e.message}"))
+        }
+    }
+
+
 }

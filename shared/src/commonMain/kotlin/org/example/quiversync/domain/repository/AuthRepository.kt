@@ -16,5 +16,6 @@ interface AuthRepository {
     suspend fun updatePassword(newPassword: String): Result<Unit, Error>
     suspend fun sendPasswordResetEmail(email: String): Result<Unit, Error>
     suspend fun signInWithGoogle(idToken: String): Result<AuthResult, Error>
+    suspend fun signInWithApple(idToken: String): Result<AuthResult, Error>
 
 }

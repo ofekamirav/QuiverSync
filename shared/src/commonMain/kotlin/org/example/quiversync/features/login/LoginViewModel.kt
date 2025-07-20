@@ -12,8 +12,7 @@ import org.example.quiversync.utils.extensions.platformLogger
 
 
 class LoginViewModel (
-    private val  loginUseCase : LoginUserUseCase,
-    private val signInWithGoogleUseCase: SignInWithGoogleUseCase
+    private val loginUseCases : LoginUseCases
 ): BaseViewModel() {
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle(LoginData()))
@@ -54,7 +53,7 @@ class LoginViewModel (
         scope.launch {
             _loginState.value = LoginState.Loading
             platformLogger("LoginViewModel", "Logging in user with email: ${currentState.data.email}")
-            val result = loginUseCase(
+            val result = loginUseCases.loginUser(
                 email = currentState.data.email,
                 password = currentState.data.password
             )
@@ -98,7 +97,7 @@ class LoginViewModel (
 
         scope.launch {
             _loginState.value = LoginState.Loading
-            when (val result = signInWithGoogleUseCase(idToken)) {
+            when (val result = loginUseCases.signInWithGoogle(idToken)) {
                 is Result.Success -> {
                     result.data?.let {
                         if (it.isNewUser) {
@@ -117,6 +116,27 @@ class LoginViewModel (
                     }
                 }
 
+                is Result.Failure -> {
+                    _loginState.value = LoginState.Error(result.error?.message ?: "Unknown error")
+                }
+            }
+        }
+    }
+
+    fun onAppleSignInResult(token: String){
+        scope.launch{
+            val result = loginUseCases.signInWithApple(token)
+            _loginState.value = LoginState.Loading
+            when(result){
+                is Result.Success -> {
+                    if (result.data?.isNewUser == true) {
+                        _loginState.value = LoginState.NavigateToOnboarding
+                        platformLogger("LoginViewModel", "New user signed in with Apple, navigating to onboarding.")
+                    } else {
+                        _loginState.value = LoginState.Loaded
+                        platformLogger("LoginViewModel", "Existing user signed in with Apple, loading main screen.")
+                    }
+                }
                 is Result.Failure -> {
                     _loginState.value = LoginState.Error(result.error?.message ?: "Unknown error")
                 }

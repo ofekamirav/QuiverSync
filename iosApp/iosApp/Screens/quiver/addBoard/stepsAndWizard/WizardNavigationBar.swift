@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct WizardNavigationBar: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let currentStep: Int
     let totalSteps: Int
     let onBack: () -> Void
@@ -55,7 +57,7 @@ struct WizardNavigationBar: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(Color(.systemBackground).opacity(0.95))
+        .background(AppColors.sectionBackground(for: colorScheme))
         .shadow(radius: 4)
     }
 }

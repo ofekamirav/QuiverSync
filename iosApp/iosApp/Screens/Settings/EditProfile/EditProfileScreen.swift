@@ -44,11 +44,33 @@ public struct EditProfileScreen: View {
                 )
 
             case .loading:
-                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 200)
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .success:
-                Color.clear.onAppear(){
-                    onSucsess()
+                VStack {
+                    Spacer()
+
+                    SuccessMessageView(
+                        title: "Profile Updated!",
+                        subtitle: "Your changes have been saved successfully.",
+                        systemIconName: "person.crop.circle.badge.checkmark",
+                        iconColor: .green,
+                        backgroundColor: .green,
+                        onDismiss: {
+                            onSucsess()
+                        }
+                    )
+                    .padding(.top, 80)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.spring(), value: UUID())
+
+                    Spacer()
                 }
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        onSucsess()
+                    }
+                }
+
             }
         }
         .onAppear(){

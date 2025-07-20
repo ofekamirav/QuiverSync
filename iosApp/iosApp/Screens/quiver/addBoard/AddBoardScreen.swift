@@ -29,14 +29,33 @@ public struct AddBoardScreen: View {
                     onBackRequested: onBackRequested
                 )
             case .loading:
-                LoadingView(colorName: "background")
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .loaded:
-                Text("✅ Board added successfully!")
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                VStack {
+                    Spacer()
+
+                    SuccessMessageView(
+                        title: "Board Added!",
+                        subtitle: "Your surfboard has been added to your quiver.",
+                        systemIconName: "surfboard.fill", // Or fallback: "checkmark.circle.fill"
+                        iconColor: .blue,
+                        backgroundColor: .blue,
+                        onDismiss: {
                             onBackRequested()
                         }
+                    )
+                    .padding(.top, 80)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.easeInOut, value: UUID())
+
+                    Spacer()
+                }
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        onBackRequested()
                     }
+                }
+
 
             case .error(let error):
                 ErrorView(

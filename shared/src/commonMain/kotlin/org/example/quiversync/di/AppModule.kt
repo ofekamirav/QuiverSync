@@ -33,6 +33,8 @@ import org.example.quiversync.data.remote.datasource.favSpot.FavSpotRemoteSource
 import org.example.quiversync.data.remote.datasource.quiver.QuiverRemoteDataSource
 import org.example.quiversync.data.remote.datasource.quiver.QuiverRemoteDataSourceService
 import org.example.quiversync.data.remote.datasource.favSpot.FavSpotRemoteSourceService
+import org.example.quiversync.data.remote.datasource.user.UserRemoteSource
+import org.example.quiversync.data.remote.datasource.user.UserRemoteSourceService
 import org.example.quiversync.data.repository.AuthRepositoryImpl
 import org.example.quiversync.data.repository.FavSpotRepositoryImpl
 import org.example.quiversync.data.session.SessionManager
@@ -63,6 +65,7 @@ import org.example.quiversync.domain.usecase.gemini.GenerateAllTodayPredictionsU
 import org.example.quiversync.domain.usecase.gemini.GenerateWeeklyPredictionsUseCase
 import org.example.quiversync.domain.usecase.gemini.GenerateSingleDayMatchUseCase
 import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
+import org.example.quiversync.domain.usecase.loginUseCases.SignInWithAppleUseCase
 import org.example.quiversync.domain.usecase.loginUseCases.SignInWithGoogleUseCase
 import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
 import org.example.quiversync.domain.usecase.quiver.DeleteSurfboardUseCase
@@ -83,6 +86,7 @@ import org.example.quiversync.domain.usecase.user.SendPasswordResetEmailUseCase
 import org.example.quiversync.domain.usecase.user.UpdatePasswordUseCase
 import org.example.quiversync.domain.usecase.user.UpdateProfileDetailsUseCase
 import org.example.quiversync.features.home.HomeUseCases
+import org.example.quiversync.features.login.LoginUseCases
 import org.example.quiversync.features.login.forgot_password.ForgotPasswordViewModel
 import org.example.quiversync.features.quiver.QuiverUseCases
 import org.example.quiversync.features.quiver.QuiverViewModel
@@ -98,8 +102,7 @@ import org.example.quiversync.features.spots.FavSpotsUseCases
 import org.example.quiversync.features.user.UserUseCases
 import org.example.quiversync.features.user.UserViewModel
 import org.example.quiversync.features.user.edit_user.EditProfileDetailsViewModel
-import org.example.quiversync.data.remote.datasource.user.UserRemoteSource
-import org.example.quiversync.data.remote.datasource.user.UserRemoteSourceService
+//import org.example.quiversync.utils.event.EventBus
 
 
 fun initKoin(config: KoinAppDeclaration? = null) {
@@ -180,6 +183,7 @@ val commonModule= module {
     single { UpdatePasswordUseCase(get()) }
     single { SendPasswordResetEmailUseCase(get()) }
     single { SignInWithGoogleUseCase(get()) }
+    single { SignInWithAppleUseCase(get()) }
     single { GetSpotsNumberUseCase(get()) }
     single { IsImperialUnitsUseCase(get()) }
 
@@ -222,6 +226,15 @@ val commonModule= module {
             isImperialUnitsUseCases = get()
       )
    }
+
+    single {
+        LoginUseCases(
+            loginUser = get(),
+            signInWithGoogle = get(),
+            signInWithApple = get()
+        )
+    }
+
    single {
       RegisterUseCases(
          registerUser = get(),
@@ -288,8 +301,8 @@ val commonModule= module {
    single { RegisterViewModel(get()) }
    single { OnboardingViewModel(get(), get(),get()) }
    factory { UserViewModel(get()) }
-   single { HomeViewModel(get()) }
-   single { LoginViewModel(get(), get()) }
+    factory { HomeViewModel(get()) }
+   single { LoginViewModel(get()) }
    single { OnboardingViewModel(get(), get(), get()) }
    factory { QuiverViewModel(get()) }
    single { AddBoardViewModel(get(), get()) }
@@ -299,9 +312,6 @@ val commonModule= module {
    factory { FavSpotsViewModel(get()) }
    single { AddFavSpotViewModel(get())}
    single { ForgotPasswordViewModel(get()) }
-
-
-
 }
 
 fun createJson(): Json = Json {
@@ -316,10 +326,10 @@ fun createHttpClient(clientEngine: HttpClientEngine, json: Json) = HttpClient(cl
         socketTimeoutMillis  = 60_000
         requestTimeoutMillis = 60_000
     }
-   install(Logging) {
-      level = LogLevel.ALL
-      logger = Logger.DEFAULT
-   }
+//   install(Logging) {
+//      level = LogLevel.ALL
+//      logger = Logger.DEFAULT
+//   }
    install(ContentNegotiation) {
       json(json)
    }

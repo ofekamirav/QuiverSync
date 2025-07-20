@@ -127,8 +127,13 @@ struct LoginView: View {
                     DividerWithText(text: "Or continue with")
 
                     HStack(spacing: 12) {
-                        SocialLoginButton(text: "Google", imageName: "g.circle")
-                        SocialLoginButton(text: "Apple", imageName: "apple.logo")
+                        SocialLoginButton(text: "Google", imageName: "g.circle") {
+                            print("Google login tapped")
+                        }
+
+                        SocialLoginButton(text: "Apple", imageName: "apple.logo") {
+                            SignInWithAppleCoordinator(viewModel: loginViewModel).startSignIn()
+                        }
                     }
 
                     Button(action: onRegisterClick) {

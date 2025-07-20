@@ -17,6 +17,7 @@ struct AppNavigationView: View {
     @State private var selectedTab: AppRoute = .home
     @State private var showSplash = true
     @State private var uid: String? = nil
+    
 
 
 
@@ -31,9 +32,9 @@ struct AppNavigationView: View {
                             endPoint: .bottom
                         )
                         .ignoresSafeArea()
+                        
 
                         LottieView(animationName: "splash_intro_animation", loopMode: .playOnce , size : 500)
-                            .frame(width: 200, height: 200)
                     }
 
                 }
@@ -41,6 +42,8 @@ struct AppNavigationView: View {
                     LoginScreen(
                         onRegisterClick: { path.append(AppRoute.register) },
                         onForgotPasswordClick: { path.append(AppRoute.forgotPassword) },
+                        onNavigateToOnboarding: { path.append(AppRoute.completeRegister) },
+                        onBackBtn: { path.removeLast(path.count) },
                         isLoggedIn: Binding(
                             get: { isLoggedIn ?? false },
                             set: { isLoggedIn = $0 }
@@ -78,8 +81,9 @@ struct AppNavigationView: View {
                         // Main Tabs
                         TabView(selection: $selectedTab) {
                             HomeScreen()
-                                .tabItem { Label("Home", systemImage: "house") }
-                                .tag(AppRoute.home)
+                            .tabItem { Label("Home", systemImage: "house") }
+                            .tag(AppRoute.home)
+
 
                             FavSpotsScreen()
                                 .tabItem { Label("Spots", systemImage: "map") }
@@ -107,16 +111,17 @@ struct AppNavigationView: View {
                 case .register:
                     RegisterScreen(
                         onBackBtn: { path.removeLast(path.count) },
-                        onSuccess: { path.append(AppRoute.completeRegister) },
+                        onSuccess: {path.append( AppRoute.completeRegister) },
                         isLoggedIn: Binding(get: { isLoggedIn ?? false }, set: { isLoggedIn = $0 }),
                         onLoginSuccess: {
-                                Task {
-                                    let sessionManager = SessionManager(context: nil)
-                                    uid = try? await sessionManager.getUid()
-                                    print("🔁 onLoginSuccess triggered — this is the uid after login: \(String(describing: uid) )")
+                            Task {
+                               let sessionManager = SessionManager(context: nil)
+                               uid = try? await sessionManager.getUid()
+                               print("🔁 onLoginSuccess triggered — this is the uid after login: \(String(describing: uid) )")
 
-                                }
-                            }
+                               }
+                        }
+                        
                     )
 
 
@@ -159,7 +164,15 @@ struct AppNavigationView: View {
                             path.removeLast(path.count) // reset stack
                             selectedTab = .home
                         },
-                        isLoggedIn: Binding(get: { isLoggedIn ?? false }, set: { isLoggedIn = $0 })
+                        isLoggedIn: Binding(get: { isLoggedIn ?? false }, set: { isLoggedIn = $0 }),
+                        onLoginSuccess: {
+                            Task {
+                               let sessionManager = SessionManager(context: nil)
+                               uid = try? await sessionManager.getUid()
+                               print("🔁 onLoginSuccess triggered — this is the uid after login: \(String(describing: uid) )")
+
+                               }
+                        }
                     )
 
 
@@ -175,6 +188,7 @@ struct AppNavigationView: View {
                     Text("TODO: Screen not implemented for \(route)")
                 }
             }
+            .background(AppColors.sectionBackground(for: colorScheme))
             .onAppear {
                 Task {
                     let sessionManager = SessionManager(context: nil)

@@ -12,6 +12,8 @@ import Shared
 import Foundation
 
 struct AddBoardStep2View: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let data: AddBoardFormData
     let onEvent: (AddBoardEvent) -> Void
 
@@ -59,10 +61,10 @@ struct AddBoardStep2View: View {
                 imageUrl: data.imageUrl,
                 isUploading: data.isUploadingImage,
                 onClick: { showImageOptions = true },
-                errorMessage: data.imageUploadError
-            )
-            .frame(height: 160)
+                errorMessage: data.imageUploadError,
+                frameSize : 250
 
+            )
             Spacer()
         }
         .padding()
@@ -115,6 +117,7 @@ struct AddBoardStep2View: View {
                 }
             }
         }
+        .background(AppColors.sectionBackground(for: colorScheme))
         .animation(.easeInOut, value: data.heightError)
         .animation(.easeInOut, value: data.widthError)
         .animation(.easeInOut, value: data.volumeError)

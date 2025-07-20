@@ -31,64 +31,79 @@ struct EditProfileFormView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 16) {
-                // Name
-                // Inside VStack(spacing: 16) {
+                
                 Group {
                     // Name
-                    TextField("Name", text: $name)
-                        .onChange(of: name) { onEvent(EditUserDetailsEventOnNameChange(name: $0)) }
-                        .padding()
-                        .background(AppColors.cardColor(for: colorScheme))
-                        .cornerRadius(10)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Name")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
 
-                    if let error = form.nameError {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .padding(.leading, 4)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        TextField("Enter your name", text: $name)
+                            .onChange(of: name) { onEvent(EditUserDetailsEventOnNameChange(name: $0)) }
+                            .padding()
+                            .background(AppColors.cardColor(for: colorScheme))
+                            .cornerRadius(10)
+
+                        if let error = form.nameError {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .padding(.leading, 4)
+                        }
                     }
 
                     // Height
-                    TextField("Height (cm)", text: $height)
-                        .keyboardType(.decimalPad)
-                        .onChange(of: height) { newValue in
-                            if let value = Double(newValue) {
-                                onEvent(EditUserDetailsEventOnHeightChange(height: value))
-                            }
-                        }
-                        .padding()
-                        .background(AppColors.cardColor(for: colorScheme))
-                        .cornerRadius(10)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Height (cm)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
 
-                    if let error = form.heightError {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .padding(.leading, 4)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        TextField("e.g. 178", text: $height)
+                            .keyboardType(.decimalPad)
+                            .onChange(of: height) { newValue in
+                                if let value = Double(newValue) {
+                                    onEvent(EditUserDetailsEventOnHeightChange(height: value))
+                                }
+                            }
+                            .padding()
+                            .background(AppColors.cardColor(for: colorScheme))
+                            .cornerRadius(10)
+
+                        if let error = form.heightError {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .padding(.leading, 4)
+                        }
                     }
 
                     // Weight
-                    TextField("Weight (kg)", text: $weight)
-                        .keyboardType(.decimalPad)
-                        .onChange(of: weight) { newValue in
-                            if let value = Double(newValue) {
-                                onEvent(EditUserDetailsEventOnWeightChange(weight: value))
-                            }
-                        }
-                        .padding()
-                        .background(AppColors.cardColor(for: colorScheme))
-                        .cornerRadius(10)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Weight (kg)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
 
-                    if let error = form.weightError {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .padding(.leading, 4)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        TextField("e.g. 72", text: $weight)
+                            .keyboardType(.decimalPad)
+                            .onChange(of: weight) { newValue in
+                                if let value = Double(newValue) {
+                                    onEvent(EditUserDetailsEventOnWeightChange(weight: value))
+                                }
+                            }
+                            .padding()
+                            .background(AppColors.cardColor(for: colorScheme))
+                            .cornerRadius(10)
+
+                        if let error = form.weightError {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .padding(.leading, 4)
+                        }
                     }
                 }
+
 
 
                 Spacer()
@@ -97,9 +112,9 @@ struct EditProfileFormView: View {
                     imageUrl: form.profilePicture,
                     isUploading: form.isUploadingImage,
                     onClick: { showImageOptions = true },
-                    errorMessage: form.imageUploadError
+                    errorMessage: form.imageUploadError,
+                    frameSize : 250
                 )
-                .frame(height: 200)
 
                 Spacer()
 
@@ -115,6 +130,7 @@ struct EditProfileFormView: View {
                 }
             }
             .padding()
+            .background(AppColors.sectionBackground(for: colorScheme))
             .onAppear {
                 name = form.name ?? ""
                 height = form.height?.description ?? ""
