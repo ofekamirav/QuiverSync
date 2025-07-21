@@ -12,5 +12,6 @@ interface UserRepository {
     suspend fun deleteProfileLocal(uid:String)
     suspend fun getUserCurrentLocation(): Result<Location, Error>
     suspend fun updateUserCurrentLocation(location: Location): Result<Unit, Error>
+    suspend fun getUserById(userId: String): Result<User, Error>
     suspend fun stopUserSync()
 }

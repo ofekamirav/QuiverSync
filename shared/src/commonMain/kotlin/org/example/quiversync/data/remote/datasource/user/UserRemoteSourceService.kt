@@ -42,4 +42,20 @@ class UserRemoteSourceService(
             Result.Failure(UserError("Update failed: ${e.message}"))
         }
     }
+
+
+    override suspend fun getUserById(userId: String): Result<User, Error> {
+        return try{
+            val user = firebase.collection("users").document(userId).get()
+            run {
+                platformLogger("UserRemoteSourceService", "User found with ID: $userId")
+                Result.Success(user.data<User>() ?: User(uid = userId, name = "Unknown", email = "Unknown"))
+            }
+        }
+        catch ( e: Exception) {
+            platformLogger("UserRemoteSourceService", "Error fetching user by ID: ${e.message}")
+            Result.Failure(UserError("Error fetching user by ID: ${e.message}"))
+        }
+    }
+
 }

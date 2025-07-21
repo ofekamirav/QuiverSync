@@ -14,7 +14,6 @@ struct RegisterScreen: View {
     @ObservedObject private(set) var viewModel = RegisterViewModelWrapper()
     
     let onBackBtn: () -> Void
-    let onSuccess: () -> Void
     @Binding var isLoggedIn: Bool
     let onLoginSuccess : () -> Void
 
@@ -32,10 +31,8 @@ struct RegisterScreen: View {
                 )
             case .loaded:
                 Color.clear.onAppear {
-                    Task{
+                        onLoginSuccess()
                         viewModel.viewModel.resetState()
-                    }
-                    onSuccess()
                 }
             case .error(let error):
                 AuthErrorView(

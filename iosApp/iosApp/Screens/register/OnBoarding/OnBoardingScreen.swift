@@ -16,7 +16,6 @@ struct OnBoardingScreen: View {
     
     let onCompleteClick: () -> Void // 👈 trigger navigation back to home
     @Binding var isLoggedIn: Bool
-    let onLoginSuccess: () -> Void
     
     var body: some View {
         VStack {
@@ -31,13 +30,10 @@ struct OnBoardingScreen: View {
                 )
 
             case .success:
+                
                 Color.clear.onAppear {
-                    Task{
-                        onLoginSuccess()
-                    }
+                    
                     isLoggedIn = true
-                    
-                    
                     onCompleteClick()
                 }
 

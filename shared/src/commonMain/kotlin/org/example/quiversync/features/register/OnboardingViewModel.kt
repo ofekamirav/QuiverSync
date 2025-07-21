@@ -75,9 +75,15 @@ class OnboardingViewModel(
 
     fun onEvent(event: OnboardingEvent) {
         when (event) {
-            is OnboardingEvent.PhoneNumberChanged -> updateForm { it.copy(phoneNumber = event.value) }
+            is OnboardingEvent.PhoneNumberChanged -> {
+                platformLogger("OnboardingViewModel", "Phone number changed: ${event.value}")
+                updateForm { it.copy(phoneNumber = event.value) }
+            }
             is OnboardingEvent.DateOfBirthChanged -> updateForm { it.copy(dateOfBirth = event.value) }
-            is OnboardingEvent.HeightChanged -> updateForm { it.copy(heightCm = event.value) }
+            is OnboardingEvent.HeightChanged ->{
+                platformLogger("OnboardingViewModel", "Height changed: ${event.value}")
+                updateForm { it.copy(heightCm = event.value) }
+            }
             is OnboardingEvent.WeightChanged -> updateForm { it.copy(weightKg = event.value) }
             is OnboardingEvent.SurfLevelChanged -> updateForm { it.copy(selectedSurfLevel = event.level) }
             is OnboardingEvent.ProfileImageSelected -> onProfileImageSelected(event.bytes)

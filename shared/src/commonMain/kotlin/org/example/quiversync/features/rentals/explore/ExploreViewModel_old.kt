@@ -10,9 +10,9 @@ import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.features.BaseViewModel
 
-class ExploreViewModel : BaseViewModel(){
-    private val _uiState = MutableStateFlow<ExploreState>(ExploreState.Loading)
-    val uiState: StateFlow<ExploreState> get() = _uiState
+class ExploreViewModel_old : BaseViewModel(){
+    private val _uiState = MutableStateFlow<ExploreState_old>(ExploreState_old.Loading)
+    val uiState: StateFlow<ExploreState_old> get() = _uiState
 
     init {
         fetchBoards()
@@ -39,7 +39,7 @@ class ExploreViewModel : BaseViewModel(){
             }
 
             _uiState.emit(
-                ExploreState.Loaded(boardsForRent)
+                ExploreState_old.Loaded(boardsForRent)
             )
         }
     }

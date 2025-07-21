@@ -36,6 +36,9 @@ DELETE FROM SurfboardEntity WHERE ownerId = ?;
 getSurfboardsByOwnerId:
 SELECT * FROM SurfboardEntity WHERE ownerId = ?;
 
+getSurfboardsNotByOwnerId:
+SELECT * FROM SurfboardEntity WHERE ownerId != ?;
+
 publishSurfboardForRental:
 UPDATE SurfboardEntity SET isRentalPublished = 1, isRentalAvailable = 1, longitude = ?, latitude = ?, pricePerDay = ?
 WHERE id = ?;

@@ -40,7 +40,7 @@ public struct QuiverScreen: View {
                     systemImageName: "shippingbox.fill",
                     buttonText: "Retry",
                     onRetry: {
-                        ViewModel.startObserving()
+                        ViewModel.ViewModel.refreshQuiver()
                     }
                 )
 

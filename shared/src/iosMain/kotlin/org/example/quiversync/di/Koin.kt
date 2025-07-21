@@ -1,5 +1,6 @@
 package org.example.quiversync.di
 
+import org.example.quiversync.features.exploreRentals.ExploreViewModel
 import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.features.login.forgot_password.ForgotPasswordViewModel
@@ -43,3 +44,5 @@ fun securityAndPrivacyViewModel() : SecurityAndPrivacyViewModel = KoinPlatform.g
 fun forgotPasswordViewModel() : ForgotPasswordViewModel = KoinPlatform.getKoin().get()
 
 fun onboardingViewModel() : OnboardingViewModel = KoinPlatform.getKoin().get()
+
+fun exploreViewModel() : ExploreViewModel = KoinPlatform.getKoin().get()

@@ -67,5 +67,13 @@ actual class SessionManager actual constructor(context: Any?) {
         defaults.setObject(units, forKey = "units")
     }
 
+    actual suspend fun isOnboardingComplete(): Boolean {
+        return defaults.boolForKey("onboardingProcessComplete")
+    }
+
+    actual suspend fun setOnboardingComplete(complete: Boolean) {
+        defaults.setObject(complete, forKey = "onboardingProcessComplete")
+    }
+
 
 }

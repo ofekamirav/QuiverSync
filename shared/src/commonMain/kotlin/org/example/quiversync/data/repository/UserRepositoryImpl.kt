@@ -112,10 +112,30 @@ class UserRepositoryImpl(
         }
     }
 
+    override suspend fun getUserById(userId: String): Result<User, Error> {
+        return try {
+            when (val user = userRemoteSource.getUserById(userId)) {
+                is Result.Success -> {
+                    Result.Success(user.data)
+                }
+                is Result.Failure -> {
+                    platformLogger("UserRepository", "Failed to fetch user by ID: ${user.error?.message}")
+                    Result.Failure(UserError("Fetch failed: ${user.error?.message}"))
+                }
+            }
+        }
+        catch ( e: Exception) {
+            platformLogger("UserRepository", "Error fetching user by ID: ${e.message}")
+            Result.Failure(UserError("Fetch failed: ${e.message}"))
+        }
+    }
+
     override suspend fun stopUserSync() {
         syncJob?.cancel()
         syncJob = null
         platformLogger("UserRepository", "User sync stopped.")
     }
+
+
 
 }

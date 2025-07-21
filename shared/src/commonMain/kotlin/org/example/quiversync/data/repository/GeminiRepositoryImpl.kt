@@ -35,8 +35,6 @@ class GeminiRepositoryImpl(
         return try {
             val uid = sessionManager.getUid()
                 ?: return Result.Failure(GeminiError("User UID is null, cannot generate match"))
-            val user = userDao.getUserProfile(uid).firstOrNull()
-                ?: return Result.Failure(GeminiError("User not found for UID: $uid"))
             val existingPrediction = dao.getMatch(
                 dailyForecast.date,
                 dailyForecast.latitude,
@@ -162,12 +160,12 @@ class GeminiRepositoryImpl(
         dailyForecasts: List<DailyForecast>
     ): Result<List<GeminiPrediction>, Error> {
         return try {
-            println("🌀 Starting prediction generation for all spots (User: ${user.uid})")
-            println("📆 Received ${dailyForecasts.size} forecasts for today:\n" +
-                    dailyForecasts.joinToString("\n") {
-                        "• Date: ${it.date}, Location: (${it.latitude}, ${it.longitude}), WaveHeight: ${it.waveHeight}m"
-                    }
-            )
+//            println("🌀 Starting prediction generation for all spots (User: ${user.uid})")
+//            println("📆 Received ${dailyForecasts.size} forecasts for today:\n" +
+//                    dailyForecasts.joinToString("\n") {
+//                        "• Date: ${it.date}, Location: (${it.latitude}, ${it.longitude}), WaveHeight: ${it.waveHeight}m"
+//                    }
+//            )
 
             val predictions = mutableListOf<GeminiPrediction>()
             val forecastsForProcess = mutableListOf<DailyForecast>()
@@ -183,20 +181,20 @@ class GeminiRepositoryImpl(
                 )
 
                 if (existingPrediction != null) {
-                    println("✅ Existing prediction found for ${forecast.date} at (${forecast.latitude}, ${forecast.longitude}) → Skipping")
+//                    println("✅ Existing prediction found for ${forecast.date} at (${forecast.latitude}, ${forecast.longitude}) → Skipping")
                     predictions.add(existingPrediction)
                 } else {
-                    println("🆕 No prediction for ${forecast.date} at (${forecast.latitude}, ${forecast.longitude}) → Will generate")
+//                    println("🆕 No prediction for ${forecast.date} at (${forecast.latitude}, ${forecast.longitude}) → Will generate")
                     forecastsForProcess.add(forecast)
                 }
             }
 
             if (forecastsForProcess.isEmpty()) {
-                println("🎉 All predictions already exist — returning ${predictions.size} predictions")
+//                println("🎉 All predictions already exist — returning ${predictions.size} predictions")
                 return Result.Success(predictions)
             }
 
-            println("🚀 Sending ${forecastsForProcess.size} forecasts to Gemini API for prediction:")
+//            println("🚀 Sending ${forecastsForProcess.size} forecasts to Gemini API for prediction:")
             forecastsForProcess.forEachIndexed { i, f ->
                 println("   🔹 [$i] ${f.date} @ (${f.latitude}, ${f.longitude}) - Wave: ${f.waveHeight}m, Wind: ${f.windSpeed}m/s")
             }
@@ -209,16 +207,16 @@ class GeminiRepositoryImpl(
 
                 is Result.Success -> {
                     val received = result.data?.size ?: 0
-                    println("🎯 Gemini API returned $received new predictions:")
+//                    println("🎯 Gemini API returned $received new predictions:")
                     result.data?.forEachIndexed { i, prediction ->
-                        println("   📦 [$i] Date: ${prediction.date}, Spot: (${prediction.forecastLatitude}, ${prediction.forecastLongitude}), Score: ${prediction.score}")
+//                        println("   📦 [$i] Date: ${prediction.date}, Spot: (${prediction.forecastLatitude}, ${prediction.forecastLongitude}), Score: ${prediction.score}")
                         dao.insert(prediction, userUid)
                         predictions.add(prediction)
                     }
                 }
             }
 
-            println("✅ Finished generating predictions → Returning total of ${predictions.size} predictions")
+//            println("✅ Finished generating predictions → Returning total of ${predictions.size} predictions")
             Result.Success(predictions)
 
         } catch (e: Exception) {

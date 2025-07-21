@@ -44,6 +44,13 @@ class FavSpotsViewModel(
         observeFavoriteSpots()
     }
 
+    fun refreshFavSpots() {
+        scope.launch {
+            _uiState.value = FavSpotsState.Loading
+            observeFavoriteSpots()
+        }
+    }
+
     private fun observeFavoriteSpots() {
         scope.launch {
             favSpotsUseCases.getAllFavUserSpotsUseCase().collect { result ->
@@ -88,14 +95,11 @@ class FavSpotsViewModel(
             return
         }
 
-        platformLogger(
-            "FavSpotsViewModel",
-            "User details loaded: ${userDetails.name} (${userDetails.uid})"
-        )
+
         val forecasts = spots.mapNotNull { spot ->
             (favSpotsUseCases.getDailyForecast(spot) as? Result.Success)?.data
         }
-        platformLogger("FavSpotsViewModel", "Forecasts loaded: ${forecasts.size}")
+//        platformLogger("FavSpotsViewModel", "Forecasts loaded: ${forecasts.size}")
 
         val predictions = if (quiver.isNotEmpty()) {
             (favSpotsUseCases.generateAllTodayPredictionsUseCase(
@@ -106,7 +110,7 @@ class FavSpotsViewModel(
         } else {
             emptyList()
         }
-        platformLogger("FavSpotsViewModel", "Predictions loaded: ${predictions.size}")
+//        platformLogger("FavSpotsViewModel", "Predictions loaded: ${predictions.size}")
 
         _uiState.value = FavSpotsState.Loaded(
             FavSpotsData(
@@ -226,13 +230,13 @@ class FavSpotsViewModel(
                 if (favSpotDataWeekly.first().latitude == spot.spotLatitude &&
                     favSpotDataWeekly.first().longitude == spot.spotLongitude
                 ) {
-                    println("FavSpotsViewModel: Weekly forecast already loaded for this spot: ${spot.name}")
+//                    println("FavSpotsViewModel: Weekly forecast already loaded for this spot: ${spot.name}")
                     // Already loaded for this spot, no need to fetch again
                     _uiState.emit(FavSpotsState.Loaded(currentState.favSpotsData))
                     return@launch
                 }
             } else {
-                print("FavSpotsViewModel: No weekly forecast data available for this spot, fetching new data")
+//                print("FavSpotsViewModel: No weekly forecast data available for this spot, fetching new data")
                 updateUiState {
                     it.copy(
                         weeklyForecastForSpecificSpot = emptyList(),
@@ -307,10 +311,10 @@ class FavSpotsViewModel(
                                                     )
                                                 )
                                             } else {
-                                                println(
-                                                    "FavSpotsViewModel: Skipping prediction for ${prediction.forecastLatitude}, ${prediction.forecastLongitude} - " +
-                                                            "Board or forecast not found"
-                                                )
+//                                                println(
+//                                                    "FavSpotsViewModel: Skipping prediction for ${prediction.forecastLatitude}, ${prediction.forecastLongitude} - " +
+//                                                            "Board or forecast not found"
+//                                                )
                                             }
 
                                         }

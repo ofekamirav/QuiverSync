@@ -31,7 +31,7 @@ public struct FavSpotsScreen: View {
                     systemImageName: "map.fill",
                     buttonText: "Retry",
                     onRetry: {
-                        viewModel.startObserving()
+                        viewModel.viewModel.refreshFavSpots()
                     }
                 )
             }

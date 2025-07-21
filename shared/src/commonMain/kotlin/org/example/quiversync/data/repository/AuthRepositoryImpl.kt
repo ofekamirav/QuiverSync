@@ -52,6 +52,8 @@ class AuthRepositoryImpl(
                 val userDto = UserDto(email = email, name = name)
                 firestore.collection("users").document(uid).set(userDto)
                 sessionManager.setUid(uid)
+                val user = User(email = email, name = name , uid = uid)
+                userDao.insertOrReplaceProfile(user, uid)
                 Result.Success(Unit)
             } else {
                 Result.Failure(AuthError("Failed to create user: UID is null after registration."))

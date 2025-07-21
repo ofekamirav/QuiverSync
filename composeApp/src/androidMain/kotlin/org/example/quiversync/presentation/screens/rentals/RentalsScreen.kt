@@ -1,21 +1,17 @@
 package org.example.quiversync.presentation.screens.rentals
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.domain.model.RentalStatus
-import org.example.quiversync.features.rentals.explore.ExploreViewModel
+import org.example.quiversync.features.rentals.explore.ExploreViewModel_old
 import org.example.quiversync.features.rentals.my_offers.MyOffersViewModel
 import org.example.quiversync.features.rentals.my_rentals.MyRentalsViewModel
 import org.example.quiversync.utils.LocalWindowInfo
@@ -38,7 +34,7 @@ fun colorForStatus(status: RentalStatus): Color {
 @Composable
 fun RentalsHubScreen(
     modifier: Modifier = Modifier,
-    exploreViewModel: ExploreViewModel = ExploreViewModel(),
+    exploreViewModel: ExploreViewModel_old = ExploreViewModel_old(),
     myOffersViewModel: MyOffersViewModel = MyOffersViewModel(),
     myRentalsViewModel: MyRentalsViewModel = MyRentalsViewModel(),
 ) {
@@ -116,7 +112,7 @@ fun RentalsHubScreen(
 @Composable
 private fun RentalsHubContent(
     selectedTabIndex: Int,
-    exploreViewModel: ExploreViewModel,
+    exploreViewModel: ExploreViewModel_old,
     myOffersViewModel: MyOffersViewModel,
     myRentalsViewModel: MyRentalsViewModel,
 ) {
@@ -132,7 +128,7 @@ private fun RentalsHubContent(
 fun RentalsHubScreenPreview() {
     QuiverSyncTheme(darkTheme = false) {
         RentalsHubScreen(
-            exploreViewModel = ExploreViewModel(),
+            exploreViewModel = ExploreViewModel_old(),
             myOffersViewModel = MyOffersViewModel(),
             myRentalsViewModel = MyRentalsViewModel(),
         )

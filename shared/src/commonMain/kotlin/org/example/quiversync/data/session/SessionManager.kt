@@ -19,6 +19,9 @@ expect class SessionManager(context: Any?) {
     suspend fun getUnitsPreference(): String?
     suspend fun setUnitsPreference(units: String)
 
+    suspend fun isOnboardingComplete(): Boolean
+    suspend fun setOnboardingComplete(complete: Boolean)
+
 
 }
 

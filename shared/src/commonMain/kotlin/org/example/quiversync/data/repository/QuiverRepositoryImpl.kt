@@ -24,7 +24,9 @@ import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.SurfboardError
 import org.example.quiversync.domain.repository.QuiverRepository
 import org.example.quiversync.utils.extensions.platformLogger
+import org.example.quiversync.utils.extensions.toDomain
 import org.example.quiversync.utils.extensions.toDto
+
 
 
 
@@ -85,8 +87,6 @@ class QuiverRepositoryImpl(
         quiverSyncJob?.cancel()
         quiverSyncJob = null
     }
-
-
 
     override suspend fun addSurfboard(surfboard: Surfboard): Result<Boolean, Error> {
         return try {
@@ -206,5 +206,40 @@ class QuiverRepositoryImpl(
             Result.Failure(SurfboardError(e.message ?: "An error occurred while setting the surfboard as unavailable for rental"))
         }
     }
+
+    override suspend fun getBoardById(surfboardId: String): Result<Surfboard, Error> {
+        return try{
+            val surfboardEntity = localDataSource.getSurfboardById(surfboardId)
+                ?: return Result.Failure(SurfboardError("Surfboard not found with ID: $surfboardId"))
+
+            val surfboard = surfboardEntity.toDomain()
+            platformLogger("QuiverRepositoryImpl", "Fetched surfboard by ID: ${surfboard.id}")
+            Result.Success(surfboard)
+        }
+        catch ( e: Exception) {
+            platformLogger("QuiverRepositoryImpl", "Error fetching surfboard by ID: ${e.message}")
+            Result.Failure(SurfboardError(e.message ?: "An error occurred while fetching the surfboard by ID"))
+        }
+    }
+
+    override suspend fun getAvailableSurfboards(userId: String): Result<List<Surfboard>, Error> {
+        return try{
+            when (val result = remoteDataSource.getAvailableSurfboardsRemote(userId)) {
+                is Result.Success -> {
+                    platformLogger("QuiverRepositoryImpl", "Fetched available surfboards for user: $userId")
+                    Result.Success(result.data)
+                }
+                is Result.Failure -> {
+                    platformLogger("QuiverRepositoryImpl", "Failed to fetch available surfboards: ${result.error?.message}")
+                    Result.Failure(SurfboardError(result.error?.message ?: "Failed to fetch available surfboards"))
+                }
+            }
+        }
+        catch ( e: Exception) {
+            platformLogger("QuiverRepositoryImpl", "Error fetching available surfboards: ${e.message}")
+            Result.Failure(SurfboardError(e.message ?: "An error occurred while fetching available surfboards"))
+        }
+    }
+
 
 }

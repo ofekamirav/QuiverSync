@@ -53,6 +53,14 @@ class QuiverDao(
         return false
     }
 
+    fun addListOfBoards(surfboards : List<Surfboard>){
+        for (surfboard in surfboards) {
+            if(getSurfboardById(surfboard.id) != null) {
+                addSurfboard(surfboard)
+            }
+        }
+    }
+
     fun deleteSurfboard(surfboardId: String): Boolean {
         try {
             queries.deleteSurfboardById(surfboardId)
