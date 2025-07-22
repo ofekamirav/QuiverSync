@@ -6,7 +6,6 @@ import org.example.quiversync.data.remote.dto.SurfboardDto
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.Error
-import org.example.quiversync.domain.model.RentalOffer
 
 
 interface QuiverRemoteDataSource {
@@ -16,6 +15,6 @@ interface QuiverRemoteDataSource {
     suspend fun unpublishForRentalRemote(surfboardId: String): Result<Boolean, Error>
     suspend fun setSurfboardAsRentalAvailableRemote(surfboardId: String): Result<Boolean, Error>
     suspend fun setSurfboardAsRentalUnavailableRemote(surfboardId: String): Result<Boolean, Error>
-    suspend fun getAvailableSurfboardsRemote(userId: String): Result<List<Surfboard>, Error>
     fun observeQuiver(userId: String): Flow<List<Surfboard>>
+    suspend fun fetchRentalPage(userId: String, pageSize: Int, lastDocumentId: String?): Result<List<Surfboard>, Error>
 }
