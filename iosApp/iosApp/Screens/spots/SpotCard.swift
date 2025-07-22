@@ -38,13 +38,21 @@ public struct SpotCard: View {
                         Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                             .foregroundColor(AppColors.textPrimary(for: colorScheme).opacity(0.6))
                     }
-                    .buttonStyle(PlainButtonStyle())
+                }
+                .contentShape(Rectangle()) // Make entire area tappable
+                .onTapGesture {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        isExpanded.toggle()
+                    }
                 }
                 .padding(.top, 12)
                 .padding(.horizontal)
 
                 if isExpanded {
                     Divider()
+                        .opacity(isExpanded ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.3), value: isExpanded)
+
                     ExtendCard(
                         favSpot: favSpot,
                         favSpotData: favSpotsData,
@@ -57,14 +65,18 @@ public struct SpotCard: View {
                         selectedSpot: $selectedSpot
                     )
                     .opacity(isExpanded ? 1 : 0)
-                    .frame(height: isExpanded ? nil : 0)
+                    .frame(maxHeight: isExpanded ? .infinity : 0)
                     .clipped()
                     .padding(.horizontal)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, isExpanded ? 20 : 0)
+                    .animation(.easeInOut(duration: 0.3), value: isExpanded)
 
                 }
+
             }
             .background(AppColors.cardColor(for: colorScheme)) // 💡 ensure it's always colored
+            .animation(.easeInOut(duration: 0.3), value: isExpanded)
+
         }
         .padding()
         .background(AppColors.cardColor(for: colorScheme))

@@ -17,6 +17,7 @@ actual class SessionManager actual constructor(context: Any?) {
     private val longitudeKey = doublePreferencesKey("longitude")
     private val lastRefreshKey = stringPreferencesKey("lastRefresh")
     private val unitsPreferenceKey = stringPreferencesKey("units_preference")
+    private val onboardingCompleteKey = booleanPreferencesKey("onboarding_complete")
 
 
 
@@ -85,6 +86,14 @@ actual class SessionManager actual constructor(context: Any?) {
 
     actual suspend fun setUnitsPreference(units: String) {
         context.dataStore.edit { it[unitsPreferenceKey] = units }
+    }
+
+    actual suspend fun isOnboardingComplete(): Boolean {
+        return context.dataStore.data.first()[onboardingCompleteKey] ?: false
+    }
+
+    actual suspend fun setOnboardingComplete(complete: Boolean) {
+        context.dataStore.edit { it[onboardingCompleteKey] = complete }
     }
 
 }

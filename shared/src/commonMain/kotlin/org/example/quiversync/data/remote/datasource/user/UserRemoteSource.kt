@@ -8,4 +8,5 @@ import org.example.quiversync.domain.model.User
 interface UserRemoteSource {
     fun observeUserProfile(uid: String): Flow<User?>
     suspend fun updateUserProfile(user: User): Result<Unit, Error>
+    suspend fun getUserById(userId: String): Result<User, Error>
 }

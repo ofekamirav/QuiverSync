@@ -38,13 +38,29 @@ public struct SecurityAndPrivacyScreen: View {
                 )
 
             case .loading:
-                LoadingView(colorName: "foamwhite")
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .success:
                 VStack {
-                    LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 200)
+                    Spacer()
+
+                    SuccessMessageView(
+                        title: "Password Updated!",
+                        subtitle: "Your account is now more secure.",
+                        systemIconName: "checkmark.shield.fill",
+                        iconColor: .green,
+                        backgroundColor: .green,
+                        onDismiss: {
+                            navigateToProfile = true
+                        }
+                    )
+                    .padding(.top, 80)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.spring(), value: UUID())
+
+                    Spacer()
                 }
                 .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
                         navigateToProfile = true
                     }
                 }

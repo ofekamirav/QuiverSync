@@ -100,6 +100,13 @@ import org.example.quiversync.features.user.UserViewModel
 import org.example.quiversync.features.user.edit_user.EditProfileDetailsViewModel
 import org.example.quiversync.data.remote.datasource.user.UserRemoteSource
 import org.example.quiversync.data.remote.datasource.user.UserRemoteSourceService
+import org.example.quiversync.data.repository.RentalsRepositoryImpl
+import org.example.quiversync.domain.repository.RentalsRepository
+import org.example.quiversync.domain.usecase.rentals.FetchExplorePageUseCase
+import org.example.quiversync.domain.usecase.rentals.ObserveExploreBoardsUseCase
+import org.example.quiversync.domain.usecase.user.GetUserByIdUseCase
+import org.example.quiversync.features.rentals.RentalsUseCases
+import org.example.quiversync.features.rentals.explore.ExploreViewModel
 
 
 fun initKoin(config: KoinAppDeclaration? = null) {
@@ -145,6 +152,7 @@ val commonModule= module {
    single<ForecastRepository> { ForecastRepositoryImpl(get(), get(), get() , get()) }
    single<UserRepository> { UserRepositoryImpl(get(), get(),get(), get()) }
    single<QuiverRepository> { QuiverRepositoryImpl(get(), get(), get(), get()) }
+   single<RentalsRepository> { RentalsRepositoryImpl(get(), get(), get()) }
 
    //----------------------------------------------------- Firebase- Remote Data Source----------------------------------
    single<QuiverRemoteDataSource>{ QuiverRemoteDataSourceService(get()) }
@@ -159,10 +167,10 @@ val commonModule= module {
    single { get<QuiverSyncDatabase>().userProfileQueries }
    single { get<QuiverSyncDatabase>().surfboardQueries }
    single { get<QuiverSyncDatabase>().favSpotQueries }
-   single { UserDao(get()) }
-   single { QuiverDao(get()) }
-   single {GeminiPredictionDao(get())}
-   single { FavSpotDao(get()) }
+   single { UserDao(queries = get()) }
+   single { QuiverDao(queries  = get()) }
+   single {GeminiPredictionDao(queries  = get())}
+   single { FavSpotDao(queries = get()) }
 
 
    //---------------------------------------------------UseCases--------------------------------------------
@@ -182,6 +190,8 @@ val commonModule= module {
     single { SignInWithGoogleUseCase(get()) }
     single { GetSpotsNumberUseCase(get()) }
     single { IsImperialUnitsUseCase(get()) }
+    single { GetUserByIdUseCase(get()) }
+    single { SignInWithAppleUseCase(get()) }
 
    //Quiver UseCases
    single { AddBoardUseCase(get()) }
@@ -210,6 +220,9 @@ val commonModule= module {
    single { DeleteAllPredictionsBySpotUseCase(get()) }
    single { GenerateAllTodayPredictionsUseCase(get()) }
 //   single { GetPredictionsForTodayUseCase(get()) }
+    //Rentals UseCases
+    single { FetchExplorePageUseCase(get()) }
+    single { ObserveExploreBoardsUseCase(get()) }
 
 
    //Data Classes for UseCases
@@ -228,7 +241,8 @@ val commonModule= module {
          updateUserProfile = get()
       )
    }
-   single{
+    single { RentalsUseCases(get(), get()) }
+    single{
       UserUseCases(
           getUserProfileUseCase = get(),
           updateUserProfileUseCase = get(),
@@ -255,7 +269,6 @@ val commonModule= module {
    // FavSpots UseCases Collection
    single {
       FavSpotsUseCases(
-
             // FavSpots UseCases
             deleteOutDateForecastUseCase = get(),
             getAllFavUserSpotsUseCase = get(),
@@ -288,7 +301,7 @@ val commonModule= module {
    single { RegisterViewModel(get()) }
    single { OnboardingViewModel(get(), get(),get()) }
    factory { UserViewModel(get()) }
-   single { HomeViewModel(get()) }
+   factory { HomeViewModel(get()) }
    single { LoginViewModel(get(), get()) }
    single { OnboardingViewModel(get(), get(), get()) }
    factory { QuiverViewModel(get()) }
@@ -299,6 +312,7 @@ val commonModule= module {
    factory { FavSpotsViewModel(get()) }
    single { AddFavSpotViewModel(get())}
    single { ForgotPasswordViewModel(get()) }
+   factory { ExploreViewModel(get(), get()) }
 
 
 

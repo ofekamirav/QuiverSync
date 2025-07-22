@@ -43,11 +43,11 @@ class HomeViewModel(
 
     private fun fetchForecastAndBoardMatch() {
         scope.launch {
-            platformLogger("HomeViewModel", "fetching forecast and best board match")
+//            platformLogger("HomeViewModel", "fetching forecast and best board match")
             _uiState.value = HomeState.Loading
-            platformLogger("HomeViewModel", "Fetching weekly forecast and best board match")
+//            platformLogger("HomeViewModel", "Fetching weekly forecast and best board match")
             val forecastResult = homeUseCases.getWeeklyForecastByLocationUseCase()
-            platformLogger("HomeViewModel", "forecast for the week by your location: $forecastResult")
+//            platformLogger("HomeViewModel", "forecast for the week by your location: $forecastResult")
             val userResult = homeUseCases.getUser().firstOrNull()
             val forecast: List<DailyForecast>
             val user : User
@@ -87,7 +87,7 @@ class HomeViewModel(
                 }
             }
             val quiverResult = homeUseCases.getQuiverUseCase().firstOrNull()
-            platformLogger("HomeViewModel", "quiver result: $quiverResult")
+//            platformLogger("HomeViewModel", "quiver result: $quiverResult")
             var quiver  = emptyList<Surfboard>()
             when(quiverResult){
                 is Result.Failure -> {
@@ -129,12 +129,12 @@ class HomeViewModel(
                 )
                 return@launch
             }
-            println( "Quiver size: ${quiver.size}, Forecast size: ${forecast.size} this is the user profile " +
-            " ${user.name} with id ${user.uid} and email ${user.email}")
+//            println( "Quiver size: ${quiver.size}, Forecast size: ${forecast.size} this is the user profile " +
+//            " ${user.name} with id ${user.uid} and email ${user.email}")
             val bestBoardMatch = forecast.firstOrNull()
                 ?.let { homeUseCases.getDailyPrediction(quiver , it , user) }
                 ?: return@launch
-            platformLogger("HomeViewModel", "best board match: $bestBoardMatch")
+//            platformLogger("HomeViewModel", "best board match: $bestBoardMatch")
 
 
             when (bestBoardMatch) {
@@ -147,7 +147,7 @@ class HomeViewModel(
                     val prediction = bestBoardMatch.data ?: return@launch
                     val surfboard = quiver.find { it.id ==  prediction.surfboardID }
                     if (surfboard == null) {
-                        platformLogger("HomeViewModel", "Surfboard not found for the best match: ${prediction.surfboardID}")
+//                        platformLogger("HomeViewModel", "Surfboard not found for the best match: ${prediction.surfboardID}")
                         _uiState.value = HomeState.Error("Surfboard not found for the best match")
                         return@launch
                     }

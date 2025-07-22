@@ -30,9 +30,11 @@ struct OnBoardingScreen: View {
                 )
 
             case .success:
+                
                 Color.clear.onAppear {
+                    
                     isLoggedIn = true
-                    onCompleteClick() // 👈 navigate to home screen
+                    onCompleteClick()
                 }
 
             case .error(let error):
@@ -55,5 +57,6 @@ struct OnBoardingScreen: View {
         .onAppear {
             viewModel.startObserving()
         }
+        .navigationBarBackButtonHidden(true)
     }
 }

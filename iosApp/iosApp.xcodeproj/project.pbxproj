@@ -45,6 +45,12 @@
 		6963055F2E211FA600018B65 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6963055E2E211FA600018B65 /* FirebaseCore */; };
 		696305612E211FA600018B65 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 696305602E211FA600018B65 /* FirebaseCrashlytics */; };
 		696305632E211FA600018B65 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 696305622E211FA600018B65 /* FirebaseFirestore */; };
+		696392442E2E5D2300C05C6A /* exploreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696392432E2E5D1D00C05C6A /* exploreWrapper.swift */; };
+		696392462E2E5D2B00C05C6A /* exploreScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696392452E2E5D2600C05C6A /* exploreScreen.swift */; };
+		696392482E2E5D3300C05C6A /* exploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696392472E2E5D2F00C05C6A /* exploreView.swift */; };
+		6963924B2E2E60B900C05C6A /* RentalBoardCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6963924A2E2E60B700C05C6A /* RentalBoardCardView.swift */; };
+		6971841E2E2BE08C0083BA31 /* SignInWithAppleCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6971841D2E2BE0850083BA31 /* SignInWithAppleCoordinator.swift */; };
+		697184202E2BF6C90083BA31 /* SuccessMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6971841F2E2BF6C30083BA31 /* SuccessMessageView.swift */; };
 		6975DFA22E04B6B000D14119 /* QuiverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6975DFA12E04B6AD00D14119 /* QuiverView.swift */; };
 		697E7CAD2E0561C00030392F /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CAC2E0561B60030392F /* ProfileScreen.swift */; };
 		697E7CAF2E05656E0030392F /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CAE2E05656B0030392F /* LoadingView.swift */; };
@@ -69,6 +75,8 @@
 		69A923962E23D06F001EB624 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923952E23D06E001EB624 /* ImagePicker.swift */; };
 		69A923992E23D17D001EB624 /* KotlinInteropExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923982E23D17C001EB624 /* KotlinInteropExtensions.swift */; };
 		69A9239B2E23D262001EB624 /* OutlinedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9239A2E23D260001EB624 /* OutlinedButton.swift */; };
+		69B24F7B2E2D31260098C5B7 /* SwipeToDeleteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B24F7A2E2D31210098C5B7 /* SwipeToDeleteCard.swift */; };
+		69B24F7D2E2D36150098C5B7 /* ForecastOnlyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B24F7C2E2D36140098C5B7 /* ForecastOnlyCard.swift */; };
 		69C86FF52E12ACBF00850490 /* RegisterWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C86FF42E12ACB600850490 /* RegisterWrapper.swift */; };
 		69C86FF72E12B4E500850490 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C86FF62E12B4E100850490 /* RegisterView.swift */; };
 		69D02A022E27C27E0074E2E9 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D02A012E27C2780074E2E9 /* SettingsScreen.swift */; };
@@ -153,6 +161,12 @@
 		6953D4762E296283005C54F5 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		6953D4782E2966EE005C54F5 /* AuthErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthErrorView.swift; sourceTree = "<group>"; };
 		6953D47A2E29705F005C54F5 /* splash_intro_animation.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = splash_intro_animation.json; sourceTree = "<group>"; };
+		696392432E2E5D1D00C05C6A /* exploreWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = exploreWrapper.swift; sourceTree = "<group>"; };
+		696392452E2E5D2600C05C6A /* exploreScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = exploreScreen.swift; sourceTree = "<group>"; };
+		696392472E2E5D2F00C05C6A /* exploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = exploreView.swift; sourceTree = "<group>"; };
+		6963924A2E2E60B700C05C6A /* RentalBoardCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RentalBoardCardView.swift; sourceTree = "<group>"; };
+		6971841D2E2BE0850083BA31 /* SignInWithAppleCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInWithAppleCoordinator.swift; sourceTree = "<group>"; };
+		6971841F2E2BF6C30083BA31 /* SuccessMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessMessageView.swift; sourceTree = "<group>"; };
 		6975DFA12E04B6AD00D14119 /* QuiverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuiverView.swift; sourceTree = "<group>"; };
 		697E7CAC2E0561B60030392F /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		697E7CAE2E05656B0030392F /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -177,6 +191,8 @@
 		69A923952E23D06E001EB624 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		69A923982E23D17C001EB624 /* KotlinInteropExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinInteropExtensions.swift; sourceTree = "<group>"; };
 		69A9239A2E23D260001EB624 /* OutlinedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlinedButton.swift; sourceTree = "<group>"; };
+		69B24F7A2E2D31210098C5B7 /* SwipeToDeleteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToDeleteCard.swift; sourceTree = "<group>"; };
+		69B24F7C2E2D36140098C5B7 /* ForecastOnlyCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastOnlyCard.swift; sourceTree = "<group>"; };
 		69C86FF42E12ACB600850490 /* RegisterWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterWrapper.swift; sourceTree = "<group>"; };
 		69C86FF62E12B4E100850490 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		69D02A012E27C2780074E2E9 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
@@ -324,6 +340,33 @@
 			path = OnBoarding;
 			sourceTree = "<group>";
 		};
+		696392422E2E5D1000C05C6A /* explore */ = {
+			isa = PBXGroup;
+			children = (
+				696392492E2E606900C05C6A /* components */,
+				696392472E2E5D2F00C05C6A /* exploreView.swift */,
+				696392452E2E5D2600C05C6A /* exploreScreen.swift */,
+				696392432E2E5D1D00C05C6A /* exploreWrapper.swift */,
+			);
+			path = explore;
+			sourceTree = "<group>";
+		};
+		696392492E2E606900C05C6A /* components */ = {
+			isa = PBXGroup;
+			children = (
+				6963924A2E2E60B700C05C6A /* RentalBoardCardView.swift */,
+			);
+			path = components;
+			sourceTree = "<group>";
+		};
+		6971841C2E2BE07D0083BA31 /* AppleAuth */ = {
+			isa = PBXGroup;
+			children = (
+				6971841D2E2BE0850083BA31 /* SignInWithAppleCoordinator.swift */,
+			);
+			path = AppleAuth;
+			sourceTree = "<group>";
+		};
 		697E7CAB2E055B910030392F /* profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -343,6 +386,7 @@
 		699AE8AD2E1D3D3B00717A8B /* FavSpotsMainScreen */ = {
 			isa = PBXGroup;
 			children = (
+				69B24F7C2E2D36140098C5B7 /* ForecastOnlyCard.swift */,
 				699AE8AB2E1D3CFA00717A8B /* FavSpotWrapper.swift */,
 				69EAE8262E05CA13004E31CD /* FavSpotsView.swift */,
 				69EAE8242E05B678004E31CD /* FavSpotsScreen.swift */,
@@ -405,6 +449,7 @@
 		69C1292E2E157D5E0054411E /* Login */ = {
 			isa = PBXGroup;
 			children = (
+				6971841C2E2BE07D0083BA31 /* AppleAuth */,
 				6953D4642E291446005C54F5 /* Forgot_Password */,
 				692B517C2E16D9920036FCD8 /* LoginScreen.swift */,
 				692B517A2E16D97D0036FCD8 /* LoginWrapper.swift */,
@@ -556,6 +601,7 @@
 		69E55AB62E02DDF800B530D3 /* rentals */ = {
 			isa = PBXGroup;
 			children = (
+				696392422E2E5D1000C05C6A /* explore */,
 				69E55ACA2E02DEAD00B530D3 /* RentalsScreen.swift */,
 			);
 			path = rentals;
@@ -564,6 +610,7 @@
 		69E55AB82E02DE0900B530D3 /* spots */ = {
 			isa = PBXGroup;
 			children = (
+				69B24F7A2E2D31210098C5B7 /* SwipeToDeleteCard.swift */,
 				694813F92E1E86DF00F9F297 /* HelperFunctions */,
 				699AE8AD2E1D3D3B00717A8B /* FavSpotsMainScreen */,
 				6904CA742E0C027B0039C9D9 /* ForecastRow.swift */,
@@ -578,6 +625,7 @@
 		69E55ADA2E02EE5000B530D3 /* components */ = {
 			isa = PBXGroup;
 			children = (
+				6971841F2E2BF6C30083BA31 /* SuccessMessageView.swift */,
 				6953D4782E2966EE005C54F5 /* AuthErrorView.swift */,
 				6953D4762E296283005C54F5 /* EmptyStateView.swift */,
 				69DB83DF2E265072005489FD /* ImageUploader.swift */,
@@ -779,6 +827,7 @@
 				69DB83E22E267E53005489FD /* ProfileWrapper.swift in Sources */,
 				69E55AAF2E02DD9400B530D3 /* RegisterScreen.swift in Sources */,
 				69A923852E23BA15001EB624 /* AddBoardStep1View.swift in Sources */,
+				697184202E2BF6C90083BA31 /* SuccessMessageView.swift in Sources */,
 				69A923762E23A986001EB624 /* SurfboardDetailDialog.swift in Sources */,
 				69D02A202E27D7A40074E2E9 /* EditProfileScreen.swift in Sources */,
 				694F855B2E26EA6400C2322F /* TODOView.swift in Sources */,
@@ -810,6 +859,7 @@
 				69E55AB12E02DDBA00B530D3 /* WelcomeBottomSheetScreen.swift in Sources */,
 				69E55ADC2E02EE6A00B530D3 /* GradientButton.swift in Sources */,
 				6904CA752E0C027C0039C9D9 /* ForecastRow.swift in Sources */,
+				696392462E2E5D2B00C05C6A /* exploreScreen.swift in Sources */,
 				69A9238F2E23BA3B001EB624 /* FinsSetupDropdown.swift in Sources */,
 				699AE8AC2E1D3D0100717A8B /* FavSpotWrapper.swift in Sources */,
 				69A923712E23A4F7001EB624 /* QuiverViewModelWrapper.swift in Sources */,
@@ -831,6 +881,7 @@
 				69D02A222E27EFC90074E2E9 /* EditProfileFormView.swift in Sources */,
 				6904CA712E0BFB180039C9D9 /* WeeklyForecastPopup.swift in Sources */,
 				69EAE8272E05CA1E004E31CD /* FavSpotsView.swift in Sources */,
+				696392482E2E5D3300C05C6A /* exploreView.swift in Sources */,
 				6953D4792E2966EF005C54F5 /* AuthErrorView.swift in Sources */,
 				69DB83EF2E2681F7005489FD /* VerticalDivider.swift in Sources */,
 				69E55ACF2E02DED300B530D3 /* QuiverScreen.swift in Sources */,
@@ -845,6 +896,8 @@
 				6953D4752E29351B005C54F5 /* SurfLevelSelectorView.swift in Sources */,
 				697E7CAD2E0561C00030392F /* ProfileScreen.swift in Sources */,
 				69E55ADE2E02EE7100B530D3 /* SocialLoginButton.swift in Sources */,
+				6963924B2E2E60B900C05C6A /* RentalBoardCardView.swift in Sources */,
+				6971841E2E2BE08C0083BA31 /* SignInWithAppleCoordinator.swift in Sources */,
 				6953D4632E291400005C54F5 /* ForgotPasswordScreen.swift in Sources */,
 				692B517B2E16D98C0036FCD8 /* LoginWrapper.swift in Sources */,
 				69EAE8292E05CB39004E31CD /* SpotCard.swift in Sources */,
@@ -860,15 +913,18 @@
 				69A923922E23C518001EB624 /* CustomTextField.swift in Sources */,
 				69D02A1E2E27D7970074E2E9 /* EditProfileWrapper.swift in Sources */,
 				69E55AA92E02D20600B530D3 /* LoginView.swift in Sources */,
+				696392442E2E5D2300C05C6A /* exploreWrapper.swift in Sources */,
 				692B517D2E16D9B40036FCD8 /* LoginScreen.swift in Sources */,
 				69DB83E92E267F44005489FD /* ProfileHeaderView.swift in Sources */,
 				69DB83E02E265076005489FD /* ImageUploader.swift in Sources */,
 				6953D4682E2915FA005C54F5 /* ForgotPasswordView.swift in Sources */,
 				69E55AF52E033C0300B530D3 /* ForecastItemView.swift in Sources */,
 				69C86FF52E12ACBF00850490 /* RegisterWrapper.swift in Sources */,
+				69B24F7D2E2D36150098C5B7 /* ForecastOnlyCard.swift in Sources */,
 				69DB83ED2E268150005489FD /* StatItem.swift in Sources */,
 				69DB83EB2E267F56005489FD /* UserDetailsSectionView.swift in Sources */,
 				697E7CAF2E05656E0030392F /* LoadingView.swift in Sources */,
+				69B24F7B2E2D31260098C5B7 /* SwipeToDeleteCard.swift in Sources */,
 				69A9238D2E23BA34001EB624 /* SelectableBoardTypeGrid.swift in Sources */,
 				69A923822E23B7FB001EB624 /* AddBoardView.swift in Sources */,
 				6953D45D2E2905E0005C54F5 /* SecurityAndPrivacyWrapper.swift in Sources */,

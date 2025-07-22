@@ -15,6 +15,8 @@ struct LoginScreen: View {
     @ObservedObject private(set) var viewModel = LoginViewModelWrapper()
     let onRegisterClick: () -> Void
     let onForgotPasswordClick: () -> Void
+    let onNavigateToOnboarding: () -> Void
+    let onBackBtn: () -> Void
     @Binding var isLoggedIn: Bool
     let onLoginSuccess: () -> Void
 
@@ -54,19 +56,23 @@ struct LoginScreen: View {
                     message: error.message,
                     primaryButtonText: "Try Again",
                     onPrimaryTap: {
-                        viewModel.startObserving()
+                        isLoggedIn = false
+                        viewModel.viewModel.resetState()
+                        onBackBtn()
                     },
                     secondaryButtonText: "Back to Welcome",
                     onSecondaryTap: {
                         isLoggedIn = false
+                        viewModel.viewModel.resetState()
+                        onBackBtn()
                     }
                 )
 
                 
             case .navigateToOnboarding:
-//                Color.clear.onAppear {
-//                    onNavigateToOnboarding()
-//                }
+                Color.clear.onAppear {
+                    onNavigateToOnboarding()
+                }
                 Text("Navigate to Onboarding")
             }
         }

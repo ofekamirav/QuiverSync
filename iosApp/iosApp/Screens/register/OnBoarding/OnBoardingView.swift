@@ -18,9 +18,12 @@ struct OnBoardingView: View {
     @State private var name = ""
     @State private var height = ""
     @State private var weight = ""
+    @State private var phoneNumber = ""
+    @State private var selectedSurfLevel: SurfLevel? = nil
     @State private var showImageOptions = false
     @State private var showCamera = false
     @State private var showGallery = false
+    @State private var localImageUrl: String? = nil
     @State private var didStartIOSUpload = false
     @State private var selectedImageData: Data?
 
@@ -33,11 +36,15 @@ struct OnBoardingView: View {
                         .font(.title)
                         .fontWeight(.semibold)
                         .padding(.top)
+                        .foregroundColor(AppColors.textPrimary(for: colorScheme))
+
 
                     Text("This helps us find the best spots and gear for you.")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                         .multilineTextAlignment(.center)
+                        .foregroundColor(AppColors.textPrimary(for: colorScheme))
+
 
                     // Date Picker (custom view or native)
                     CustomDatePickerView(
@@ -48,10 +55,11 @@ struct OnBoardingView: View {
                     )
 
                     // Height
-                    TextField("Height (cm)", text: Binding(
-                        get: { form.heightCm },
-                        set: { onEvent(OnboardingEventHeightChanged(value: $0)) }
-                    ))
+                    TextField("Height (cm)", text: $height)
+                        .onChange(of: height) { newValue in
+                            onEvent(OnboardingEventHeightChanged(value: newValue))
+                        }
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
                     .keyboardType(.numberPad)
                     .padding()
                     .background(AppColors.cardColor(for: colorScheme))
@@ -62,10 +70,11 @@ struct OnBoardingView: View {
                     }
 
                     // Weight
-                    TextField("Weight (kg)", text: Binding(
-                        get: { form.weightKg },
-                        set: { onEvent(OnboardingEventWeightChanged(value: $0)) }
-                    ))
+                    TextField("Weight (kg)", text: $weight)
+                        .onChange(of: weight) { newValue in
+                            onEvent(OnboardingEventWeightChanged(value: newValue))
+                        }
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
                     .keyboardType(.numberPad)
                     .padding()
                     .background(AppColors.cardColor(for: colorScheme))
@@ -74,14 +83,33 @@ struct OnBoardingView: View {
                     if let error = form.weightError {
                         Text(error).font(.caption).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    
+                    // Phone number
+                    TextField("Phone number", text: $phoneNumber)
+                        .onChange(of: phoneNumber) { newValue in
+                            onEvent(OnboardingEventPhoneNumberChanged(value: newValue))
+                        }
+                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
+                    .keyboardType(.numberPad)
+                    .padding()
+                    .background(AppColors.cardColor(for: colorScheme))
+                    .cornerRadius(10)
+
+                    if let error = form.phoneNumberError {
+                        Text(error).font(.caption).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading)
+                    }
 
                     // Surf Level
                     Text("How do you rate your surfing?")
                         .font(.headline)
+                        .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
                     SurfLevelSelectorView(
-                        selectedLevel: form.selectedSurfLevel,
-                        onSelect: { onEvent(OnboardingEventSurfLevelChanged(level: $0)) },
+                        selectedLevel: selectedSurfLevel,
+                        onSelect: {
+                            selectedSurfLevel = $0
+                            onEvent(OnboardingEventSurfLevelChanged(level: $0))
+                        },
                         error: form.surfLevelError
                     )
 
@@ -93,19 +121,61 @@ struct OnBoardingView: View {
                         errorMessage: form.profileImageError
                     )
                     .frame(height: 180)
+                    
+                    HStack(alignment: .center, spacing: 12) {
+                        Button(action: {
+                            onEvent(OnboardingEventOnAgreementChange(isAgreed: !form.agreedToTerms))
+                        }) {
+                            Image(systemName: form.agreedToTerms ? "checkmark.square.fill" : "square")
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                                .foregroundColor(form.agreedToTerms ? AppColors.surfBlue : .gray)
+                        }
+                        .buttonStyle(PlainButtonStyle())
 
-                    Button("Continue") {
+                        Text("I agree to the Terms and Conditions")
+                            .font(.subheadline)
+                            .foregroundColor(AppColors.textPrimary(for: colorScheme))
+                            .onTapGesture {
+                                onEvent(OnboardingEventOnAgreementChange(isAgreed: !form.agreedToTerms))
+                            }
+
+                        Spacer()
+                    }
+                    .padding(.vertical, 8)
+
+                    if let error = form.termsError {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+
+                    
+                    GradientButton(text: "Continue"){
                         onEvent(OnboardingEventContinueClicked())
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(AppColors.surfBlue)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+                    .buttonStyle(PressableButtonStyle())
+
+
+
                 }
                 .padding()
             }
-
+            .onAppear {
+                height = form.heightCm
+                weight = form.weightKg
+                selectedSurfLevel = form.selectedSurfLevel
+                localImageUrl = form.profileImageUrl
+                phoneNumber = form.phoneNumber
+            }
+            .background(AppColors.sectionBackground(for: colorScheme))
+            .gesture(
+                TapGesture().onEnded {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+            )
             // Image Option Sheet
             .sheet(isPresented: $showImageOptions) {
                 ImageSourceSelectorSheet(
@@ -179,5 +249,15 @@ struct OnBoardingView: View {
                 LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 180)
             }
         }
+    }
+}
+
+
+struct PressableButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .opacity(configuration.isPressed ? 0.85 : 1.0)
+            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
     }
 }

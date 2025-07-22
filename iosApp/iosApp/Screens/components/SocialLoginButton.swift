@@ -11,12 +11,10 @@ import SwiftUI
 struct SocialLoginButton: View {
     let text: String
     let imageName: String
-
+    let action: () -> Void  // 👈 Add this
 
     var body: some View {
-        Button(action: {
-            // Add action
-        }) {
+        Button(action: action) {  // 👈 Use it here
             HStack {
                 Image(systemName: imageName)
                     .resizable()
@@ -34,3 +32,4 @@ struct SocialLoginButton: View {
         }
     }
 }
+

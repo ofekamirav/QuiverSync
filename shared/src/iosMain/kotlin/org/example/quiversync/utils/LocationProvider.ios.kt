@@ -13,7 +13,7 @@ import kotlinx.cinterop.useContents
 @OptIn(ExperimentalForeignApi::class)
 class IOSLocationProvider : LocationProvider {
     private val manager = CLLocationManager().apply {
-        desiredAccuracy = kCLLocationAccuracyBest
+        desiredAccuracy = kCLLocationAccuracyHundredMeters
         requestWhenInUseAuthorization()
     }
 
@@ -56,7 +56,7 @@ class IOSLocationProvider : LocationProvider {
             locationDelegate = delegate // 👈 persist the delegate
 
             manager.delegate = delegate
-            manager.requestLocation()
+            manager.startUpdatingLocation()
 
             cont.invokeOnCancellation {
                 manager.stopUpdatingLocation()

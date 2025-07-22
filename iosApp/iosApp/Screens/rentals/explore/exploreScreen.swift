@@ -1,39 +1,40 @@
 //
-//  ForecastResults.swift
+//  exploreScreen.swift
 //  iosApp
 //
-//  Created by gal levi on 20/06/2025.
+//  Created by gal levi on 21/07/2025.
 //  Copyright © 2025 orgName. All rights reserved.
 //
 
 import SwiftUI
 import Shared
 
-public struct FavSpotsScreen: View {
+
+public struct ExploreScreen: View {
     
-    @ObservedObject private(set) var viewModel = FavSpotsViewModelWrapper()
-    
+    @ObservedObject private(set) var viewModel = ExploreScreenModelWrapper()
     
     public var body: some View {
+        
         VStack{
             switch onEnum(of: viewModel.uiState){
             case .loading:
                 LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
-            case .loaded(let loaded):
-                FavSpotsView(
-                    favSpots: loaded.favSpotsData,
-                    favSpotsViewModel: viewModel.viewModel,
+            case .loaded(let data):
+                ExploreView(
+                    exploreData: data.explorePageData
                 )
             case .error(let error):
                 ErrorView(
-                    title: "Can’t Load Your Spots 📍",
+                    title: "No Rental Boards Available",
                     message: error.message,
-                    systemImageName: "map.fill",
-                    buttonText: "Retry",
+                    systemImageName: "surfboard.fill",
+                    buttonText: "Try Again",
                     onRetry: {
-                        viewModel.viewModel.refreshFavSpots()
+                        viewModel.viewModel.refreshBoards()
                     }
                 )
+
             }
         }
         .onAppear(){
@@ -41,7 +42,3 @@ public struct FavSpotsScreen: View {
         }
     }
 }
-
-
-
-

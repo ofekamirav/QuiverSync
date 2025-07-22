@@ -10,6 +10,8 @@ import SwiftUI
 import Shared
 
 struct SurfLevelSelectorView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let selectedLevel: SurfLevel?
     let onSelect: (SurfLevel) -> Void
     let error: String?
@@ -28,7 +30,7 @@ struct SurfLevelSelectorView: View {
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(level == selectedLevel ? Color.accentColor : Color.gray.opacity(0.2))
+                                .fill(level == selectedLevel ? AppColors.textPrimary(for: colorScheme) : Color.gray.opacity(0.2))
                         )
                         .foregroundColor(level == selectedLevel ? .white : .primary)
                         .onTapGesture {

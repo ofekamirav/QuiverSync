@@ -54,11 +54,11 @@ class FavSpotRepositoryImpl(
         val userId = sessionManager.getUid() ?: return
 
         syncJob = applicationScope.launch {
-            platformLogger("FavSpotRepo", "Starting Firestore sync for user $userId")
+//            platformLogger("FavSpotRepo", "Starting Firestore sync for user $userId")
             remoteDataSource.observeFavSpots(userId)
                 .catch { e -> platformLogger("FavSpotRepo", "Sync Error: ${e.message}") }
                 .collect { remoteSpots ->
-                    platformLogger("FavSpotRepo", "Syncing ${remoteSpots.size} spots from remote.")
+//                    platformLogger("FavSpotRepo", "Syncing ${remoteSpots.size} spots from remote.")
                     syncRemoteToLocal(userId, remoteSpots)
                 }
         }
@@ -66,7 +66,7 @@ class FavSpotRepositoryImpl(
     override suspend fun stopRealtimeSync() {
         syncJob?.cancel()
         syncJob = null
-        platformLogger("FavSpotRepo", "Favorite spots sync stopped.")
+//        platformLogger("FavSpotRepo", "Favorite spots sync stopped.")
     }
 
 
@@ -79,12 +79,12 @@ class FavSpotRepositoryImpl(
 
         dao.transaction {
             if (spotsToDelete.isNotEmpty()) {
-                platformLogger("FavSpotRepo", "Deleting ${spotsToDelete.size} spots.")
+//                platformLogger("FavSpotRepo", "Deleting ${spotsToDelete.size} spots.")
                 spotsToDelete.forEach { dao.deleteFavSpot(it) }
             }
 
             if (remoteSpots.isNotEmpty()) {
-                platformLogger("FavSpotRepo", "Inserting/Updating ${remoteSpots.size} spots.")
+//                platformLogger("FavSpotRepo", "Inserting/Updating ${remoteSpots.size} spots.")
                 remoteSpots.forEach { dao.insertFavSpot(it) }
             }
         }

@@ -14,9 +14,8 @@ struct RegisterScreen: View {
     @ObservedObject private(set) var viewModel = RegisterViewModelWrapper()
     
     let onBackBtn: () -> Void
-    let onSuccess: () -> Void
     @Binding var isLoggedIn: Bool
-    let onLoginSuccess: () -> Void
+    let onLoginSuccess : () -> Void
 
     
     var body: some View {
@@ -32,18 +31,9 @@ struct RegisterScreen: View {
                 )
             case .loaded:
                 Color.clear.onAppear {
-                    Task {
-                            let sessionManager = SessionManager(context: nil)
-                            if let newUid = try? await sessionManager.getUid(), newUid != "" {
-                                print("User logged in successfully: \(newUid)")
-                                onLoginSuccess()
-                            } else {
-                                print("❌ Login attempted, but UID is still nil")
-                            }
+                        onLoginSuccess()
                         viewModel.viewModel.resetState()
-                        }
-                        onSuccess()
-                    }
+                }
             case .error(let error):
                 AuthErrorView(
                     title: "Registration Wipeout 🌊",

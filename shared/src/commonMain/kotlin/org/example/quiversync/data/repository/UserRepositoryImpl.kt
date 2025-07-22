@@ -112,6 +112,21 @@ class UserRepositoryImpl(
         }
     }
 
+    override suspend fun getUserById(uid: String): Flow<Result<User, Error>> {
+        startUserProfileSync(uid)
+        return userDao.getUserProfile(uid)
+            .map { user ->
+                if (user != null) {
+                    Result.Success(user)
+                } else {
+                    Result.Failure(UserError("User not found"))
+                }
+            }
+            .catch { e ->
+                emit(Result.Failure(UserError("DB error: ${e.message}")))
+            }
+    }
+
     override suspend fun stopUserSync() {
         syncJob?.cancel()
         syncJob = null

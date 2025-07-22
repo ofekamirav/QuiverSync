@@ -12,7 +12,8 @@ data class RentalOffer(
     val surfboardName: String = "",
     val surfboardImageUrl: String? = null,
     val pricePerDay: Double = 0.0,
-    val location: String = "",
+    val latitude: Double,
+    val longitude: Double,
     val description: String = "",
     val isAvailable: Boolean = true
 )

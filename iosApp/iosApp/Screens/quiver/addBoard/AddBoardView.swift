@@ -11,6 +11,8 @@ import SwiftUI
 import Shared
 
 struct AddBoardView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let addBoardData: AddBoardFormData
     let onEvent: (AddBoardEvent) -> Void
     let onBackRequested: () -> Void
@@ -46,5 +48,7 @@ struct AddBoardView: View {
             )
         }
         .padding()
+        .background(AppColors.sectionBackground(for: colorScheme))
+
     }
 }

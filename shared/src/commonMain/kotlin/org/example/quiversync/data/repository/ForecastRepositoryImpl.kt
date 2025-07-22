@@ -8,6 +8,7 @@ import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.repository.ForecastRepository
 import org.example.quiversync.utils.Location
 import org.example.quiversync.utils.extensions.isOutsideRadius
+import org.example.quiversync.utils.extensions.distanceBetween
 import org.example.quiversync.utils.extensions.toDailyForecast
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.dao.GeminiPredictionDao
@@ -21,7 +22,6 @@ class ForecastRepositoryImpl(
 ): ForecastRepository {
     private val queries = database.dailyForecastQueries
 
-
     override suspend fun getWeeklyForecast(
         latitude: Double,
         longitude: Double,
@@ -29,11 +29,44 @@ class ForecastRepositoryImpl(
     ): Result<List<DailyForecast>, TMDBError> {
         println("🌍 getWeeklyForecast called with: lat=$latitude, lon=$longitude, inHomePage=$inHomePage")
 
-        val howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne()
-        println("📦 Found $howManyDaily daily forecasts in local DB for ($latitude, $longitude)")
+        var howManyDaily = 0
+
+        if(inHomePage){
+            val forecasts = queries.selectAll().executeAsList()
+
+            val nearbyForecast = forecasts.firstOrNull { forecast ->
+                distanceBetween(
+                    lat1 = latitude,
+                    lon1 = longitude,
+                    lat2 = forecast.latitude,
+                    lon2 = forecast.longitude
+                ) <= 7
+            }
+
+            if (nearbyForecast != null) {
+                println("📦 Found nearby forecast in local DB for ($latitude, $longitude)")
+                sessionManager.setLatitude(nearbyForecast.latitude)
+                sessionManager.setLongitude(nearbyForecast.longitude)
+                howManyDaily =  queries.howManyBySpot(nearbyForecast.latitude, nearbyForecast.longitude).executeAsOne().toInt()
+                println("📦 Found $howManyDaily daily forecasts in local DB for nearby spot (${nearbyForecast.latitude}, ${nearbyForecast.longitude})")
+            } else {
+                println("❌ No nearby forecast found in local DB for ($latitude, $longitude)")
+            }
+
+        }
+        else{
+            howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne().toInt()
+            println("📦 Found $howManyDaily daily forecasts in local DB for ($latitude, $longitude)")
+
+        }
 
         val userID = sessionManager.getUid()
         val lastLocation = sessionManager.getLastLocation()
+
+
+        val currentDate = kotlinx.datetime.Clock.System.now()
+            .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+            .date.toString()
 
         println("🧭 Last location: ${lastLocation?.latitude}, ${lastLocation?.longitude}")
         val isFar = lastLocation == null || isOutsideRadius(
@@ -42,11 +75,7 @@ class ForecastRepositoryImpl(
         println("📏 isFar from last location? $isFar")
 
         // Check if we are on the homepage and the location hasn't changed much
-        if (inHomePage && !isFar) {
-            val currentDate = kotlinx.datetime.Clock.System.now()
-                .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
-                .date.toString()
-
+        if (inHomePage) {
             val lastRefresh = sessionManager.getLastRefresh()
             println("🗓 Current date: $currentDate | Last refresh: $lastRefresh")
 
@@ -54,18 +83,30 @@ class ForecastRepositoryImpl(
                 println("🔄 Refreshing forecasts due to outdated or missing refresh date")
                 sessionManager.setLastRefresh()
             } else {
+
                 println("✅ Using cached forecasts from local DB (fresh for today)")
 
-                if (lastLocation != null) {
+                if (lastLocation != null && !isFar && howManyDaily >= 6) {
                     val localList = queries.SELECT_BY_SPOT(lastLocation.latitude, lastLocation.longitude)
                         .executeAsList()
                         .map { it.toDailyForecast() }
 
                     println("📥 Returning ${localList.size} cached forecasts from local DB")
                     return Result.Success(localList)
+                }else if( lastLocation == null && howManyDaily >= 6) {
+                    // If we have no last location, but enough forecasts, we can still return them
+                    val localList = queries.SELECT_BY_SPOT(latitude, longitude)
+                        .executeAsList()
+                        .map { it.toDailyForecast() }
+
+                    sessionManager.setLastLocation(Location(latitude, longitude))
+                    println("📥 Returning ${localList.size} cached forecasts from local DB for ($latitude, $longitude)")
+                    return Result.Success(localList)
                 }
+
             }
         }
+
 
         if (howManyDaily < 6) {
             if (howManyDaily > 0) {
@@ -73,9 +114,15 @@ class ForecastRepositoryImpl(
                 queries.deleteBySpot(latitude, longitude)
             }
 
-            if (userID != null) {
+            if (userID != null && !inHomePage) {
                 println("🗑 Deleting Gemini predictions for user $userID at ($latitude, $longitude)")
                 geminiPredictionDao.deleteBySpotAndUser(latitude, longitude, userID)
+            }
+            else if (userID != null && inHomePage) {
+                println("🗑 Deleting Gemini predictions for user $userID at last location (${lastLocation?.latitude}, ${lastLocation?.longitude})")
+                if (lastLocation != null) {
+                    geminiPredictionDao.deletePredictionByDateAndIDAndLocation(currentDate,userID,lastLocation.latitude, lastLocation.longitude)
+                }
             }
 
             println("🌐 Fetching new forecast from API for ($latitude, $longitude)")
@@ -152,7 +199,7 @@ class ForecastRepositoryImpl(
             }
         }
         else{
-            println("Using local database for spot ($latitude, $longitude) with $howManyDaily days of forecast")
+//            println("Using local database for spot ($latitude, $longitude) with $howManyDaily days of forecast")
         }
         val local = queries.selectToday(date, latitude, longitude).executeAsOneOrNull()
 
@@ -178,6 +225,11 @@ class ForecastRepositoryImpl(
     ): Result<Unit, TMDBError> {
 
         try {
+            val lastLocation = sessionManager.getLastLocation()
+            if (lastLocation != null && lastLocation.latitude == latitude && lastLocation.longitude == longitude) {
+                println("📍 Dont delete the forecast due to extra use in it in the home page($latitude, $longitude)")
+                return Result.Success(Unit)
+            }
             queries.deleteBySpot(latitude, longitude)
             return Result.Success(Unit)
         } catch (e: Exception) {

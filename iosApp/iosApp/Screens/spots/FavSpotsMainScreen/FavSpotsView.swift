@@ -20,6 +20,8 @@ public struct FavSpotsView: View {
     @State private var spotToDelete: FavoriteSpot? = nil
 
     public var body: some View {
+        
+        
         ZStack(alignment: .bottomTrailing) {
             // 🔹 Background
             AppColors.sectionBackground(for: colorScheme)
@@ -37,38 +39,47 @@ public struct FavSpotsView: View {
                 )
             } else {
                 // 🔹 Main List
-                List {
-                    ForEach(favSpots.spots, id: \.spotID) { spot in
-                        ZStack {
-                            SpotCard(
-                                favSpot: spot,
-                                favSpotsData: favSpots,
-                                favSpotsViewModel: favSpotsViewModel,
-                                selectedSpot: $selectedSpot
-                            )
-                            .padding()
-                            .animation(.easeInOut(duration: 0.5), value: selectedSpot) // 👈 smoother toggle
-                        }
-                        .padding(.vertical, 2)
-                        .padding(.horizontal, 8)
-                        .background(AppColors.sectionBackground(for: colorScheme))
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                withAnimation {
-                                    spotToDelete = spot
-                                }
-                            } label: {
-                                Image(systemName: "trash")
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(favSpots.spots, id: \.spotID) { spot in
+
+                            if favSpots.boards.isEmpty{
+                                SwipeToDeleteCard(
+                                    content: {
+                                        ForecastOnlyCard(
+                                            spot: spot,
+                                            favSpotsData: favSpots
+                                        )
+                                    },
+                                    onDelete: {
+                                        spotToDelete = spot
+                                    }
+                                )
+                                .padding(.vertical, 2)
+                                .padding(.horizontal, 8)
+                                .background(AppColors.sectionBackground(for: colorScheme))
+                            } else {
+                                SwipeToDeleteCard(
+                                    content: {
+                                        SpotCard(
+                                            favSpot: spot,
+                                            favSpotsData: favSpots,
+                                            favSpotsViewModel: favSpotsViewModel,
+                                            selectedSpot: $selectedSpot
+                                        )
+                                        .padding()
+                                    },
+                                    onDelete: {
+                                        spotToDelete = spot
+                                    }
+                                )
+                                .padding(.vertical, 2)
+                                .padding(.horizontal, 8)
+                                .background(AppColors.sectionBackground(for: colorScheme))
                             }
-                            .tint(.red)
                         }
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
                     }
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
                 .background(AppColors.sectionBackground(for: colorScheme))
                 .blur(radius: (selectedSpot != nil || spotToDelete != nil) ? 10 : 0)
 
@@ -156,5 +167,17 @@ public struct FavSpotsView: View {
             }
         }
         .animation(.easeInOut, value: selectedSpot != nil || spotToDelete != nil)
+        
+        
+        
+        
+        
     }
 }
+
+
+
+
+
+
+

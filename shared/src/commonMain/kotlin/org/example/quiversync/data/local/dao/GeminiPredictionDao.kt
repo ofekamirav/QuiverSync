@@ -81,6 +81,20 @@ class GeminiPredictionDao(private val queries: GeminiPredictionQueries) {
         queries.deleteAllPredictions()
     }
 
+    fun deletePredictionByDateAndIDAndLocation(
+        date: String,
+        userId: String,
+        latitude: Double,
+        longitude: Double
+    ) {
+        queries.DELETE_BEST_MATCH_FOR_DATE(
+            forecastDate = date,
+            userID = userId,
+            forecastLatitude = latitude,
+            forecastLongitude = longitude
+        )
+    }
+
     private fun GeminiPredictionEntity.toDomain() = GeminiPrediction(
         predictionID = this.predictionID,
         userID = this.userID,

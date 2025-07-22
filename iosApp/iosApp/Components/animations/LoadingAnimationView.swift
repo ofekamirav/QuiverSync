@@ -9,11 +9,17 @@
 import SwiftUI
 
 struct LoadingAnimationView: View {
+    @Environment(\.colorScheme) var colorScheme
     let animationName: String
     let size: CGFloat
+    
 
     var body: some View {
-        LottieView(animationName: animationName, loopMode: .loop, size: size)
-            .frame(width: size, height: size)
+        ZStack{
+            LottieView(animationName: animationName, loopMode: .loop, size: size)
+//                .frame(width: size, height: size)
+                
+        }
+        .background(AppColors.sectionBackground(for: colorScheme))
     }
 }

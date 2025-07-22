@@ -16,4 +16,5 @@ interface QuiverRemoteDataSource {
     suspend fun setSurfboardAsRentalAvailableRemote(surfboardId: String): Result<Boolean, Error>
     suspend fun setSurfboardAsRentalUnavailableRemote(surfboardId: String): Result<Boolean, Error>
     fun observeQuiver(userId: String): Flow<List<Surfboard>>
+    suspend fun fetchRentalPage(userId: String, pageSize: Int, lastDocumentId: String?): Result<List<Surfboard>, Error>
 }

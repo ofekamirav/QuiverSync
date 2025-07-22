@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct CustomDatePickerView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let title: String
     let selectedDate: String
     let onDateSelected: (String) -> Void
@@ -20,19 +22,25 @@ struct CustomDatePickerView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.headline)
+                .foregroundColor(AppColors.textPrimary(for: colorScheme))
+
 
             DatePicker(
                 "",
-                selection: Binding(
-                    get: { formattedDateToDate(selectedDate) ?? Date() },
-                    set: {
-                        onDateSelected(formatDate($0))
-                    }
-                ),
+                selection: $date,
                 displayedComponents: [.date]
             )
             .labelsHidden()
             .datePickerStyle(.compact)
+            .onChange(of: date) {
+                onDateSelected(formatDate($0))
+            }
+            .foregroundColor(AppColors.textPrimary(for: colorScheme))
+            .onAppear {
+                if let parsed = formattedDateToDate(selectedDate) {
+                    date = parsed
+                }
+            }
 
             if let error = errorMessage {
                 Text(error)

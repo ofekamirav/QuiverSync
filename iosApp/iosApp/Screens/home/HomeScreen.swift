@@ -17,7 +17,7 @@ struct HomeScreen: View {
         VStack{
             switch onEnum(of: viewModel.uistate) {
             case .loading:
-                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 200)
+                LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .loaded(let loaded):
                 HomeView(data:loaded.homePageData)
             case .error(let error):

@@ -1,5 +1,6 @@
 package org.example.quiversync.features.rentals.explore
 
+import org.example.quiversync.domain.model.BoardForRent
 import org.example.quiversync.domain.model.Surfboard
 
 sealed class ExploreState {

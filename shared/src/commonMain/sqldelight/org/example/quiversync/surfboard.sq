@@ -55,3 +55,11 @@ WHERE id = ?;
 deleteAllSurfboardsByOwnerId:
 DELETE FROM SurfboardEntity WHERE ownerId = ?;
 
+getAllRentalSurfboards:
+SELECT * FROM SurfboardEntity
+WHERE isRentalPublished = 1 AND isRentalAvailable = 1;
+
+getRentalSurfboardsByOwnerId:
+SELECT * FROM SurfboardEntity
+WHERE ownerId = ? AND isRentalPublished = 1 AND isRentalAvailable = 1;
+

@@ -10,6 +10,8 @@ import SwiftUI
 import Shared
 
 struct SecurityAndPrivacyView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     let form: SecurityAndPrivacyFormData
     let onEvent: (SecurityAndPrivacyEvent) -> Void
     @Binding var showToast: Bool
@@ -73,12 +75,13 @@ struct SecurityAndPrivacyView: View {
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.accentColor)
+                    .background(AppColors.surfBlue)
                     .cornerRadius(12)
             }
             .disabled(form.isPasswordLoading)
         }
         .padding()
+        .background(AppColors.sectionBackground(for: colorScheme))
         .onAppear {
             // Initial sync with form state
             currentPassword = form.currentPassword
