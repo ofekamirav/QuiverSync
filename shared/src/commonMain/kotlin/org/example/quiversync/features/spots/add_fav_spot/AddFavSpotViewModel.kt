@@ -70,29 +70,29 @@ class AddFavSpotViewModel(
                 is Result.Success -> {
                    val forecast = forecastResult.data
                     if (forecast == null) {
-                        _addFavSpotState.value = AddFavSpotState.Error("No forecast data available for this spot")
+                        _addFavSpotState.emit(AddFavSpotState.Error("No forecast data available for this spot"))
                         return@launch
                     }
                     forecast.let { dailyForecasts ->
                         if(dailyForecasts.first().waveHeight <= 0.0) {
-                            _addFavSpotState.value = AddFavSpotState.Error("Please enter a valid spot near the ocean yew!")
+                            _addFavSpotState.emit(AddFavSpotState.Error("Please enter a valid spot near the ocean yew!"))
                             return@launch
                         }
                     }
 
                 }
                 is Result.Failure -> {
-                    _addFavSpotState.value = AddFavSpotState.Error("Failed to fetch forecast: ${forecastResult.error?.message}")
+                    _addFavSpotState.emit(AddFavSpotState.Error("Failed to fetch forecast: ${forecastResult.error?.message}"))
                     return@launch
                 }
             }
 
             val result = favSpotUseCases.addFavSpotUseCase(spot)
             if( result is Result.Success ) {
-                _addFavSpotState.value = AddFavSpotState.Loaded
-                _addFavSpotState.value = AddFavSpotState.Idle(FavoriteSpotForm())
+                _addFavSpotState.emit(AddFavSpotState.Loaded)
+                _addFavSpotState.emit(AddFavSpotState.Idle(FavoriteSpotForm()))
             } else {
-                _addFavSpotState.value = AddFavSpotState.Error("Failed to add favorite spot")
+                _addFavSpotState.emit(AddFavSpotState.Error("Failed to add favorite spot"))
             }
         }
     }

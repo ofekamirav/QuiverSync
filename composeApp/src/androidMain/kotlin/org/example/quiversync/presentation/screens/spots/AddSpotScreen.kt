@@ -89,7 +89,8 @@ fun AddSpotScreen(
                 Column(
                     contentModifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     ExposedDropdownMenuBox(

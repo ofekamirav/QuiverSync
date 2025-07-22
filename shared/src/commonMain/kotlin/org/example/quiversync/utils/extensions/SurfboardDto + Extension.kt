@@ -2,10 +2,13 @@ package org.example.quiversync.utils.extensions
 
 import org.example.quiversync.SurfboardEntity
 import org.example.quiversync.data.remote.dto.SurfboardDto
+import org.example.quiversync.domain.model.BoardForRent
 import org.example.quiversync.domain.model.FinsSetup
 import org.example.quiversync.domain.model.SurfLevel
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.SurfboardType
+import org.example.quiversync.domain.model.User
+import org.example.quiversync.utils.AppConfig
 
 fun SurfboardEntity.toDomain(): Surfboard {
     return Surfboard(
@@ -110,6 +113,21 @@ fun Surfboard.toEntity(): SurfboardEntity {
     )
 }
 
+fun Surfboard.toBoardForRent(owner: User?): BoardForRent =
+    BoardForRent(
+        surfboardId = id,
+        ownerName = owner?.name.orEmpty(),
+        ownerPic = owner?.profilePicture.orEmpty(),
+        surfboardPic = imageRes,
+        model = model,
+        type = type.name,
+        height = height,
+        width = width,
+        volume = volume,
+        pricePerDay = pricePerDay ?: 0.0,
+        ownerPhoneNumber = owner?.phoneNumber.orEmpty(),
+    )
+
 fun FinsSetup.toEntity(): String {
     return when (this) {
         FinsSetup.FIVEFINS -> "Five Fins"
@@ -168,3 +186,14 @@ fun Long.toBoolean(): Boolean {
     return this == 1L
 }
 
+fun getDefaultImageUrlForType(type: SurfboardType): String {
+    val cloudName = AppConfig.cloudName
+    val baseUrl = "https://res.cloudinary.com/$cloudName/image/upload/v1/defaults"
+    return when (type) {
+        SurfboardType.SHORTBOARD -> "$baseUrl/shortboard_default.jpg"
+        SurfboardType.LONGBOARD  -> "$baseUrl/longboard_default.jpg"
+        SurfboardType.FUNBOARD   -> "$baseUrl/funboard_default.jpg"
+        SurfboardType.FISHBOARD  -> "$baseUrl/fish_default.jpg"
+        SurfboardType.SOFTBOARD  -> "$baseUrl/softboard_default.jpg"
+    }
+}

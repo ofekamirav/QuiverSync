@@ -179,7 +179,7 @@ val commonModule= module {
     single { UpdateUserProfileUseCase(get()) }
     single { UploadImageUseCase(get()) }
     single { UpdateProfileDetailsUseCase(get()) }
-    single { GetWeeklyForecastByLocationUseCase(get(),get()) }
+    single { GetWeeklyForecastByLocationUseCase(get(),get(), get()) }
     single { GetWeeklyForecastBySpotUseCase(get()) }
     single { GetUserProfileUseCase(get()) }
     single { LogoutUseCase(get(), get(), get(), get()) }
@@ -269,6 +269,7 @@ val commonModule= module {
    // FavSpots UseCases Collection
    single {
       FavSpotsUseCases(
+
             // FavSpots UseCases
             deleteOutDateForecastUseCase = get(),
             getAllFavUserSpotsUseCase = get(),

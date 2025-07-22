@@ -14,6 +14,7 @@ import org.example.quiversync.domain.usecase.quiver.AddBoardUseCase
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.data.local.Result
+import org.example.quiversync.utils.extensions.getDefaultImageUrlForType
 
 class AddBoardViewModel(
     private val addBoardUseCase: AddBoardUseCase,
@@ -65,6 +66,11 @@ class AddBoardViewModel(
                 val formData = (_uiState.value as? AddBoardState.Idle)?.data ?: return
                 scope.launch {
                     _uiState.value = AddBoardState.Loading
+                    val finalImageUrl = if (!formData.imageUrl.isNullOrBlank()) {
+                        formData.imageUrl
+                    } else {
+                        formData.boardType.let { getDefaultImageUrlForType(it) }
+                    }
                     try {
                         val surfboard = Surfboard(
                             id = "",
@@ -72,7 +78,7 @@ class AddBoardViewModel(
                             model = formData.model,
                             company = formData.company,
                             type = formData.boardType,
-                            imageRes = formData.imageUrl ?: "",
+                            imageRes = finalImageUrl,
                             height = formData.height,
                             volume = formData.volume,
                             width = formData.width,

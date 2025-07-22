@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.example.quiversync.data.local.Result
+import org.example.quiversync.data.local.Error
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.domain.model.forecast.DailyForecast
 import org.example.quiversync.domain.model.prediction.DailyPrediction
@@ -16,6 +17,9 @@ import org.example.quiversync.domain.model.prediction.GeminiPrediction
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.features.spots.FavSpotsUseCases
 import org.example.quiversync.utils.extensions.platformLogger
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 
 
 class FavSpotsViewModel(
@@ -53,23 +57,20 @@ class FavSpotsViewModel(
 
     private fun observeFavoriteSpots() {
         scope.launch {
-            favSpotsUseCases.getAllFavUserSpotsUseCase().collect { result ->
-                when (result) {
-                    is Result.Success -> {
-                        val spots = result.data ?: emptyList()
-                        processSpotsAndFetchDependencies(spots)
-                    }
-
-                    is Result.Failure -> {
-                        _uiState.value =
-                            FavSpotsState.Error(result.error?.message ?: "Failed to load spots")
-                    }
+            favSpotsUseCases
+                .getAllFavUserSpotsUseCase()
+                .filterIsInstance<Result.Success<List<FavoriteSpot>>>()
+                .map { it.data.orEmpty() }
+                .distinctUntilChanged()
+                .collect { spots ->
+                    platformLogger("FavSpotsViewModel", "observeFavoriteSpots ▶️ spots.size=${spots.size}")
+                    processSpotsAndFetchDependencies(spots)
                 }
-            }
         }
     }
 
     private suspend fun processSpotsAndFetchDependencies(spots: List<FavoriteSpot>) {
+        platformLogger("FavSpotsViewModel", "processSpotsAndFetchDependencies ▶️ got ${spots.size} spots")
         if (spots.isEmpty()) {
             _uiState.value = FavSpotsState.Loaded(
                 FavSpotsData(
@@ -101,28 +102,32 @@ class FavSpotsViewModel(
         }
 //        platformLogger("FavSpotsViewModel", "Forecasts loaded: ${forecasts.size}")
 
-        val predictions = if (quiver.isNotEmpty()) {
-            (favSpotsUseCases.generateAllTodayPredictionsUseCase(
-                user = userDetails,
-                surfboards = quiver,
-                forecasts = forecasts
-            ) as? Result.Success)?.data ?: emptyList()
-        } else {
-            emptyList()
-        }
-//        platformLogger("FavSpotsViewModel", "Predictions loaded: ${predictions.size}")
-
-        _uiState.value = FavSpotsState.Loaded(
-            FavSpotsData(
-                spots = spots,
-                allSpotsDailyPredictions = predictions,
-                boards = quiver,
-                currentForecastsForAllSpots = forecasts,
-                weeklyForecastForSpecificSpot = emptyList(),
-                weeklyPredictionsForSpecificSpot = emptyList(),
-                weeklyUiPredictions = emptyList()
-            )
+        val predictionsResult = favSpotsUseCases.generateAllTodayPredictionsUseCase(
+            user = userDetails,
+            surfboards = quiver,
+            forecasts = forecasts
         )
+        when (predictionsResult) {
+            is Result.Success -> {
+                val preds = predictionsResult.data.orEmpty()
+                platformLogger("FavSpotsViewModel", "generateAllTodayPredictionsUseCase returned ${preds.size} predictions")
+                _uiState.value = FavSpotsState.Loaded(
+                    FavSpotsData(
+                        spots = spots,
+                        allSpotsDailyPredictions = preds,
+                        boards = quiver,
+                        currentForecastsForAllSpots = forecasts,
+                        weeklyForecastForSpecificSpot = emptyList(),
+                        weeklyPredictionsForSpecificSpot = emptyList(),
+                        weeklyUiPredictions = emptyList()
+                    )
+                )
+            }
+            is Result.Failure -> {
+                platformLogger("FavSpotsViewModel", "generateAllTodayPredictionsUseCase failed: ${predictionsResult.error?.message}")
+                _uiState.value = FavSpotsState.Error(predictionsResult.error?.message ?: "Unknown error")
+            }
+        }
     }
 
     /**

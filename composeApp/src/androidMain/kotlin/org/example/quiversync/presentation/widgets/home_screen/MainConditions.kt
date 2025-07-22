@@ -104,15 +104,17 @@ fun MainConditions(
             val isDark = isSystemInDarkTheme()
             val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.White
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally),
                 colors = CardDefaults.cardColors(containerColor = cardColor),
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(20.dp),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Your quiver is empty",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = if (isDark) Color.LightGray else Color.DarkGray,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -124,7 +126,13 @@ fun MainConditions(
 
                 }
             }
+        }else {
+            surfboard?.let {
+                BoardRecommendationCard(
+                    surfboard = it,
+                    score = prediction?.score.toString()
+                )
+            }
         }
-        surfboard?.let { BoardRecommendationCard(surfboard = it, score = prediction?.score.toString()) }
     }
 }

@@ -96,7 +96,13 @@ class FavSpotRepositoryImpl(
         return try {
             val userId = sessionManager.getUid() ?: return Result.Failure(SpotsError("User not logged in"))
             when (val result = remoteDataSource.addFavSpotRemote(favSpot, userId)) {
-                is Result.Success -> Result.Success(Unit)
+                is Result.Success -> {
+                    if (result.data == null) {
+                        return Result.Failure(SpotsError("Failed to add spot: Remote returned null"))
+                    }
+                    dao.insertFavSpot(result.data)
+                    Result.Success(Unit)
+                }
                 is Result.Failure -> Result.Failure(SpotsError(result.error?.message ?: "Failed to add spot"))
             }
         } catch (e: Exception) {

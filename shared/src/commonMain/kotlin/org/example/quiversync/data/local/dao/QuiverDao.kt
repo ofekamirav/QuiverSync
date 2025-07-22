@@ -140,6 +140,24 @@ class QuiverDao(
             0
         }
     }
+
+    fun getAllRentalSurfboards(): Flow<List<Surfboard>> {
+        return queries.getAllRentalSurfboards()
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }
+    }
+
+    fun getRentalBoardsNumber(userId: String): Int {
+        return try {
+            queries.getRentalSurfboardsByOwnerId(userId).executeAsList().size
+        } catch (e: Exception) {
+            platformLogger("QuiverDao", "Error fetching rental boards number: ${e.message}")
+            0
+        }
+    }
     fun transaction(block: () -> Unit) {
         queries.transaction {
             block()

@@ -8,7 +8,6 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,14 +29,11 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import org.example.quiversync.R
 import org.example.quiversync.features.quiver.add_board.AddBoardEvent
 import org.example.quiversync.features.quiver.add_board.AddBoardState
-import org.example.quiversync.features.register.OnboardingEvent
-import org.example.quiversync.presentation.components.BoardImagePicker
+import org.example.quiversync.presentation.widgets.quiver_screen.BoardImagePicker
 import org.example.quiversync.presentation.components.CustomTextField
 import org.example.quiversync.presentation.components.ImageSourceSelectorSheet
-import org.example.quiversync.presentation.widgets.register.ImagePickerSection
 import org.example.quiversync.utils.extentions.toCompressedByteArray
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -125,7 +121,8 @@ fun AddSurfboardStep2(
                 isUploading = state.data.isUploadingImage,
                 onClick = { showImageOptions = true },
                 errorMessage = state.data.imageUploadError,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                surfboardType = state.data.boardType,
             )
         }
     }
