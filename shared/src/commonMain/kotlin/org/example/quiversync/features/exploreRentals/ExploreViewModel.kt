@@ -1,117 +1,98 @@
-package org.example.quiversync.features.exploreRentals
+package org.example.quiversync.features.rentals.explore
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import org.example.quiversync.data.local.Result
-import org.example.quiversync.domain.model.RentalOffer
 import org.example.quiversync.domain.model.User
+import org.example.quiversync.domain.usecase.user.GetUserByIdUseCase
 import org.example.quiversync.features.BaseViewModel
-import kotlin.math.exp
+import org.example.quiversync.features.rentals.RentalsUseCases
+import org.example.quiversync.utils.extensions.platformLogger
+import org.example.quiversync.utils.extensions.toBoardForRent
 
-class ExploreViewModel (
-    private val exploreUseCases: ExploreUseCases
-) : BaseViewModel(){
-
+class ExploreViewModel(
+    private val rentalsUseCases: RentalsUseCases,
+    private val getUserById: GetUserByIdUseCase,
+    ) : BaseViewModel(){
     private val _uiState = MutableStateFlow<ExploreState>(ExploreState.Loading)
     val uiState: StateFlow<ExploreState> get() = _uiState
 
-    init{
-        fetchBoardsForRentals()
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore
+
+    private val userCache = mutableMapOf<String, User>()
+    private var lastId: String? = null
+    private val pageSize = 10
+
+
+    init {
+        loadNextPage()
+        observeLocal()
     }
 
-    private fun fetchBoardsForRentals() {
+    private fun observeLocal() {
         scope.launch {
-            _uiState.value = ExploreState.Loading
-
-            val builtOffers = mutableListOf<RentalOffer>()
-
-            try {
-                val userResult = exploreUseCases.getUserProfileUseCase()
-                var user = User(
-                    uid = "",
-                    name = "",
-                    email = "",
-                )
-                when (userResult) {
-                    is Result.Success<*> -> {
-                        user = userResult.data as User
-                    }
-                    is Result.Failure<*> -> {
-                        _uiState.value = ExploreState.Error("Error fetching user profile: ${userResult.error?.message}")
-                        return@launch
-                    }
+            rentalsUseCases.observeExploreBoards()
+                .onStart { _uiState.value = ExploreState.Loading }
+                .catch { e ->
+                    platformLogger("ExploreVM", "DB flow error: ${e.message}")
+                    _uiState.value = ExploreState.Error("Database error")
                 }
-
-                when ( val availableBoardsResult = exploreUseCases.getAvailableBoardsUseCase(userId =user.uid)){
-                    is Result.Success -> {
-                        val boards = availableBoardsResult.data
-                        if (boards == null) {
-                            _uiState.value = ExploreState.Error("No boards available for rent at the moment.")
-                            return@launch
-                        }
-                        if (boards.isEmpty()) {
-                            _uiState.value = ExploreState.Error("No boards available for rent at the moment.")
-                            return@launch
-                        }
-
-                        for (board in boards) {
-                            val ownerResult = exploreUseCases.getUserByIDUseCase(board.ownerId)
-                            if (ownerResult is Result.Failure) {
-                                _uiState.value = ExploreState.Error("Error fetching owner details: ${ownerResult.error?.message}")
-                                return@launch
-                            }
-
-                            val owner = (ownerResult as Result.Success).data ?: run {
-                                _uiState.value = ExploreState.Error("Owner not found for board: ${board.id}")
-                                return@launch
-                            }
-
-                            when (val offerResult = exploreUseCases.buildRentalOfferUseCase(board, owner)) {
-                                is Result.Success -> offerResult.data?.let { builtOffers.add(it) }
-                                is Result.Failure -> {
-                                    _uiState.value = ExploreState.Error("Error building rental offer for board: ${board.id} - ${offerResult.error?.message}")
-                                    return@launch
-                                }
-                            }
-                        }
-                        _uiState.value = ExploreState.Loaded(builtOffers)
+                .collectLatest { surfboards ->
+                    val boardsForRent = surfboards.map { surf ->
+                        val owner = userCache[surf.ownerId]
+                            ?: fetchAndCacheUser(surf.ownerId)
+                        surf.toBoardForRent(owner)
                     }
-                    is Result.Failure -> {
-                        _uiState.value = ExploreState.Error("Error fetching rental boards: ${availableBoardsResult.error?.message}")
-                        return@launch
-                    }
+                    _uiState.value = ExploreState.Loaded(boardsForRent)
                 }
-            } catch (e: Exception) {
-                _uiState.value = ExploreState.Error("Failed to fetch rental boards: ${e.message}")
+        }
+    }
+
+
+    private suspend fun fetchAndCacheUser(ownerId: String): User? {
+        return when (val res = getUserById(ownerId).firstOrNull()) {
+            is Result.Success -> {
+                val user = res.data
+                if (user != null) {
+                    userCache[ownerId] = user
+                }
+                user
+            }
+            is Result.Failure -> {
+                platformLogger("ExploreVM", "Failed fetch user $ownerId: ${res.error?.message}")
+                null
+            }
+
+            else -> {
+                platformLogger("ExploreVM", "Unknown result type for user $ownerId")
+                null
             }
         }
     }
 
-    fun refreshBoards() {
-        fetchBoardsForRentals()
+
+    fun loadNextPage() {
+        scope.launch {
+            if (_isLoadingMore.value) return@launch
+
+            _isLoadingMore.value = true
+            when (val res = rentalsUseCases.fetchExplorePage(pageSize, lastId)) {
+                is Result.Success -> {
+                    lastId = res.data?.lastOrNull()?.id
+                }
+                is Result.Failure -> {
+                    platformLogger("ExploreVM", "Page fetch error: ${res.error?.message}")
+                     _uiState.value = ExploreState.Error("Load page failed")
+                }
+            }
+            _isLoadingMore.value = false
+        }
     }
+
 }
-
-
-
-
-
-//                when (val surfboardsResult= exploreUseCases.getRentalsBoardsUseCase()){
-//                    is Result.Success ->{
-//                        val surfboards = surfboardsResult.data
-//                        if(surfboards == null){
-//                            _uiState.value = ExploreState.Error("No rental boards available at the moment.")
-//                            return@launch
-//                        }
-//                        if(surfboards.isEmpty()) {
-//                            _uiState.value = ExploreState.Error("No rental boards available at the moment.")
-//                            return@launch
-//                        }
-//                        _uiState.value = ExploreState.Loaded(surfboards)
-//                    }
-//                    is Result.Failure -> {
-//                        _uiState.value = ExploreState.Error("Error fetching rental boards: ${surfboardsResult.error?.message}")
-//                        return@launch
-//                    }
-//                }
