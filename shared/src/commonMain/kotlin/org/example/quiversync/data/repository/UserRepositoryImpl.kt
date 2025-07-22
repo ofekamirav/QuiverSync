@@ -112,33 +112,19 @@ class UserRepositoryImpl(
         }
     }
 
-    override suspend fun getUserById(uid: String): Result<User, Error> {
-        return try {
-            val user = userDao.getUserById(uid)
-            if (user != null) {
-                Result.Success(user)
-            } else {
-                val remote = userRemoteSource.getUserById(uid)
-                when (remote) {
-                    is Result.Success -> {
-                        if (remote.data == null) {
-                            platformLogger("UserRepository", "User not found in remote source for UID: $uid")
-                            return Result.Failure(UserError("User not found"))
-                        }
-                        userDao.insertOrReplaceProfile(remote.data, uid)
-                        Result.Success(remote.data)
-                    }
-
-                    is Result.Failure -> {
-                        platformLogger("UserRepository", "Failed to fetch user by ID: ${remote.error?.message}")
-                        Result.Failure(UserError("Fetch failed: ${remote.error?.message}"))
-                    }
+    override suspend fun getUserById(uid: String): Flow<Result<User, Error>> {
+        startUserProfileSync(uid)
+        return userDao.getUserProfile(uid)
+            .map { user ->
+                if (user != null) {
+                    Result.Success(user)
+                } else {
+                    Result.Failure(UserError("User not found"))
                 }
             }
-        } catch (e: Exception) {
-            platformLogger("UserRepository", "Error fetching user by ID: ${e.message}")
-            Result.Failure(UserError("DB error: ${e.message}"))
-        }
+            .catch { e ->
+                emit(Result.Failure(UserError("DB error: ${e.message}")))
+            }
     }
 
     override suspend fun stopUserSync() {
@@ -146,7 +132,5 @@ class UserRepositoryImpl(
         syncJob = null
         platformLogger("UserRepository", "User sync stopped.")
     }
-
-
 
 }
