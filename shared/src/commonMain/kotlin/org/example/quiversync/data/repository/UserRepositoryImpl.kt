@@ -112,21 +112,32 @@ class UserRepositoryImpl(
         }
     }
 
-    override suspend fun getUserById(userId: String): Result<User, Error> {
+    override suspend fun getUserById(uid: String): Result<User, Error> {
         return try {
-            when (val user = userRemoteSource.getUserById(userId)) {
-                is Result.Success -> {
-                    Result.Success(user.data)
-                }
-                is Result.Failure -> {
-                    platformLogger("UserRepository", "Failed to fetch user by ID: ${user.error?.message}")
-                    Result.Failure(UserError("Fetch failed: ${user.error?.message}"))
+            val user = userDao.getUserById(uid)
+            if (user != null) {
+                Result.Success(user)
+            } else {
+                val remote = userRemoteSource.getUserById(uid)
+                when (remote) {
+                    is Result.Success -> {
+                        if (remote.data == null) {
+                            platformLogger("UserRepository", "User not found in remote source for UID: $uid")
+                            return Result.Failure(UserError("User not found"))
+                        }
+                        userDao.insertOrReplaceProfile(remote.data, uid)
+                        Result.Success(remote.data)
+                    }
+
+                    is Result.Failure -> {
+                        platformLogger("UserRepository", "Failed to fetch user by ID: ${remote.error?.message}")
+                        Result.Failure(UserError("Fetch failed: ${remote.error?.message}"))
+                    }
                 }
             }
-        }
-        catch ( e: Exception) {
+        } catch (e: Exception) {
             platformLogger("UserRepository", "Error fetching user by ID: ${e.message}")
-            Result.Failure(UserError("Fetch failed: ${e.message}"))
+            Result.Failure(UserError("DB error: ${e.message}"))
         }
     }
 
