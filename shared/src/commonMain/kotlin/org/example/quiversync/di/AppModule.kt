@@ -350,7 +350,7 @@ val commonModule= module {
    factory { FavSpotsViewModel(get()) }
    single { AddFavSpotViewModel(get())}
    single { ForgotPasswordViewModel(get()) }
-   single {ExploreViewModel(get()) }
+   factory {ExploreViewModel(get()) }
 }
 
 fun createJson(): Json = Json {
