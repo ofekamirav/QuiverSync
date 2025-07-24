@@ -1,6 +1,7 @@
 package org.example.quiversync.presentation.screens.register
 
 import android.Manifest
+import android.content.Context
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
@@ -13,8 +14,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -39,42 +38,43 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.android.volley.toolbox.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
-import org.example.quiversync.domain.model.OnboardingProfileDetails
-import org.example.quiversync.features.register.OnboardingState
-import org.example.quiversync.features.register.OnboardingViewModel
-import org.example.quiversync.presentation.components.CustomTextField
-import org.example.quiversync.presentation.components.DateOfBirthPicker
-import org.example.quiversync.presentation.components.GradientButton
-import org.example.quiversync.presentation.components.LoadingAnimation
-import org.example.quiversync.presentation.widgets.register.SurfLevelSelector
-import org.koin.androidx.compose.koinViewModel
 import org.example.quiversync.R
+import org.example.quiversync.domain.model.OnboardingProfileDetails
+import org.example.quiversync.domain.model.SurfLevel
 import org.example.quiversync.features.register.OnboardingEvent
 import org.example.quiversync.features.register.OnboardingFormData
-import org.example.quiversync.presentation.components.ImageSourceSelectorSheet
+import org.example.quiversync.features.register.OnboardingState
+import org.example.quiversync.features.register.OnboardingViewModel
+import org.example.quiversync.presentation.components.*
 import org.example.quiversync.presentation.widgets.register.ImagePickerSection
+import org.example.quiversync.presentation.widgets.register.SurfLevelSelector
+import org.example.quiversync.utils.LocalWindowInfo
+import org.example.quiversync.utils.WindowWidthSize
 import org.example.quiversync.utils.extentions.toCompressedByteArray
-
+import org.koin.androidx.compose.koinViewModel
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun OnboardingScreen(
     viewModel: OnboardingViewModel = koinViewModel(),
-    onCompleteClick:  () -> Unit,
+    onCompleteClick: () -> Unit,
 ) {
     val uiState by viewModel.onboardingState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val windowInfo = LocalWindowInfo.current
 
     when (val currentState = uiState) {
         is OnboardingState.Idle -> {
             CompleteRegisterScreen(
                 formData = currentState.data,
                 onEvent = viewModel::onEvent,
+                context = context,
+                widthSize = windowInfo.widthSize
             )
         }
         is OnboardingState.Loading -> {
@@ -82,9 +82,12 @@ fun OnboardingScreen(
                 modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
                 contentAlignment = Alignment.Center
             ) {
-                LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
+                LoadingAnimation(
+                    isLoading = true,
+                    animationFileName = "quiver_sync_loading_animation.json",
+                    animationSize = 240.dp
+                )
             }
-
         }
         is OnboardingState.Success -> {
             LaunchedEffect(Unit) {
@@ -103,23 +106,23 @@ fun OnboardingScreen(
             ) {
                 Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
             }
-
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CompleteRegisterScreen(
     formData: OnboardingFormData,
-    onEvent: (OnboardingEvent) -> Unit
+    onEvent: (OnboardingEvent) -> Unit,
+    context: Context = LocalContext.current,
+    widthSize: WindowWidthSize = WindowWidthSize.COMPACT
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val isDark = isSystemInDarkTheme()
     val placeholderRes = if (isDark) R.drawable.placeholder_dark else R.drawable.placeholder_light
     val coroutineScope = rememberCoroutineScope()
     var showTermsDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val termsText = remember {
         context.resources.openRawResource(R.raw.terms_of_service)
             .bufferedReader().use { it.readText() }
@@ -146,7 +149,6 @@ fun CompleteRegisterScreen(
             Manifest.permission.READ_EXTERNAL_STORAGE
         }
     )
-
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -180,22 +182,17 @@ fun CompleteRegisterScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
             )
         },
         bottomBar = {
             Box(
-                Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
+                Modifier.padding(16.dp).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 GradientButton(
                     text = "Continue",
-                    onClick = {
-                         onEvent(OnboardingEvent.ContinueClicked)
-                    },
+                    onClick = { onEvent(OnboardingEvent.ContinueClicked) },
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -207,104 +204,135 @@ fun CompleteRegisterScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
                     .padding(horizontal = 24.dp)
+                    .then(if (widthSize >= WindowWidthSize.EXPANDED) Modifier.widthIn(max = 600.dp) else Modifier)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
-
                 Text(
                     text = "This helps us find the best spots and gear for you.",
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
+                Spacer(modifier = Modifier.height(12.dp))
                 LinearProgressIndicator(
                     progress = 1.0f,
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
+                    modifier = Modifier.fillMaxWidth(0.5f)
                 )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                CustomTextField(
-                    value = formData.phoneNumber,
-                    onValueChange = { onEvent(OnboardingEvent.PhoneNumberChanged(it)) },
-                    label = "Phone Number",
-                    isError = formData.phoneNumberError != null,
-                    errorMessage = formData.phoneNumberError,
-                    keyboardType = KeyboardType.Phone,
-                    imeAction = ImeAction.Next
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                DateOfBirthPicker(
-                    selectedDate = formData.dateOfBirth,
-                    onDateSelected = { onEvent(OnboardingEvent.DateOfBirthChanged(it)) },
-                    errorMessage = formData.dateOfBirthError
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                CustomTextField(
-                    value = formData.heightCm,
-                    onValueChange = { onEvent(OnboardingEvent.HeightChanged(it)) },
-                    label = "Height (cm)",
-                    isError = formData.heightError != null,
-                    errorMessage = formData.heightError,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                CustomTextField(
-                    value = formData.weightKg,
-                    onValueChange = { onEvent(OnboardingEvent.WeightChanged(it)) },
-                    label = "Weight (kg)",
-                    isError = formData.weightError != null,
-                    errorMessage = formData.weightError,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    "How do you rate your surfing?",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                formData.selectedSurfLevel?.let {
-                    SurfLevelSelector(
-                        selectedLevel = it,
-                        onLevelSelected = { onEvent(OnboardingEvent.SurfLevelChanged(it)) },
-                        errorMessage = formData.surfLevelError
+                if (widthSize >= WindowWidthSize.MEDIUM) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            CustomTextField(
+                                value = formData.phoneNumber,
+                                onValueChange = { onEvent(OnboardingEvent.PhoneNumberChanged(it)) },
+                                label = "Phone Number",
+                                isError = formData.phoneNumberError != null,
+                                errorMessage = formData.phoneNumberError,
+                                keyboardType = KeyboardType.Phone,
+                                imeAction = ImeAction.Next
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            CustomTextField(
+                                value = formData.heightCm,
+                                onValueChange = { onEvent(OnboardingEvent.HeightChanged(it)) },
+                                label = "Height (cm)",
+                                isError = formData.heightError != null,
+                                errorMessage = formData.heightError,
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            )
+                        }
+                        Column(modifier = Modifier.weight(1f)) {
+                            DateOfBirthPicker(
+                                selectedDate = formData.dateOfBirth,
+                                onDateSelected = { onEvent(OnboardingEvent.DateOfBirthChanged(it)) },
+                                errorMessage = formData.dateOfBirthError
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            CustomTextField(
+                                value = formData.weightKg,
+                                onValueChange = { onEvent(OnboardingEvent.WeightChanged(it)) },
+                                label = "Weight (kg)",
+                                isError = formData.weightError != null,
+                                errorMessage = formData.weightError,
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            )
+                        }
+                    }
+                } else {
+                    CustomTextField(
+                        value = formData.phoneNumber,
+                        onValueChange = { onEvent(OnboardingEvent.PhoneNumberChanged(it)) },
+                        label = "Phone Number",
+                        isError = formData.phoneNumberError != null,
+                        errorMessage = formData.phoneNumberError,
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Next
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    DateOfBirthPicker(
+                        selectedDate = formData.dateOfBirth,
+                        onDateSelected = { onEvent(OnboardingEvent.DateOfBirthChanged(it)) },
+                        errorMessage = formData.dateOfBirthError
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    CustomTextField(
+                        value = formData.heightCm,
+                        onValueChange = { onEvent(OnboardingEvent.HeightChanged(it)) },
+                        label = "Height (cm)",
+                        isError = formData.heightError != null,
+                        errorMessage = formData.heightError,
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    CustomTextField(
+                        value = formData.weightKg,
+                        onValueChange = { onEvent(OnboardingEvent.WeightChanged(it)) },
+                        label = "Weight (kg)",
+                        isError = formData.weightError != null,
+                        errorMessage = formData.weightError,
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
                     )
                 }
+
                 Spacer(modifier = Modifier.height(12.dp))
+                Text("How do you rate your surfing?", style = MaterialTheme.typography.titleMedium)
+                SurfLevelSelector(
+                    selectedLevel = formData.selectedSurfLevel ?: SurfLevel.BEGINNER,
+                    onLevelSelected = { onEvent(OnboardingEvent.SurfLevelChanged(it)) },
+                    errorMessage = formData.surfLevelError
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                val imageSize = when (widthSize) {
+                    WindowWidthSize.COMPACT -> 120.dp
+                    WindowWidthSize.MEDIUM -> 160.dp
+                    WindowWidthSize.EXPANDED -> 200.dp
+                    else -> 120.dp
+                }
+
                 ImagePickerSection(
                     imageUrl = formData.profileImageUrl,
                     isUploading = formData.isUploadingImage,
                     onChangePhotoClick = { showImageOptions = true },
                     placeholderRes = placeholderRes,
-                    errorMessage = formData.profileImageError
+                    errorMessage = formData.profileImageError,
+                    modifier = Modifier.size(imageSize)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
-
-
-                Text(
-                    text = "Tap to upload profile pic",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-
+                Text(text = "Tap to upload profile pic", fontSize = 12.sp, color = Color.Gray)
                 Spacer(modifier = Modifier.height(24.dp))
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
                 ) {
                     Checkbox(
                         checked = formData.agreedToTerms,
@@ -327,9 +355,7 @@ fun CompleteRegisterScreen(
                                 onEvent(OnboardingEvent.OnAgreementChange(!formData.agreedToTerms))
                             }
                         },
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f)
+                        modifier = Modifier.padding(start = 8.dp).weight(1f)
                     )
                     formData.termsError?.let {
                         Text(
@@ -341,15 +367,14 @@ fun CompleteRegisterScreen(
                     }
                 }
             }
+
             if (showTermsDialog) {
                 AlertDialog(
                     onDismissRequest = { showTermsDialog = false },
                     title = { Text("Terms of Service") },
                     text = {
                         Column(
-                            modifier = Modifier
-                                .verticalScroll(rememberScrollState())
-                                .fillMaxWidth()
+                            modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxWidth()
                         ) {
                             Text(
                                 text = termsText,
@@ -365,6 +390,7 @@ fun CompleteRegisterScreen(
                     }
                 )
             }
+
             if (showImageOptions) {
                 ImageSourceSelectorSheet(
                     onDismiss = { showImageOptions = false },
@@ -374,9 +400,6 @@ fun CompleteRegisterScreen(
                             cameraLauncher.launch(null)
                         } else {
                             cameraPermissionState.launchPermissionRequest()
-                            if (cameraPermissionState.status.isGranted) {
-                                cameraLauncher.launch(null)
-                            }
                         }
                     },
                     onChooseFromGallery = {
@@ -385,13 +408,26 @@ fun CompleteRegisterScreen(
                             galleryLauncher.launch("image/*")
                         } else {
                             storagePermissionState.launchPermissionRequest()
-                            if (storagePermissionState.status.isGranted) {
-                                galleryLauncher.launch("image/*")
-                            }
                         }
                     }
                 )
             }
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CompleteRegisterScreenPreview() {
+    val dummyData = OnboardingFormData(
+        phoneNumber = "1234567890",
+        dateOfBirth = "2000-01-01",
+        heightCm = "180",
+        weightKg = "75",
+        selectedSurfLevel = SurfLevel.INTERMEDIATE,
+        profileImageUrl = null,
+        isUploadingImage = false,
+        agreedToTerms = true
+    )
+    CompleteRegisterScreen(formData = dummyData, onEvent = {})
 }

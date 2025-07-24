@@ -5,6 +5,7 @@ import org.example.quiversync.domain.usecase.user.GetUserProfileUseCase
 import org.example.quiversync.domain.usecase.register.UpdateUserProfileUseCase
 import org.example.quiversync.domain.usecase.user.CheckUserAuthMethodUseCase
 import org.example.quiversync.domain.usecase.user.GetBoardsNumberUseCase
+import org.example.quiversync.domain.usecase.user.GetRentalsNumberUseCase
 import org.example.quiversync.domain.usecase.user.GetSpotsNumberUseCase
 import org.example.quiversync.domain.usecase.user.LogoutUseCase
 import org.example.quiversync.domain.usecase.user.SendPasswordResetEmailUseCase
@@ -21,5 +22,6 @@ data class UserUseCases(
     val checkUserAuthMethod: CheckUserAuthMethodUseCase,
     val updatePasswordUseCase: UpdatePasswordUseCase,
     val sendPasswordResetEmailUseCase: SendPasswordResetEmailUseCase,
-    val getSpotsNumberUseCase: GetSpotsNumberUseCase
+    val getSpotsNumberUseCase: GetSpotsNumberUseCase,
+    val getRentalsNumberUseCase: GetRentalsNumberUseCase
 )

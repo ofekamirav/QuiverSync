@@ -1,7 +1,10 @@
 package org.example.quiversync.data.repository
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.example.quiversync.data.local.dao.QuiverDao
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.data.local.Error
@@ -15,9 +18,11 @@ import org.example.quiversync.utils.extensions.platformLogger
 class RentalsRepositoryImpl(
     private val dao: QuiverDao,
     private val quiverRemote: QuiverRemoteDataSource,
-    private val session: SessionManager
+    private val session: SessionManager,
+    private val applicationScope: CoroutineScope
 ) : RentalsRepository {
     private var lastFetchedId: String? = null
+    private var remoteSyncJob: Job? = null
 
     override fun observeExploreBoards(): Flow<List<Surfboard>> =
         dao.getAllRentalSurfboards()
@@ -46,4 +51,24 @@ class RentalsRepositoryImpl(
             }
         }
     }
+
+    override fun startRemoteSync() {
+        if (remoteSyncJob?.isActive == true) return
+
+        remoteSyncJob = applicationScope.launch {
+            quiverRemote.observeAllRentals()
+                .collect { remoteBoards ->
+                    dao.transaction {
+                        remoteBoards.forEach { dao.addSurfboard(it) }
+                    }
+                }
+        }
+    }
+
+    override fun stopRemoteSync() {
+        remoteSyncJob?.cancel()
+        remoteSyncJob = null
+        platformLogger("RentalsRepo", "Remote sync stopped")
+    }
+
 }

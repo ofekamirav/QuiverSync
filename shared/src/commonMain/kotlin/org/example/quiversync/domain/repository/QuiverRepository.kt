@@ -8,6 +8,7 @@ import org.example.quiversync.data.local.Result
 
 interface QuiverRepository {
     suspend fun getMyQuiver(): Flow<Result<List<Surfboard>, Error>>
+    suspend fun startQuiverSync()
     suspend fun addSurfboard(surfboard: Surfboard): Result<Boolean, Error>
     suspend fun deleteSurfboard(surfboardId: String): Result<Boolean, Error>
     suspend fun publishForRental(surfboardId: String, rentalsDetails: RentalPublishDetails): Result<Boolean, Error>

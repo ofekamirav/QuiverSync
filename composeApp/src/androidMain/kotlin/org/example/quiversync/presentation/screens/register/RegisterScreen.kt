@@ -33,7 +33,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.presentation.components.GradientButton
 import org.example.quiversync.R

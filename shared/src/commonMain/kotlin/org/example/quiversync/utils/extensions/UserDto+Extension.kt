@@ -1,8 +1,10 @@
 package org.example.quiversync.utils.extensions
 
+import kotlinx.datetime.Clock
 import org.example.quiversync.UserProfileEntity
 import org.example.quiversync.domain.model.User
 import org.example.quiversync.data.remote.dto.UserDto
+import org.example.quiversync.domain.model.OwnerLocal
 
 fun UserDto.toDomain(uid: String): User {
     return User(
@@ -42,5 +44,16 @@ fun UserProfileEntity.toUser(): User {
         weightKg = weightKg,
         surfLevel = surfLevel,
         profilePicture = profilePicture
+    )
+}
+
+fun User.toOwnerLocal(): OwnerLocal {
+    return OwnerLocal(
+        id = uid,
+        fullName = name,
+        email = email,
+        profilePicture = profilePicture,
+        phoneNumber = phoneNumber,
+        updatedAt = Clock.System.now().toEpochMilliseconds()
     )
 }

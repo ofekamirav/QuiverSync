@@ -20,10 +20,12 @@ import org.example.quiversync.utils.extensions.platformLogger
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
+import org.example.quiversync.data.session.SessionManager
 
 
 class FavSpotsViewModel(
     private val favSpotsUseCases: FavSpotsUseCases,
+    private val sessionManager: SessionManager
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow<FavSpotsState>(FavSpotsState.Loading)
@@ -42,7 +44,12 @@ class FavSpotsViewModel(
     init {
         scope.launch {
             favSpotsUseCases.deleteOutDateForecastUseCase()
-            _isImperialUnits.value = favSpotsUseCases.isImperialUnitsUseCase()
+            sessionManager.getUnitsPreferenceFlow()
+                .map { it == "imperial" }
+                .collect { isImperial ->
+                    _isImperialUnits.value = isImperial
+                    platformLogger("FavSpotsViewModel", "isImperialUnits updated: $isImperial")
+                }
         }
 
         observeFavoriteSpots()

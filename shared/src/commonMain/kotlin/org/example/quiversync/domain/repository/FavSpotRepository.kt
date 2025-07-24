@@ -10,6 +10,7 @@ interface FavSpotRepository {
     suspend fun addFavSpot(favSpot: FavoriteSpot): Result<Unit, Error>
     suspend fun removeFavSpot(favSpot: FavoriteSpot): Result<Unit, Error>
     suspend fun clearAllSpots(): Result<Unit, Error>
-    fun getAllFavSpots(): Flow<Result<List<FavoriteSpot>, Error>>
+    suspend fun getAllFavSpots(): Flow<Result<List<FavoriteSpot>, Error>>
     suspend fun stopRealtimeSync()
+    suspend fun startRealtimeSync()
 }

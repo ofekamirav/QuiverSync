@@ -163,4 +163,9 @@ class QuiverDao(
             block()
         }
     }
+
+    fun clearAllRentalBoards() {
+        queries.deleteAllRentalSurfboards()
+    }
+
 }

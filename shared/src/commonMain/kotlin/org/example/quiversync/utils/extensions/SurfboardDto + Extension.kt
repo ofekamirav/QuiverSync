@@ -4,6 +4,7 @@ import org.example.quiversync.SurfboardEntity
 import org.example.quiversync.data.remote.dto.SurfboardDto
 import org.example.quiversync.domain.model.BoardForRent
 import org.example.quiversync.domain.model.FinsSetup
+import org.example.quiversync.domain.model.OwnerLocal
 import org.example.quiversync.domain.model.SurfLevel
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.SurfboardType
@@ -113,10 +114,10 @@ fun Surfboard.toEntity(): SurfboardEntity {
     )
 }
 
-fun Surfboard.toBoardForRent(owner: User?): BoardForRent =
+fun Surfboard.toBoardForRent(owner: OwnerLocal?): BoardForRent =
     BoardForRent(
         surfboardId = id,
-        ownerName = owner?.name.orEmpty(),
+        ownerName = owner?.fullName.orEmpty(),
         ownerPic = owner?.profilePicture.orEmpty(),
         surfboardPic = imageRes,
         model = model,
@@ -188,12 +189,11 @@ fun Long.toBoolean(): Boolean {
 
 fun getDefaultImageUrlForType(type: SurfboardType): String {
     val cloudName = AppConfig.cloudName
-    val baseUrl = "https://res.cloudinary.com/$cloudName/image/upload/v1/defaults"
     return when (type) {
-        SurfboardType.SHORTBOARD -> "$baseUrl/shortboard_default.jpg"
-        SurfboardType.LONGBOARD  -> "$baseUrl/longboard_default.jpg"
-        SurfboardType.FUNBOARD   -> "$baseUrl/funboard_default.jpg"
-        SurfboardType.FISHBOARD  -> "$baseUrl/fish_default.jpg"
-        SurfboardType.SOFTBOARD  -> "$baseUrl/softboard_default.jpg"
+        SurfboardType.SHORTBOARD -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014518/shortboard_ydkjml.png"
+        SurfboardType.LONGBOARD  -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014512/longboard_ycfpgb.png"
+        SurfboardType.FUNBOARD   -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014500/funboard_gxzbiv.png"
+        SurfboardType.FISHBOARD  -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014504/fish_rofh7n.png"
+        SurfboardType.SOFTBOARD  -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014523/softboard_hstkvq.png"
     }
 }

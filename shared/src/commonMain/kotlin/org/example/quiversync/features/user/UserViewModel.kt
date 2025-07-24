@@ -2,12 +2,8 @@ package org.example.quiversync.features.user
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.example.quiversync.data.local.Error
 import org.example.quiversync.data.local.Result
-import org.example.quiversync.data.session.SessionManager
-import org.example.quiversync.domain.model.User
 import org.example.quiversync.features.BaseViewModel
 
 
@@ -30,7 +26,8 @@ class UserViewModel(
                         if (user != null) {
                             val boardsNumber = userUseCases.getBoardsNumberUseCase(user.uid)
                             val spotsNumber = userUseCases.getSpotsNumberUseCase(user.uid)
-                            _uiState.emit(UserState.Loaded(user, boardsNumber, spotsNumber))
+                            val rentalsNumber = userUseCases.getRentalsNumberUseCase(user.uid)
+                            _uiState.emit(UserState.Loaded(user, boardsNumber, spotsNumber, rentalsNumber))
                         } else {
                             _uiState.emit(UserState.Error("User profile not found."))
                         }

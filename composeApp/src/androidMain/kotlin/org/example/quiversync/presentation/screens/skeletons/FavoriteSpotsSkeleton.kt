@@ -1,10 +1,5 @@
 package org.example.quiversync.presentation.screens.skeletons
 
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -40,6 +35,7 @@ import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.ShimmerBrush
 import org.example.quiversync.utils.WindowWidthSize
+import org.example.quiversync.utils.rememberShimmerBrush
 
 @Composable
 fun ExpandableSpotCardSkeleton(brush: Brush) {
@@ -50,7 +46,7 @@ fun ExpandableSpotCardSkeleton(brush: Brush) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -91,12 +87,7 @@ fun ExpandableSpotCardSkeleton(brush: Brush) {
 @Composable
 fun FavoriteSpotsScreenSkeleton(modifier: Modifier = Modifier) {
     val isDark = isSystemInDarkTheme()
-    val shimmerColors = listOf(
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-    )
-    val brush = ShimmerBrush(shimmerColors  = shimmerColors)
+    val brush = rememberShimmerBrush()
     val windowInfo = LocalWindowInfo.current
 
     when (windowInfo.widthSize) {

@@ -8,4 +8,6 @@ import org.example.quiversync.data.local.Error
 interface RentalsRepository {
     fun observeExploreBoards(): Flow<List<Surfboard>>
     suspend fun fetchExplorePage(pageSize: Int, lastDocumentId: String?): Result<List<Surfboard>,Error>
+    fun startRemoteSync()
+    fun stopRemoteSync()
 }

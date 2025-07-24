@@ -90,10 +90,12 @@ class AddFavSpotViewModel(
             val result = favSpotUseCases.addFavSpotUseCase(spot)
             if( result is Result.Success ) {
                 _addFavSpotState.emit(AddFavSpotState.Loaded)
-                _addFavSpotState.emit(AddFavSpotState.Idle(FavoriteSpotForm()))
             } else {
                 _addFavSpotState.emit(AddFavSpotState.Error("Failed to add favorite spot"))
             }
         }
+    }
+    fun resetToIdle() {
+        _addFavSpotState.value = AddFavSpotState.Idle(FavoriteSpotForm())
     }
 }

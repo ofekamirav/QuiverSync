@@ -41,6 +41,8 @@ import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.presentation.theme.QuiverSyncTheme
 import org.example.quiversync.utils.AppConfig
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import org.example.quiversync.utils.extensions.getDefaultImageUrlForType
 
@@ -56,11 +58,11 @@ fun BoardImagePicker(
     val context = LocalContext.current
     val hasCustomImage = !imageUrl.isNullOrBlank()
     val defaultUrl = surfboardType?.let { getDefaultImageUrlForType(it) }
-    val placeHolderResource = if (isSystemInDarkTheme()) {
-        R.drawable.ic_board_placeholder_dark
-    } else {
-        R.drawable.ic_board_placeholder_light
-    }
+//    val placeHolderResource = if (isSystemInDarkTheme()) {
+//        R.drawable.ic_board_placeholder_dark
+//    } else {
+//        R.drawable.ic_board_placeholder_light
+//    }
 
     val effectiveImageUrl = when {
         hasCustomImage -> imageUrl
@@ -90,7 +92,7 @@ fun BoardImagePicker(
             effectiveImageUrl != null -> {
                 AsyncImage(
                     model = effectiveImageUrl,
-                    placeholder = painterResource(placeHolderResource) ,
+                    placeholder = painterResource(id = R.drawable.logo_placeholder),
                     contentDescription = "Surfboard Image",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize()

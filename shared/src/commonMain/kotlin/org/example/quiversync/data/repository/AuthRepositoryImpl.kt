@@ -114,18 +114,18 @@ class AuthRepositoryImpl(
         }
     }
 
-    override suspend fun logout() {
+    override suspend fun logoutRemote() {
         auth.signOut()
-        clearLocalData()
     }
 
-    private suspend fun clearLocalData(){
+    override suspend fun clearLocalData(){
         val uid = sessionManager.getUid()
         sessionManager.clearUserData()
         if (uid != null) {
             userDao.deleteProfile(uid)
             favSpotDao.deleteAllFavSpots(uid)
             quiverDao.deleteAllSurfboardsByOwnerId(uid)
+            quiverDao.clearAllRentalBoards()
             predictionDao.deleteAllPredictions()
         }
     }

@@ -41,6 +41,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -52,17 +53,20 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import org.example.quiversync.R
 import org.example.quiversync.domain.model.BoardForRent
+import org.example.quiversync.features.rentals.explore.BoardForDisplay
+import org.example.quiversync.presentation.screens.skeletons.RentalBoardCardSkeleton
 import org.example.quiversync.presentation.theme.OceanPalette
+import org.example.quiversync.utils.rememberShimmerBrush
 
 
 @Composable
 fun ExploreBoardGrid(
-    boards: List<BoardForRent>,
+    boards: List<BoardForDisplay>,
     isLoadingMore: Boolean,
     onLoadMore: () -> Unit
 ) {
     val gridState = rememberLazyGridState()
-    val coroutineScope = rememberCoroutineScope()
+    val brush = rememberShimmerBrush()
 
     //Load more when reaching the end of the list
     LaunchedEffect(gridState) {
@@ -85,8 +89,8 @@ fun ExploreBoardGrid(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(boards) { board ->
-            RentalBoardCard(board)
+        items(boards) { boardForDisplay  ->
+            RentalBoardCardWrapper(boardForDisplay,brush)
         }
         if (isLoadingMore) {
             item {
@@ -109,10 +113,20 @@ fun ExploreBoardGrid(
 }
 
 @Composable
+fun RentalBoardCardWrapper(boardForDisplay: BoardForDisplay,brush: Brush) {
+    if (boardForDisplay.board == null) {
+        RentalBoardCardSkeleton(brush)
+    } else {
+        RentalBoardCard(board = boardForDisplay.board!!)
+    }
+}
+
+
+@Composable
 fun RentalBoardCard(board: BoardForRent, modifier: Modifier = Modifier) {
     val cardColor = if (isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.White
     val placeHolderRes =
-        if (isSystemInDarkTheme()) R.drawable.placeholder_dark else R.drawable.placeholder_light
+        if (isSystemInDarkTheme()) R.drawable.ic_board_placeholder_dark else R.drawable.ic_board_placeholder_light
     val context = LocalContext.current
     Card(
         modifier = modifier.fillMaxWidth().padding(8.dp),
@@ -120,7 +134,13 @@ fun RentalBoardCard(board: BoardForRent, modifier: Modifier = Modifier) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(cardColor)
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(cardColor)
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             AsyncImage(
                 model = board.surfboardPic,
                 contentDescription = "",
@@ -128,7 +148,7 @@ fun RentalBoardCard(board: BoardForRent, modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(140.dp)
-                    .clip(RoundedCornerShape(12.dp)),
+                    .clip(RoundedCornerShape(20.dp)),
                 contentScale = ContentScale.Fit,
             )
 
@@ -154,13 +174,19 @@ fun RentalBoardCard(board: BoardForRent, modifier: Modifier = Modifier) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.hs_shortboard),
-                        contentDescription = board.ownerPic,
+                    val ownerPic = if (isSystemInDarkTheme()){
+                        painterResource(id = R.drawable.placeholder_dark)
+                    } else {
+                        painterResource(id = R.drawable.placeholder_light)
+                    }
+                    AsyncImage(
+                        model = board.ownerPic,
+                        placeholder = ownerPic,
+                        contentDescription = "Owner Profile Picture",
                         modifier = Modifier
-                            .size(20.dp)
-                            .clip(CircleShape)
-                            .background(Color.LightGray)
+                            .size(30.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop,
                     )
                     Text(
                         text = board.ownerName,

@@ -33,7 +33,8 @@ fun ImagePickerSection(
     isUploading: Boolean,
     onChangePhotoClick: () -> Unit,
     placeholderRes: Int,
-    errorMessage: String?
+    errorMessage: String?,
+    modifier: Modifier = Modifier
 ) {
     Box(contentAlignment = Alignment.Center) {
         if (isUploading) {
@@ -46,8 +47,7 @@ fun ImagePickerSection(
                 error = painterResource(placeholderRes),
                 fallback = painterResource(placeholderRes),
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(120.dp)
+                modifier = modifier
                     .clip(CircleShape)
             )
             IconButton(

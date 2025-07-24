@@ -1,6 +1,7 @@
     package org.example.quiversync.data.remote.datasource.quiver
 
     import dev.gitlive.firebase.firestore.FirebaseFirestore
+    import dev.gitlive.firebase.firestore.where
     import kotlinx.coroutines.flow.Flow
     import kotlinx.coroutines.flow.map
     import org.example.quiversync.data.remote.dto.RentalPublishDetails
@@ -168,5 +169,23 @@
             platformLogger("QuiverRemoteDataSourceService", "Error fetching rental boards: ${e.message}")
             Result.Failure(SurfboardError(e.message ?: "Unknown error"))
         }
+
+        override fun observeAllRentals(): Flow<List<Surfboard>> =
+            firebase.collection("surfboards")
+                .where("isRentalPublished", true)
+                .where("isRentalAvailable", true)
+                .snapshots()
+                .map { snapshot ->
+                    snapshot.documents.mapNotNull { doc ->
+                        try {
+                            doc.data<SurfboardDto>().toDomain(doc.id)
+                        } catch (e: Exception) {
+                            platformLogger("QuiverRemote", "Failed to parse surfboard ${doc.id}")
+                            null
+                        }
+                    }
+                }
+
+
 
     }

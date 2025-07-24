@@ -3,7 +3,9 @@ package org.example.quiversync.data.session
 import android.content.Context
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.toLocalDateTime
 import org.example.quiversync.utils.Location
 
@@ -81,8 +83,15 @@ actual class SessionManager actual constructor(context: Any?) {
     }
 
     actual suspend fun getUnitsPreference(): String? {
-        return context.dataStore.data.first()[unitsPreferenceKey] ?: "metric"
+        return context.dataStore.data.first()[unitsPreferenceKey]
     }
+
+    actual fun getUnitsPreferenceFlow(): Flow<String> {
+        return context.dataStore.data.map { preferences ->
+            preferences[unitsPreferenceKey] ?: "metric"
+        }
+    }
+
 
     actual suspend fun setUnitsPreference(units: String) {
         context.dataStore.edit { it[unitsPreferenceKey] = units }

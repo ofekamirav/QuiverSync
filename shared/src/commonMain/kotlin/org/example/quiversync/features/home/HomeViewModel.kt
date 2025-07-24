@@ -3,9 +3,11 @@ package org.example.quiversync.features.home
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.data.local.Result
+import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.domain.model.FinsSetup
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.SurfboardType
@@ -17,6 +19,7 @@ import org.example.quiversync.utils.extensions.platformLogger
 
 class HomeViewModel(
     private val homeUseCases: HomeUseCases,
+    private val sessionManager: SessionManager,
 ): BaseViewModel() {
     private val _uiState = MutableStateFlow<HomeState>(HomeState.Loading)
     val uiState: StateFlow<HomeState> get() = _uiState
@@ -27,12 +30,11 @@ class HomeViewModel(
     init {
         fetchForecastAndBoardMatch()
         scope.launch {
-         if(homeUseCases.isImperialUnitsUseCases()){
-            _isImperial.value = true
-         }
-            else {
-                _isImperial.value = false
-            }
+            sessionManager.getUnitsPreferenceFlow()
+                .map { it == "imperial" }
+                .collect { isImperial ->
+                    _isImperial.value = isImperial
+                }
         }
     }
 
