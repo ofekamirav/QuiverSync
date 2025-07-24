@@ -49,11 +49,11 @@ fun BoardCard(
     val isPublished = board.isRentalPublished ?: false
     val isDark = isSystemInDarkTheme()
     val baseBackgroundColor = if (isDark) OceanPalette.DarkSurface else Color.White
-    val placeholderId = if (isDark) {
-        R.drawable.ic_board_placeholder_dark
-    } else {
-        R.drawable.ic_board_placeholder_light
-    }
+//    val placeholderId = if (isDark) {
+//        R.drawable.ic_board_placeholder_dark
+//    } else {
+//        R.drawable.ic_board_placeholder_light
+//    }
     val animatedBackgroundColor by animateColorAsState(
         targetValue = baseBackgroundColor,
         animationSpec = tween(300)
@@ -87,7 +87,7 @@ fun BoardCard(
         ) {
             AsyncImage(
                 model = board.imageRes,
-                placeholder = painterResource(id = placeholderId),
+                placeholder = painterResource(id = R.drawable.logo_placeholder),
                 contentDescription = "Surfboard Image",
                 modifier = Modifier
                     .size(80.dp)

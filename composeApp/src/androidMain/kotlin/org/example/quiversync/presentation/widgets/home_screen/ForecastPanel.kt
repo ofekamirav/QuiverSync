@@ -44,20 +44,12 @@ fun ForecastPanel(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(upcomingDays) { day ->
-                    val displayWaveHeight = if (isImperialUnits) {
-                        UnitConverter.metersToFeet(day.waveHeight)
-                    } else {
-                        day.waveHeight
-                    }
-                    val displayWindSpeed = if (isImperialUnits) {
-                        UnitConverter.msToKnots(day.windSpeed)
-                    } else {
-                        day.windSpeed
-                    }
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                upcomingDays.forEach { day ->
+                    val displayWaveHeight = if (isImperialUnits)
+                        UnitConverter.metersToFeet(day.waveHeight) else day.waveHeight
+                    val displayWindSpeed = if (isImperialUnits)
+                        UnitConverter.msToKnots(day.windSpeed) else day.windSpeed
 
                     ForecastItem(
                         day = day.date,
@@ -65,9 +57,6 @@ fun ForecastPanel(
                         waveHeight = "${df.format(displayWaveHeight)} $waveHeightUnit",
                         wind = "${df.format(displayWindSpeed)} $windSpeedUnit",
                     )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }

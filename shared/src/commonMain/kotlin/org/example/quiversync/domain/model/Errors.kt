@@ -34,3 +34,8 @@ data class GeminiError(
 data class SpotsError(
     override val message: String
 ): Error
+
+@Serializable
+data class RentalError(
+    override val message: String
+): Error

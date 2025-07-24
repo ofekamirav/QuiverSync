@@ -2,10 +2,14 @@ package org.example.quiversync.utils.extensions
 
 import org.example.quiversync.SurfboardEntity
 import org.example.quiversync.data.remote.dto.SurfboardDto
+import org.example.quiversync.domain.model.BoardForRent
 import org.example.quiversync.domain.model.FinsSetup
+import org.example.quiversync.domain.model.OwnerLocal
 import org.example.quiversync.domain.model.SurfLevel
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.domain.model.SurfboardType
+import org.example.quiversync.domain.model.User
+import org.example.quiversync.utils.AppConfig
 
 fun SurfboardEntity.toDomain(): Surfboard {
     return Surfboard(
@@ -110,6 +114,21 @@ fun Surfboard.toEntity(): SurfboardEntity {
     )
 }
 
+fun Surfboard.toBoardForRent(owner: OwnerLocal?): BoardForRent =
+    BoardForRent(
+        surfboardId = id,
+        ownerName = owner?.fullName.orEmpty(),
+        ownerPic = owner?.profilePicture.orEmpty(),
+        surfboardPic = imageRes,
+        model = model,
+        type = type.name,
+        height = height,
+        width = width,
+        volume = volume,
+        pricePerDay = pricePerDay ?: 0.0,
+        ownerPhoneNumber = owner?.phoneNumber.orEmpty(),
+    )
+
 fun FinsSetup.toEntity(): String {
     return when (this) {
         FinsSetup.FIVEFINS -> "Five Fins"
@@ -168,3 +187,13 @@ fun Long.toBoolean(): Boolean {
     return this == 1L
 }
 
+fun getDefaultImageUrlForType(type: SurfboardType): String {
+    val cloudName = AppConfig.cloudName
+    return when (type) {
+        SurfboardType.SHORTBOARD -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014518/shortboard_ydkjml.png"
+        SurfboardType.LONGBOARD  -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014512/longboard_ycfpgb.png"
+        SurfboardType.FUNBOARD   -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014500/funboard_gxzbiv.png"
+        SurfboardType.FISHBOARD  -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014504/fish_rofh7n.png"
+        SurfboardType.SOFTBOARD  -> "https://res.cloudinary.com/$cloudName/image/upload/v1753014523/softboard_hstkvq.png"
+    }
+}

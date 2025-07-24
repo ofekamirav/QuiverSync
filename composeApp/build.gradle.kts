@@ -119,5 +119,4 @@ dependencies {
     implementation(libs.google.play.services.location)
 
 
-
 }

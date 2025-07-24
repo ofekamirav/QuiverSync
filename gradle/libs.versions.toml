@@ -15,9 +15,13 @@ androidx-lifecycle = "2.8.4"
 androidx-material = "1.12.0"
 androidx-material3-window-size = "1.2.1"
 androidx-test-junit = "1.2.1"
+ccp = "1.0.4"
 cloudinaryAndroid = "3.0.2"
 coilCompose = "2.4.0"
 compose-multiplatform = "1.7.3"
+composeCountryCodePicker = "1.2.1"
+countrycodepickercompose = "0.1"
+countryCodePickerJetpackCompose = "2.4.0"
 datastorePreferences = "1.1.7"
 firebaseAuth = "2.1.0"
 firebaseBom = "33.15.0"
@@ -70,6 +74,8 @@ androidx-material3 = { module = "androidx.compose.material3:material3", version.
 androidx-material3-window-size = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "androidx-material3-window-size" }
 androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
 cloudinary-android = { module = "com.cloudinary:cloudinary-android", version.ref = "cloudinaryAndroid" }
+compose-country-code-picker = { module = "io.github.skeptick:compose-country-code-picker", version.ref = "composeCountryCodePicker" }
+countrycodepickercompose = { module = "com.github.ahmmedrejowan:CountryCodePickerCompose", version.ref = "countrycodepickercompose" }
 google-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseAuth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }

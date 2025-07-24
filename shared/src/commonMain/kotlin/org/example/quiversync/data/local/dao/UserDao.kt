@@ -64,6 +64,26 @@ class UserDao(
         queries.deleteProfile(uid)
     }
 
+    fun observeUserById(uid: String): Flow<User?> =
+        queries.getUserById(uid)
+            .asFlow()
+            .mapToOneOrNull(Dispatchers.Default)
+            .map { entity ->
+                entity?.let {
+                    User(
+                        uid = it.uid,
+                        name = it.name,
+                        email = it.email,
+                        dateOfBirth = it.dateOfBirth,
+                        phoneNumber = it.phoneNumber,
+                        heightCm = it.heightCm,
+                        weightKg = it.weightKg,
+                        surfLevel = it.surfLevel,
+                        profilePicture = it.profilePicture
+                    )
+                }
+            }
+
     fun getAllProfiles(): List<User> {
         return queries.getAllProfiles().executeAsList().map { userEntity ->
             User(

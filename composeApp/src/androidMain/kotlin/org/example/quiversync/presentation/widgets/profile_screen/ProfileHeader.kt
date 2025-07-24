@@ -45,6 +45,7 @@ fun ProfileHeader(
     val user = (userState as UserState.Loaded).user
     val boards = (userState as UserState.Loaded).boards
     val spots = (userState as UserState.Loaded).spots
+    val rentals = (userState as UserState.Loaded).rentals
     // Avatar & Name
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         Box {
@@ -78,7 +79,7 @@ fun ProfileHeader(
             .background(MaterialTheme.colorScheme.surface)
             .padding(vertical = 16.dp)
     ) {
-        StatItem("Rentals", "5")
+        StatItem("Rentals", rentals.toString())
         VerticalDivider()
         StatItem("Boards", boards.toString())
         VerticalDivider()

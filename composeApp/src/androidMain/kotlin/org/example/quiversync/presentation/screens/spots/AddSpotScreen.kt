@@ -1,4 +1,3 @@
-// AddSpotScreen.kt
 package org.example.quiversync.presentation.screens.spots
 
 import android.widget.Toast
@@ -30,6 +29,7 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient
 import org.example.quiversync.R
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.delay
 import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotEvent
 import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotState
 import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotViewModel
@@ -67,10 +67,19 @@ fun AddSpotScreen(
         modifier
     }
 
-
+    LaunchedEffect(formState) {
+        if (formState is AddFavSpotState.Loaded) {
+            Toast.makeText(context, "New spot added to favorites", Toast.LENGTH_SHORT).show()
+            delay(1500)
+            onSpotAdded()
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         when (formState) {
+            is AddFavSpotState.Loaded -> {
+                // This state is handled in LaunchedEffect
+            }
             is AddFavSpotState.Error -> {
                 Text(
                     text = (formState as AddFavSpotState.Error).message,
@@ -80,121 +89,136 @@ fun AddSpotScreen(
                         .padding(16.dp)
                 )
             }
-            is AddFavSpotState.Loaded -> {
-                Toast.makeText(context, "New spot added to favorites", Toast.LENGTH_SHORT).show()
-                onSpotAdded()
-            }
-            is AddFavSpotState.Idle, is AddFavSpotState.Loading-> {
+            is AddFavSpotState.Idle, is AddFavSpotState.Loading -> {
                 val form = (formState as? AddFavSpotState.Idle)?.data
-                Column(
-                    contentModifier
+                Box(
+                    modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .padding(16.dp)
                 ) {
-                    ExposedDropdownMenuBox(
-                        expanded = searchQuery.length >= 2,
-                        onExpandedChange = {},
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
                     ) {
-                        CustomTextField(
-                            value = searchQuery,
-                            onValueChange = { q ->
-                                searchQuery = q
-                                viewModel.onEvent(AddFavSpotEvent.NameChanged(q))
-                                if (q.length >= 2) {
-                                    fetchPredictions(placesClient, q, session) { suggestionsList ->
-                                        suggestions = suggestionsList
-                                        expanded = suggestionsList.isNotEmpty()
-                                    }
-                                } else {
-                                    suggestions = emptyList()
-                                    expanded = false
-                                }
-                            },
-                            label = "Enter a spot name",
-                            isError = form?.nameError != null,
-                            errorMessage = form?.nameError,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(),
-                            readOnly = false
-                        )
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                            modifier = Modifier
-                                .background(MaterialTheme.colorScheme.surface)
-                                .clip(RoundedCornerShape(12.dp))
+                        ExposedDropdownMenuBox(
+                            expanded = searchQuery.length >= 2,
+                            onExpandedChange = {},
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            suggestions.forEach { prediction ->
-                                DropdownMenuItem(
-                                    text = { Text(prediction.getFullText(null).toString()) },
-                                    onClick = {
-                                        val placeName = prediction.getFullText(null).toString()
-                                        val fetchRequest = FetchPlaceRequest.builder(
-                                            prediction.placeId,
-                                            listOf(Place.Field.LAT_LNG)
-                                        ).build()
-                                        placesClient.fetchPlace(fetchRequest)
-                                            .addOnSuccessListener { place ->
-                                                val latLng = place.place.location ?: defaultLocation
-                                                searchQuery    = placeName
-                                                suggestions    = emptyList()
-                                                expanded       = false
-                                                markerPosition = latLng
-                                                cameraState.position = CameraPosition.fromLatLngZoom(latLng, 12f)
-
-                                                viewModel.onEvent(AddFavSpotEvent.NameChanged(placeName))
-                                                viewModel.onEvent(
-                                                    AddFavSpotEvent.LocationChanged(
-                                                        latitude  = latLng.latitude,
-                                                        longitude = latLng.longitude
-                                                    )
-                                                )
-                                            }
+                            CustomTextField(
+                                value = searchQuery,
+                                onValueChange = { q ->
+                                    searchQuery = q
+                                    viewModel.onEvent(AddFavSpotEvent.NameChanged(q))
+                                    if (q.length >= 2) {
+                                        fetchPredictions(
+                                            placesClient,
+                                            q,
+                                            session
+                                        ) { suggestionsList ->
+                                            suggestions = suggestionsList
+                                            expanded = suggestionsList.isNotEmpty()
+                                        }
+                                    } else {
+                                        suggestions = emptyList()
+                                        expanded = false
                                     }
-                                )
+                                },
+                                label = "Enter a spot name",
+                                isError = form?.nameError != null,
+                                errorMessage = form?.nameError,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                readOnly = false
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .clip(RoundedCornerShape(12.dp))
+                            ) {
+                                suggestions.forEach { prediction ->
+                                    DropdownMenuItem(
+                                        text = { Text(prediction.getFullText(null).toString()) },
+                                        onClick = {
+                                            val placeName = prediction.getFullText(null).toString()
+                                            val fetchRequest = FetchPlaceRequest.builder(
+                                                prediction.placeId,
+                                                listOf(Place.Field.LAT_LNG)
+                                            ).build()
+                                            placesClient.fetchPlace(fetchRequest)
+                                                .addOnSuccessListener { place ->
+                                                    val latLng =
+                                                        place.place.location ?: defaultLocation
+                                                    searchQuery = placeName
+                                                    suggestions = emptyList()
+                                                    expanded = false
+                                                    markerPosition = latLng
+                                                    cameraState.position =
+                                                        CameraPosition.fromLatLngZoom(latLng, 12f)
+
+                                                    viewModel.onEvent(
+                                                        AddFavSpotEvent.NameChanged(
+                                                            placeName
+                                                        )
+                                                    )
+                                                    viewModel.onEvent(
+                                                        AddFavSpotEvent.LocationChanged(
+                                                            latitude = latLng.latitude,
+                                                            longitude = latLng.longitude
+                                                        )
+                                                    )
+                                                }
+                                        }
+                                    )
+                                }
                             }
                         }
-                    }
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .clip(RoundedCornerShape(30.dp)),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
-                    ) {
-                        MapWithCustomSvgMarker(
-                            position = markerPosition,
-                            cameraPositionState = cameraState,
-                            onMapClick = { latLng ->
-                                markerPosition = latLng
-                                viewModel.onEvent(
-                                    AddFavSpotEvent.LocationChanged(
-                                        latitude  = latLng.latitude,
-                                        longitude = latLng.longitude
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .clip(RoundedCornerShape(30.dp)),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            MapWithCustomSvgMarker(
+                                position = markerPosition,
+                                cameraPositionState = cameraState,
+                                onMapClick = { latLng ->
+                                    markerPosition = latLng
+                                    viewModel.onEvent(
+                                        AddFavSpotEvent.LocationChanged(
+                                            latitude = latLng.latitude,
+                                            longitude = latLng.longitude
+                                        )
                                     )
-                                )
-                            },
-                            markerSvgRes = R.drawable.ic_marker
-                        )
-                    }
-                    form?.locationError?.let {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
+                                },
+                                markerSvgRes = R.drawable.ic_marker
+                            )
+                        }
+                        form?.locationError?.let {
+                            Text(
+                                text = it,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
 
-                    GradientButton(
-                        text = "Add Spot",
-                        onClick = { viewModel.onEvent(AddFavSpotEvent.SaveClicked) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                    )
+                        Spacer(modifier = Modifier.weight(1f))
+                        GradientButton(
+                            text = "Add Spot",
+                            onClick = { viewModel.onEvent(AddFavSpotEvent.SaveClicked) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            enabled = formState !is AddFavSpotState.Loading
+                        )
+                    }
                 }
             }
         }

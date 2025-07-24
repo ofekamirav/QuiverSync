@@ -9,7 +9,7 @@ import org.example.quiversync.domain.repository.FavSpotRepository
 class GetAllFavUserSpots(
     private val favSpotRepository: FavSpotRepository
 ) {
-    operator fun invoke(): Flow<Result<List<FavoriteSpot>, Error>> {
+    suspend operator fun invoke():  Flow<Result<List<FavoriteSpot>, Error>> {
         return favSpotRepository.getAllFavSpots()
     }
 }

@@ -1,5 +1,6 @@
 package org.example.quiversync.data.session
 
+import kotlinx.coroutines.flow.Flow
 import org.example.quiversync.utils.Location
 
 expect class SessionManager(context: Any?) {
@@ -21,7 +22,6 @@ expect class SessionManager(context: Any?) {
 
     suspend fun isOnboardingComplete(): Boolean
     suspend fun setOnboardingComplete(complete: Boolean)
-
-
+    fun getUnitsPreferenceFlow(): Flow<String>
 }
 

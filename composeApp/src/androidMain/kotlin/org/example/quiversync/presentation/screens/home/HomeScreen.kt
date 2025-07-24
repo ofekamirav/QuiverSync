@@ -149,18 +149,20 @@ fun HomeScreenContent(
                 modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                MainConditions(
-                    forecast = todayForecast,
-                    prediction = predictionForToday,
-                    surfboard = surfboard,
-                    expanded = expanded,
-                    onExpandToggle = { expanded = !expanded },
-                    isImperialUnits = isImperial
-                )
-                ForecastPanel(weeklyForecast, isImperial)
+                    MainConditions(
+                        forecast = todayForecast,
+                        prediction = predictionForToday,
+                        surfboard = surfboard,
+                        expanded = expanded,
+                        onExpandToggle = { expanded = !expanded },
+                        isImperialUnits = isImperial
+                    )
+                    ForecastPanel(weeklyForecast, isImperial)
+                    Spacer(modifier = Modifier.weight(1f))
             }
         }
 

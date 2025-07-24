@@ -63,3 +63,7 @@ getRentalSurfboardsByOwnerId:
 SELECT * FROM SurfboardEntity
 WHERE ownerId = ? AND isRentalPublished = 1 AND isRentalAvailable = 1;
 
+deleteAllRentalSurfboards:
+DELETE FROM SurfboardEntity
+WHERE isRentalPublished = 1 AND isRentalAvailable = 1;
+

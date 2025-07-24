@@ -131,7 +131,7 @@ fun ExpandableSpotCard(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 AsyncImage(
                                     model = surfboard.imageRes,
-                                    placeholder = painterResource(id = R.drawable.hs_shortboard),
+                                    placeholder = painterResource(id = R.drawable.logo_placeholder),
                                     contentDescription = "Board",
                                     modifier = Modifier
                                         .size(48.dp)

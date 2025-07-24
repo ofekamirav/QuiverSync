@@ -36,3 +36,6 @@ UPDATE UserProfileEntity SET
     surfLevel = ?,
     profilePicture = ?
 WHERE uid = ?;
+
+getUserById:
+SELECT * FROM UserProfileEntity WHERE uid = ? LIMIT 1;

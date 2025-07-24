@@ -7,15 +7,19 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -73,7 +77,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
         val minSplashTime = 3000L
         val startTime = System.currentTimeMillis()
         val uid = sessionManager.getUid()
-        Log.d("AppNavigation","User ID from SessionManager: $uid")
+        Log.d("AppNavigation", "User ID from SessionManager: $uid")
         isLoggedIn = uid != null
         val endTime = System.currentTimeMillis()
         val elapsed = endTime - startTime
@@ -96,7 +100,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     if (isLoggedIn == null) {
         Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-        ){
+        ) {
             LoadingAnimation(
                 isLoading = true,
                 animationFileName = "quiver_sync_loading_animation.json"
@@ -140,8 +144,19 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
     val startDestination = if (isLoggedIn == true) Screen.Home.route else Screen.Login.route
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val hideTopBarRoutes = listOf(Screen.Login.route, Screen.Register.route, Screen.CompleteRegister.route, Screen.ForgotPassword.route)
-    val navigationIconRoutes = listOf(Screen.AddSurfboard.route, Screen.Settings.route, Screen.AddSpot.route, Screen.EditProfile.route, Screen.SecurityAndPrivacy.route)
+    val hideTopBarRoutes = listOf(
+        Screen.Login.route,
+        Screen.Register.route,
+        Screen.CompleteRegister.route,
+        Screen.ForgotPassword.route
+    )
+    val navigationIconRoutes = listOf(
+        Screen.AddSurfboard.route,
+        Screen.Settings.route,
+        Screen.AddSpot.route,
+        Screen.EditProfile.route,
+        Screen.SecurityAndPrivacy.route
+    )
     val showNavigationIcon = currentRoute in navigationIconRoutes
     val showTopBar = currentRoute !in hideTopBarRoutes
     val currentScreen = Screen::class.sealedSubclasses
@@ -236,153 +251,194 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                         )
                     }
                 }
-            }
+            } else null
         },
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = startDestination,
+        Row(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding)
         ) {
-            composable(Screen.Login.route) {
-                LoginScreen(
-                    onSignInSuccess = {
-                        coroutineScope.launch {
-                            val uid = sessionManager.getUid()
-                            isLoggedIn = uid != null
+            if (!showBottomBar && currentRoute !in hideTopBarRoutes) {
+                NavigationRail(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(72.dp),
+                    containerColor = MaterialTheme.colorScheme.background,
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        items.forEach { item ->
+                            NavigationRailItem(
+                                selected = currentRoute == item.route,
+                                onClick = {
+                                    if (currentRoute != item.route) {
+                                        navController.navigate(item.route) {
+                                            popUpTo(Screen.Home.route) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
+                                },
+                                icon = {
+                                    Icon(
+                                        item.icon,
+                                        contentDescription = item.label,
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                },
+                                colors = NavigationRailItemDefaults.colors(
+                                    selectedIconColor = OceanPalette.DeepBlue,
+                                    unselectedIconColor = OceanPalette.SkyBlue,
+                                    indicatorColor = Color.Transparent
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            )
+            NavHost(
+                navController = navController,
+                startDestination = startDestination,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                composable(Screen.Login.route) {
+                    LoginScreen(
+                        onSignInSuccess = {
+                            coroutineScope.launch {
+                                val uid = sessionManager.getUid()
+                                isLoggedIn = uid != null
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(0)
+                                }
+                            }
+                        },
+                        onRegisterClick = {
+                            navController.navigate(Screen.Register.route)
+                        },
+                        onForgotPasswordClick = {
+                            navController.navigate(Screen.ForgotPassword.route)
+                        },
+                        onNavigateToOnboarding = {
+                            navController.navigate(Screen.CompleteRegister.route) {
+                                popUpTo(0)
+                            }
+                        }
+                    )
+                }
+                composable(Screen.Register.route) {
+                    RegisterScreen(
+                        onSignUpSuccess = {
+                            navController.navigate(Screen.CompleteRegister.route)
+                        },
+                        onLoginClick = {
+                            navController.navigate(Screen.Login.route)
+                        }
+                    )
+                }
+                composable(Screen.Home.route) {
+                    HomeScreen(
+                        showWelcomeBottomSheetOnStart = navController.previousBackStackEntry?.destination?.route == Screen.CompleteRegister.route,
+                    )
+                }
+                composable(Screen.Spots.route) {
+                    FavoriteSpotsScreen(
+                        snackbarHostState = snackbarHostState,
+                        onAddSpotClick = { navController.navigate(Screen.AddSpot.route) }
+                    )
+                }
+                composable(Screen.Rentals.route) {
+                    RentalsHubScreen()
+                }
+                composable(Screen.Quiver.route) {
+                    QuiverScreen(
+                        onAddClick = { navController.navigate(Screen.AddSurfboard.route) }
+                    )
+                }
+                composable(Screen.Profile.route) {
+                    ProfileScreen()
+                }
+                composable(Screen.AddSurfboard.route) {
+                    AddSurfboardScreen(
+                        onFinish = {
+                            navController.navigate(Screen.Quiver.route) {
+                                popUpTo(Screen.Quiver.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        },
+                        onBack = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
+                composable(Screen.CompleteRegister.route) {
+                    OnboardingScreen(
+                        onCompleteClick = {
                             navController.navigate(Screen.Home.route) {
                                 popUpTo(0)
                             }
                         }
-                    },
-                    onRegisterClick = {
-                        navController.navigate(Screen.Register.route)
-                    },
-                    onForgotPasswordClick = {
-                        navController.navigate(Screen.ForgotPassword.route)
-                    },
-                    onNavigateToOnboarding = {
-                        navController.navigate(Screen.CompleteRegister.route) {
-                            popUpTo(0)
-                        }
-                    }
-                )
-            }
-            composable(Screen.Register.route) {
-                RegisterScreen(
-                    onSignUpSuccess = {
-                        navController.navigate(Screen.CompleteRegister.route)
-                    },
-                    onLoginClick = {
-                        navController.navigate(Screen.Login.route)
-                    }
-                )
-            }
-            composable(Screen.Home.route) {
-                HomeScreen(
-                    showWelcomeBottomSheetOnStart = navController.previousBackStackEntry?.destination?.route == Screen.CompleteRegister.route,
-                    modifier = Modifier.padding(innerPadding)
-                )
-            }
-            composable(Screen.Spots.route) {
-                FavoriteSpotsScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    snackbarHostState = snackbarHostState,
-                    onAddSpotClick = { navController.navigate(Screen.AddSpot.route) }
-                )
-            }
-            composable(Screen.Rentals.route) {
-                RentalsHubScreen(modifier = Modifier.padding(innerPadding))
-            }
-            composable(Screen.Quiver.route) {
-                QuiverScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    onAddClick = { navController.navigate(Screen.AddSurfboard.route) }
-                )
-            }
-            composable(Screen.Profile.route) {
-                ProfileScreen(
-                    modifier = Modifier.padding(innerPadding)
-                )
-            }
-            composable(Screen.AddSurfboard.route) {
-                AddSurfboardScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    onFinish = {
-                        navController.navigate(Screen.Quiver.route) {
-                            popUpTo(Screen.Quiver.route) { inclusive = true }
-                            launchSingleTop = true
-                        }
-                    },
-                    onBack = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable(Screen.CompleteRegister.route) {
-                OnboardingScreen(
-                    onCompleteClick = {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(0)
-                        }
-                    }
-                )
-            }
-            composable(Screen.Settings.route) {
-                SettingsScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    onEditProfile = {
-                        navController.navigate(Screen.EditProfile.route)
-                    },
-                    onSecuritySettings = {
-                        navController.navigate(Screen.SecurityAndPrivacy.route)
-                    },
-                    onNotificationsSettings = {
-                        //navController.navigate(Screen.NotificationsSettings.route)
-                    },
-                    onHelpSupport = {},
-                    onLogout = {
-                        isLoggedIn = false
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0)
-                        }
-                    },
-                )
-            }
+                    )
+                }
+                composable(Screen.Settings.route) {
+                    SettingsScreen(
+                        onEditProfile = {
+                            navController.navigate(Screen.EditProfile.route)
+                        },
+                        onSecuritySettings = {
+                            navController.navigate(Screen.SecurityAndPrivacy.route)
+                        },
+                        onNotificationsSettings = {
+                            //navController.navigate(Screen.NotificationsSettings.route)
+                        },
+                        onHelpSupport = {},
+                        onLogout = {
+                            isLoggedIn = false
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0)
+                            }
+                        },
+                    )
+                }
 
-            composable(Screen.EditProfile.route) {
-                EditProfileDetailsScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    onSave = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable(Screen.SecurityAndPrivacy.route) {
-                SecurityAndPrivacyScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    onSuccess = {
-                        navController.popBackStack()
-                    }
-                )
-            }
+                composable(Screen.EditProfile.route) {
+                    EditProfileDetailsScreen(
+                        onSave = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
+                composable(Screen.SecurityAndPrivacy.route) {
+                    SecurityAndPrivacyScreen(
+                        onSuccess = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
 
-            composable(Screen.ForgotPassword.route) {
-                 ForgotPasswordScreen(
-                     onLoginClick = {
+                composable(Screen.ForgotPassword.route) {
+                    ForgotPasswordScreen(
+                        onLoginClick = {
                             navController.navigate(Screen.Login.route) {
                                 popUpTo(Screen.Login.route) { inclusive = true }
                                 launchSingleTop = true
                             }
-                     }
-                 )
-            }
-            composable(Screen.AddSpot.route) {
-                 AddSpotScreen(
-                     modifier = Modifier.padding(innerPadding),
-                     onSpotAdded = { navController.popBackStack() }
-                 )
+                        }
+                    )
+                }
+                composable(Screen.AddSpot.route) {
+                    AddSpotScreen(
+                        onSpotAdded = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }

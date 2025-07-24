@@ -1,0 +1,22 @@
+CREATE TABLE owners (
+    id TEXT PRIMARY KEY,
+    full_name TEXT,
+    email TEXT UNIQUE,
+    profile_picture TEXT,
+    phone_number TEXT,
+    updated_at INTEGER
+);
+
+getAllOwners:
+SELECT * FROM owners;
+
+getOwnerById:
+SELECT * FROM owners WHERE id = ?;
+
+insertOwner:
+INSERT OR REPLACE INTO owners (
+  id, full_name, email, profile_picture, phone_number, updated_at
+) VALUES (?, ?, ?, ?, ?, ?);
+
+deleteAllOwners:
+DELETE FROM owners;

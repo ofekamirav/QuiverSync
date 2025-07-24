@@ -8,11 +8,13 @@ import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.data.local.Result
 import org.example.quiversync.domain.usecase.loginUseCases.SignInWithGoogleUseCase
+import org.example.quiversync.domain.usecase.user.StartSyncsUseCase
 import org.example.quiversync.utils.extensions.platformLogger
 
 
 class LoginViewModel (
-    private val loginUseCases : LoginUseCases
+    private val loginUseCases : LoginUseCases,
+    private val startSyncsUseCase: StartSyncsUseCase
 ): BaseViewModel() {
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle(LoginData()))
@@ -30,6 +32,10 @@ class LoginViewModel (
 
             LoginEvent.SignInClicked -> {
                 validateAndLogin()
+            }
+
+            LoginEvent.GoogleSignInClicked -> {
+                platformLogger("LoginViewModel", "Google Sign-In requested.")
             }
         }
     }
@@ -59,6 +65,7 @@ class LoginViewModel (
             )
             when(result){
                 is Result.Success -> {
+                    startSyncsUseCase()
                     _loginState.emit(LoginState.Loaded)
                 }
                 is Result.Failure -> {
@@ -102,12 +109,14 @@ class LoginViewModel (
                     result.data?.let {
                         if (it.isNewUser) {
                             _loginState.value = LoginState.NavigateToOnboarding
+                            startSyncsUseCase()
                             platformLogger(
                                 "LoginViewModel",
                                 "New user signed in with Google, navigating to onboarding."
                             )
                         } else {
                             _loginState.value = LoginState.Loaded
+                            startSyncsUseCase()
                             platformLogger(
                                 "LoginViewModel",
                                 "Existing user signed in with Google, loading main screen."
@@ -131,9 +140,11 @@ class LoginViewModel (
                 is Result.Success -> {
                     if (result.data?.isNewUser == true) {
                         _loginState.value = LoginState.NavigateToOnboarding
+                        startSyncsUseCase()
                         platformLogger("LoginViewModel", "New user signed in with Apple, navigating to onboarding.")
                     } else {
                         _loginState.value = LoginState.Loaded
+                        startSyncsUseCase()
                         platformLogger("LoginViewModel", "Existing user signed in with Apple, loading main screen.")
                     }
                 }

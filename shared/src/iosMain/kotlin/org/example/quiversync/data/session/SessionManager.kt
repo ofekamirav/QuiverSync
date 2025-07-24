@@ -1,5 +1,8 @@
 package org.example.quiversync.data.session
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.toLocalDateTime
 import org.example.quiversync.utils.Location
 import platform.Foundation.NSUserDefaults
@@ -8,8 +11,15 @@ actual class SessionManager actual constructor(context: Any?) {
 
     private val defaults = NSUserDefaults.standardUserDefaults
 
+    private val _unitsPreferenceFlow = MutableStateFlow(
+        defaults.stringForKey("units") ?: "metric"
+    )
+
     actual suspend fun clearUserData(){
         defaults.removeObjectForKey("uid")
+        defaults.removeObjectForKey("latitude")
+        defaults.removeObjectForKey("longitude")
+        defaults.removeObjectForKey("lastRefresh")
     }
 
     actual suspend fun getUid(): String? {
@@ -65,6 +75,7 @@ actual class SessionManager actual constructor(context: Any?) {
 
     actual suspend fun setUnitsPreference(units: String) {
         defaults.setObject(units, forKey = "units")
+        _unitsPreferenceFlow.value = units
     }
 
     actual suspend fun isOnboardingComplete(): Boolean {
@@ -73,6 +84,10 @@ actual class SessionManager actual constructor(context: Any?) {
 
     actual suspend fun setOnboardingComplete(complete: Boolean) {
         defaults.setObject(complete, forKey = "onboardingProcessComplete")
+    }
+
+    actual fun getUnitsPreferenceFlow(): Flow<String> {
+        return _unitsPreferenceFlow.asStateFlow()
     }
 
 

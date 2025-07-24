@@ -67,8 +67,6 @@ fun LoginScreen(
 
     when (val currentState = uiState) {
         is LoginState.Loading -> {
-            LoginScreenContent(currentState = LoginState.Idle(LoginData()), isLoading = true, onRegisterClick = {}, onEvent = viewModel::onEvent,
-                onForgotPasswordClick = onForgotPasswordClick, onGoogleSignInResult = viewModel::onGoogleSignInResult, modifier = contentModifier)
             Box(
                 modifier = Modifier.fillMaxSize()
                     .background(Color.Transparent),
@@ -86,13 +84,14 @@ fun LoginScreen(
         is LoginState.Loaded -> {
             LaunchedEffect(Unit) {
                 onSignInSuccess()
-                Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
                 viewModel.resetState()
             }
         }
         is LoginState.Idle -> {
             LoginScreenContent(
                 onRegisterClick = onRegisterClick,
+                modifier = contentModifier,
                 onEvent = viewModel::onEvent,
                 currentState = currentState,
                 onForgotPasswordClick = onForgotPasswordClick,
@@ -100,7 +99,9 @@ fun LoginScreen(
             )
         }
         is LoginState.NavigateToOnboarding -> {
-            LaunchedEffect(Unit) { onNavigateToOnboarding() }
+            LaunchedEffect(Unit) {
+                onNavigateToOnboarding()
+            }
         }
 
     }
@@ -255,7 +256,9 @@ fun LoginScreenContent(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 SocialLoginButton(windowInfo = windowInfo,text = "Google", logo = R.drawable.google_logo,
-                    onClick = { launcher.launch(googleSignInClient.signInIntent) }
+                    onClick = {
+                        launcher.launch(googleSignInClient.signInIntent)
+                    }
                 )
             }
 
