@@ -79,7 +79,7 @@ fun OnboardingScreen(
         }
         is OnboardingState.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 LoadingAnimation(

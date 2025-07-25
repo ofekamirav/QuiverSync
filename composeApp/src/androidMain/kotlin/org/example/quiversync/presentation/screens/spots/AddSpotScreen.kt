@@ -92,7 +92,7 @@ fun AddSpotScreen(
             is AddFavSpotState.Idle, is AddFavSpotState.Loading -> {
                 val form = (formState as? AddFavSpotState.Idle)?.data
                 Box(
-                    modifier = Modifier
+                    modifier = contentModifier
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
@@ -207,8 +207,7 @@ fun AddSpotScreen(
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
-
-                        Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.height(8.dp))
                         GradientButton(
                             text = "Add Spot",
                             onClick = { viewModel.onEvent(AddFavSpotEvent.SaveClicked) },

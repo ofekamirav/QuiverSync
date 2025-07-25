@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.navigation
 
+import android.R.attr.type
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -36,11 +37,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
-import org.example.quiversync.presentation.components.CustomSnackbar
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.components.LottieSplashScreen
 import org.example.quiversync.presentation.components.SnackbarWithCountdown
@@ -257,7 +259,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                //.padding(innerPadding)
         ) {
             if (!showBottomBar && currentRoute !in hideTopBarRoutes) {
                 NavigationRail(
@@ -344,30 +346,44 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                         }
                     )
                 }
-                composable(Screen.Home.route) {
+                composable(
+                    route = Screen.Home.route,
+                    arguments = listOf(
+                        navArgument("show_welcome") {
+                            type = NavType.BoolType
+                            defaultValue = false
+                        }
+                    )
+                ) { backStackEntry ->
+                    val showWelcome = backStackEntry.arguments?.getBoolean("show_welcome") ?: false
+
                     HomeScreen(
-                        showWelcomeBottomSheetOnStart = navController.previousBackStackEntry?.destination?.route == Screen.CompleteRegister.route,
+                        showWelcomeBottomSheetOnStart = showWelcome,
+                        modifier = Modifier.padding(innerPadding)
                     )
                 }
                 composable(Screen.Spots.route) {
                     FavoriteSpotsScreen(
+                        modifier = Modifier.padding(innerPadding),
                         snackbarHostState = snackbarHostState,
                         onAddSpotClick = { navController.navigate(Screen.AddSpot.route) }
                     )
                 }
                 composable(Screen.Rentals.route) {
-                    RentalsHubScreen()
+                    RentalsHubScreen(modifier = Modifier.padding(innerPadding))
                 }
                 composable(Screen.Quiver.route) {
                     QuiverScreen(
+                        modifier = Modifier.padding(innerPadding),
                         onAddClick = { navController.navigate(Screen.AddSurfboard.route) }
                     )
                 }
                 composable(Screen.Profile.route) {
-                    ProfileScreen()
+                    ProfileScreen(modifier = Modifier.padding(innerPadding))
                 }
                 composable(Screen.AddSurfboard.route) {
                     AddSurfboardScreen(
+                        modifier = Modifier.padding(innerPadding),
                         onFinish = {
                             navController.navigate(Screen.Quiver.route) {
                                 popUpTo(Screen.Quiver.route) { inclusive = true }
@@ -382,7 +398,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 composable(Screen.CompleteRegister.route) {
                     OnboardingScreen(
                         onCompleteClick = {
-                            navController.navigate(Screen.Home.route) {
+                            navController.navigate(Screen.Home.createRoute(showWelcome = true)) {
                                 popUpTo(0)
                             }
                         }
@@ -390,6 +406,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 }
                 composable(Screen.Settings.route) {
                     SettingsScreen(
+                        modifier = Modifier.padding(innerPadding),
                         onEditProfile = {
                             navController.navigate(Screen.EditProfile.route)
                         },
@@ -411,6 +428,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
 
                 composable(Screen.EditProfile.route) {
                     EditProfileDetailsScreen(
+                        modifier = Modifier.padding(innerPadding),
                         onSave = {
                             navController.popBackStack()
                         },
@@ -418,6 +436,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 }
                 composable(Screen.SecurityAndPrivacy.route) {
                     SecurityAndPrivacyScreen(
+                        modifier = Modifier.padding(innerPadding),
                         onSuccess = {
                             navController.popBackStack()
                         }
@@ -426,6 +445,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
 
                 composable(Screen.ForgotPassword.route) {
                     ForgotPasswordScreen(
+                        modifier = Modifier.padding(innerPadding),
                         onLoginClick = {
                             navController.navigate(Screen.Login.route) {
                                 popUpTo(Screen.Login.route) { inclusive = true }
@@ -436,6 +456,7 @@ fun AppNavigation(sessionManager: SessionManager = koinInject()) {
                 }
                 composable(Screen.AddSpot.route) {
                     AddSpotScreen(
+                        modifier = Modifier.padding(innerPadding),
                         onSpotAdded = { navController.popBackStack() }
                     )
                 }

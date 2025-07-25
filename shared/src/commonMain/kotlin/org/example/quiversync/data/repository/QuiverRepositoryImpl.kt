@@ -18,6 +18,7 @@ import org.example.quiversync.domain.model.SurfboardError
 import org.example.quiversync.domain.repository.QuiverRepository
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.utils.extensions.toDto
+import kotlin.coroutines.cancellation.CancellationException
 
 class QuiverRepositoryImpl(
     private val remoteDataSource: QuiverRemoteDataSource,
@@ -51,6 +52,28 @@ class QuiverRepositoryImpl(
                 .collect { remoteBoards ->
                     syncRemoteToLocal(userId, remoteBoards)
                 }
+        }.also { job ->
+            job.invokeOnCompletion { cause ->
+                when (cause) {
+                    null -> {
+                        platformLogger(
+                            "FavSpotRepo",
+                            "Sync job completed normally (Flow finished)."
+                        )
+                    }
+
+                    is CancellationException -> {
+                        platformLogger("FavSpotRepo", "Sync job was cancelled as expected.")
+                    }
+
+                    else -> {
+                        platformLogger(
+                            "FavSpotRepo",
+                            "Sync job FAILED with an unexpected error: ${cause.message}"
+                        )
+                    }
+                }
+            }
         }
         platformLogger("QuiverRepositoryImpl", "Core sync for Quiver has started.")
     }
@@ -84,7 +107,11 @@ class QuiverRepositoryImpl(
 
             when (val remoteRes = remoteDataSource.addSurfboardRemote(boardWithDate.toDto())) {
                 is Result.Success -> {
+                    val addedSurfboardFromRemote = remoteRes.data
                     platformLogger("QuiverRepositoryImpl", "Surfboard added remotely: ${boardWithDate.model}")
+                    if (addedSurfboardFromRemote != null) {
+                        localDataSource.addSurfboard(addedSurfboardFromRemote)
+                    }
                     Result.Success(true)
                 }
                 is Result.Failure -> {
