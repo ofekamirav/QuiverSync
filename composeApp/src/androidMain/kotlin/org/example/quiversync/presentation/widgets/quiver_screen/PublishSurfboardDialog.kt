@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.presentation.components.CustomTextField
 import org.example.quiversync.presentation.components.GradientButton
@@ -48,14 +49,14 @@ fun PublishSurfboardDialog(
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        Dialog(onDismissRequest = onDismiss) {
+        Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
             Card(
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .padding(16.dp)
                     .then(
                         if (windowInfo.widthSize == WindowWidthSize.COMPACT) Modifier.fillMaxWidth(0.9f)
-                        else Modifier.widthIn(min = 400.dp, max = 500.dp)
+                        else Modifier.widthIn(min = 400.dp, max = 700.dp)
                     ),
                 elevation = CardDefaults.cardElevation(12.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)

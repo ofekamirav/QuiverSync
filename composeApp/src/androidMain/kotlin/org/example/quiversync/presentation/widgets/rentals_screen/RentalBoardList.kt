@@ -125,9 +125,6 @@ fun RentalBoardCardWrapper(boardForDisplay: BoardForDisplay,brush: Brush) {
 @Composable
 fun RentalBoardCard(board: BoardForRent, modifier: Modifier = Modifier) {
     val cardColor = if (isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.White
-    val placeHolderRes =
-        if (isSystemInDarkTheme()) R.drawable.ic_board_placeholder_dark else R.drawable.ic_board_placeholder_light
-    val context = LocalContext.current
     Card(
         modifier = modifier.fillMaxWidth().padding(8.dp),
         shape = RoundedCornerShape(16.dp),
@@ -144,7 +141,7 @@ fun RentalBoardCard(board: BoardForRent, modifier: Modifier = Modifier) {
             AsyncImage(
                 model = board.surfboardPic,
                 contentDescription = "",
-                placeholder = painterResource(id = placeHolderRes),
+                placeholder = painterResource(id = R.drawable.logo_placeholder),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(140.dp)

@@ -45,11 +45,11 @@ class HomeViewModel(
 
     private fun fetchForecastAndBoardMatch() {
         scope.launch {
-//            platformLogger("HomeViewModel", "fetching forecast and best board match")
+            platformLogger("HomeViewModel", "fetching forecast and best board match")
             _uiState.value = HomeState.Loading
-//            platformLogger("HomeViewModel", "Fetching weekly forecast and best board match")
+            platformLogger("HomeViewModel", "Fetching weekly forecast and best board match")
             val forecastResult = homeUseCases.getWeeklyForecastByLocationUseCase()
-//            platformLogger("HomeViewModel", "forecast for the week by your location: $forecastResult")
+            platformLogger("HomeViewModel", "forecast for the week by your location: $forecastResult")
             val userResult = homeUseCases.getUser().firstOrNull()
             val forecast: List<DailyForecast>
             val user : User

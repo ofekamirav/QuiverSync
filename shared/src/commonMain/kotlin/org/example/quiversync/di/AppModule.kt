@@ -329,21 +329,21 @@ val commonModule= module {
 
 
    // --------------------------------------------ViewModels--------------------------------------------------
-   single { RegisterViewModel(get()) }
-   single { OnboardingViewModel(get(), get(),get()) }
-   factory { UserViewModel(get()) }
-   factory { HomeViewModel(get(),get()) }
-   single { LoginViewModel(get(),get()) }
-   single { OnboardingViewModel(get(), get(), get()) }
-   factory { QuiverViewModel(get()) }
-   single { AddBoardViewModel(get(), get()) }
-   single { SettingsViewModel(get(), get()) }
-   single { EditProfileDetailsViewModel(get()) }
-   single { SecurityAndPrivacyViewModel(get()) }
-   factory { FavSpotsViewModel(get(),get()) }
-   single { AddFavSpotViewModel(get())}
-   single { ForgotPasswordViewModel(get()) }
-   factory { ExploreViewModel(get(), get()) }
+    factory { RegisterViewModel(get()) }
+    factory { OnboardingViewModel(get(), get(),get()) }
+    factory { UserViewModel(get()) }
+    factory { HomeViewModel(get(),get()) }
+    factory { LoginViewModel(get(),get()) }
+    factory { OnboardingViewModel(get(), get(), get()) }
+    factory { QuiverViewModel(get()) }
+    factory { AddBoardViewModel(get(), get()) }
+    factory { SettingsViewModel(get(), get()) }
+    factory { EditProfileDetailsViewModel(get()) }
+    factory { SecurityAndPrivacyViewModel(get()) }
+    factory { FavSpotsViewModel(get(),get()) }
+    factory { AddFavSpotViewModel(get())}
+    factory { ForgotPasswordViewModel(get()) }
+    factory { ExploreViewModel(get(), get()) }
 
 }
 

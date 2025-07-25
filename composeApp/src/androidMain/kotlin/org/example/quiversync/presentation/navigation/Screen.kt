@@ -14,7 +14,7 @@ sealed class Screen(
     object ForgotPassword : Screen("forgot_password_screen")
 
     //Main Screens
-    object Home : Screen("home_screen", "QuiverSync", true)
+    object Home : Screen( "home_screen?show_welcome={show_welcome}", "QuiverSync", true)
     object Spots : Screen("spots_screen", "Surf Spots", true)
     object Rentals : Screen("rentals_screen", "Rentals", true)
     object Quiver : Screen("quiver_screen", "My Quiver", true)
@@ -29,4 +29,6 @@ sealed class Screen(
     object AddSurfboard : Screen("add_surfboard_screen", "Add Surfboard")
 
     object BottomSheet : Screen("bottom_sheet_screen")
+
+    fun createRoute(showWelcome: Boolean) = "home_screen?show_welcome=$showWelcome"
 }

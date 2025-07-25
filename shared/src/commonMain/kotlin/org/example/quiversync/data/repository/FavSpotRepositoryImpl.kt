@@ -15,6 +15,7 @@ import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.domain.model.SpotsError
 import org.example.quiversync.domain.repository.FavSpotRepository
 import org.example.quiversync.utils.extensions.platformLogger
+import kotlin.coroutines.cancellation.CancellationException
 
 class FavSpotRepositoryImpl(
     private val dao: FavSpotDao,
@@ -56,6 +57,14 @@ class FavSpotRepositoryImpl(
                     platformLogger("FavSpotRepo", "Syncing ${remoteSpots.size} spots from remote.")
                     syncRemoteToLocal(userId, remoteSpots)
                 }
+        }.also { job ->
+            job.invokeOnCompletion { cause ->
+                when (cause) {
+                    null -> platformLogger("FavSpotRepo", "Realtime sync completed successfully.")
+                    is CancellationException -> platformLogger("FavSpotRepo", "Realtime sync cancelled.")
+                    else -> platformLogger("FavSpotRepo", "Realtime sync failed: ${cause.message}")
+                }
+            }
         }
     }
 

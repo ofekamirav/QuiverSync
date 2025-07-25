@@ -27,6 +27,7 @@ import org.example.quiversync.utils.Location
 import org.example.quiversync.utils.extensions.platformLogger
 import org.example.quiversync.utils.extensions.toDto
 import org.example.quiversync.utils.extensions.toOwnerLocal
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.onFailure
 import kotlin.onSuccess
 
@@ -77,6 +78,14 @@ class UserRepositoryImpl(
                         userDao.deleteProfile(uid)
                     }
                 }
+        }.also { job ->
+            job.invokeOnCompletion { cause ->
+                when (cause) {
+                    null -> platformLogger("UserRepository", "User profile sync completed successfully.")
+                    is CancellationException -> platformLogger("UserRepository", "User profile sync was cancelled.")
+                    else -> platformLogger("UserRepository", "User profile sync failed: ${cause.message}")
+                }
+            }
         }
     }
     override suspend fun updateUserProfile(user: User): Result<Unit, Error> {

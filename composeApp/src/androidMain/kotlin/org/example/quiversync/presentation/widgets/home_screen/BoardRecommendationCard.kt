@@ -52,13 +52,13 @@ fun BoardRecommendationCard(surfboard: Surfboard, score: String) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AsyncImage(
                     model = surfboard.imageRes,
-                    placeholder = painterResource(id = R.drawable.hs_shortboard),
+                    placeholder = painterResource(id = R.drawable.logo_placeholder),
                     contentDescription = null,
                     modifier = Modifier.size(48.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Text(surfboard.type.name, fontWeight = FontWeight.Bold, color = OceanPalette.DeepBlue)
+                    Text(surfboard.model, fontWeight = FontWeight.Bold, color = OceanPalette.DeepBlue)
                     Text("${surfboard.height} x ${surfboard.width} x ${surfboard.volume}L", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

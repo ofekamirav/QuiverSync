@@ -25,6 +25,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.delay
 import org.example.quiversync.R
 import org.example.quiversync.data.remote.dto.RentalPublishDetails
 import org.example.quiversync.features.quiver.QuiverState
@@ -42,6 +44,7 @@ import org.example.quiversync.domain.model.Surfboard
 import org.example.quiversync.features.quiver.QuiverEvent
 import org.example.quiversync.presentation.components.CustomDialog
 import org.example.quiversync.presentation.components.ErrorContent
+import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.screens.skeletons.QuiverScreenSkeleton
 import org.example.quiversync.presentation.screens.skeletons.BoardCardSkeleton
 import org.example.quiversync.presentation.theme.OceanPalette
@@ -61,10 +64,34 @@ fun QuiverScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val boardToPublish by viewModel.boardToPublish.collectAsState()
+    val isLoadingPublish by viewModel.isLoading.collectAsState()
+    val contentModifier = if(isLoadingPublish) {
+        modifier.blur(8.dp)
+    } else{
+        modifier
+    }
+
     when (uiState) {
         is QuiverState.Error -> ErrorContent((uiState).message)
         is QuiverState.Loading -> { QuiverScreenSkeleton(modifier) }
-        is QuiverState.Loaded -> QuiverContent(uiState.boards, viewModel::onEvent, onAddClick ,modifier, boardToPublish)
+        is QuiverState.Loaded -> {
+            if (isLoadingPublish) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LoadingAnimation(
+                        isLoading = isLoadingPublish,
+                        animationFileName = "quiver_sync_loading_animation.json",
+                        animationSize = 240.dp
+                    )
+                }
+            }
+            QuiverContent(uiState.boards, viewModel::onEvent, onAddClick ,contentModifier, boardToPublish)
+        }
+
     }
 }
 @Composable

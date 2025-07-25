@@ -1,5 +1,6 @@
 package org.example.quiversync.features.quiver
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
@@ -19,6 +20,9 @@ class QuiverViewModel(
 
     private val _boardToPublish = MutableStateFlow<Surfboard?>(null)
     val boardToPublish: StateFlow<Surfboard?> get() = _boardToPublish
+
+    private val _isLoadingPublish = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoadingPublish
 
     init {
         observeQuiver()
@@ -79,6 +83,7 @@ class QuiverViewModel(
     }
 
     private fun publishSurfboardForRental(surfboardId: String, pricePerDay: Double) {
+        _isLoadingPublish.value = true
         scope.launch {
             val result = quiverUseCases.publishSurfboardToRentalUseCase(surfboardId,
                 RentalPublishDetails(
@@ -89,10 +94,13 @@ class QuiverViewModel(
             )
             when(result) {
                 is Result.Success -> {
+                    delay(1500)
+                    _isLoadingPublish.value = false
                     dismissPublishDialog()
                 }
                 is Result.Failure -> {
                     _uiState.emit(QuiverState.Error(result.error?.message ?: "Failed to publish surfboard for rental."))
+                    _isLoadingPublish.value = false
                     dismissPublishDialog()
                 }
             }
