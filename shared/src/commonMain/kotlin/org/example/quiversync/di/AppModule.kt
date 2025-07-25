@@ -112,6 +112,7 @@ import org.example.quiversync.domain.usecase.user.GetOwnerByIdUseCase
 import org.example.quiversync.domain.usecase.user.GetRentalsNumberUseCase
 import org.example.quiversync.domain.usecase.user.StartSyncsUseCase
 import org.example.quiversync.features.login.LoginUseCases
+import org.example.quiversync.features.main.MainViewModel
 import org.example.quiversync.features.rentals.RentalsUseCases
 import org.example.quiversync.features.rentals.explore.ExploreViewModel
 
@@ -329,11 +330,12 @@ val commonModule= module {
 
 
    // --------------------------------------------ViewModels--------------------------------------------------
+    single { MainViewModel(get(),get()) }
     factory { RegisterViewModel(get()) }
     factory { OnboardingViewModel(get(), get(),get()) }
     factory { UserViewModel(get()) }
     factory { HomeViewModel(get(),get()) }
-    factory { LoginViewModel(get(),get()) }
+    factory { LoginViewModel(get()) }
     factory { OnboardingViewModel(get(), get(), get()) }
     factory { QuiverViewModel(get()) }
     factory { AddBoardViewModel(get(), get()) }

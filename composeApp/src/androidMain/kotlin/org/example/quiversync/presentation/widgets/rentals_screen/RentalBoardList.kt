@@ -8,15 +8,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,6 +32,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,12 +52,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import org.example.quiversync.R
 import org.example.quiversync.domain.model.BoardForRent
+import org.example.quiversync.domain.model.SurfboardType
 import org.example.quiversync.features.rentals.explore.BoardForDisplay
 import org.example.quiversync.presentation.screens.skeletons.RentalBoardCardSkeleton
 import org.example.quiversync.presentation.theme.OceanPalette
@@ -120,110 +127,138 @@ fun RentalBoardCardWrapper(boardForDisplay: BoardForDisplay,brush: Brush) {
         RentalBoardCard(board = boardForDisplay.board!!)
     }
 }
-
-
 @Composable
 fun RentalBoardCard(board: BoardForRent, modifier: Modifier = Modifier) {
     val cardColor = if (isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.White
+
     Card(
-        modifier = modifier.fillMaxWidth().padding(8.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(cardColor)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(cardColor)
-                .padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             AsyncImage(
                 model = board.surfboardPic,
-                contentDescription = "",
+                contentDescription = "Surfboard Image",
                 placeholder = painterResource(id = R.drawable.logo_placeholder),
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(20.dp)),
-                contentScale = ContentScale.Fit,
+                    .width(130.dp)
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(12.dp))
             )
 
             Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = board.model,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
-                )
-                Text(
-                    text = "${board.type} - ${board.height}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = board.model,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "$${board.pricePerDay.toInt()}/day",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                HorizontalDivider()
+
+                Column {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        InfoColumn(
+                            label = "Type",
+                            value = board.type.serverName,
+                            modifier = Modifier.weight(1f)
+                        )
+                        InfoColumn(
+                            label = "Height",
+                            value = board.height,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        InfoColumn(
+                            label = "Width",
+                            value = board.width,
+                            modifier = Modifier.weight(1f)
+                        )
+                        InfoColumn(
+                            label = "Volume",
+                            value = board.volume,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier = Modifier.padding(top = 4.dp)
                 ) {
-                    val ownerPic = if (isSystemInDarkTheme()){
-                        painterResource(id = R.drawable.placeholder_dark)
-                    } else {
-                        painterResource(id = R.drawable.placeholder_light)
-                    }
                     AsyncImage(
                         model = board.ownerPic,
-                        placeholder = ownerPic,
-                        contentDescription = "Owner Profile Picture",
+                        contentDescription = "Owner Profile",
+                        placeholder = painterResource(id = R.drawable.logo_placeholder),
                         modifier = Modifier
-                            .size(30.dp)
+                            .size(28.dp)
                             .clip(CircleShape),
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.Crop
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = board.ownerName,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        modifier = Modifier.weight(1f)
-                    )
-//                    IconButton(onClick = {
-//                        val url = "https://wa.me/${board.ownerPhoneNumber.removePrefix("+")}"
-//                        val intent = Intent(Intent.ACTION_VIEW).apply {
-//                            data = Uri.parse(url)
-//                        }
-//                        //if no whatsapp installed show error message
-//                        intent.setPackage("com.whatsapp")
-//                        // Check if WhatsApp is installed
-//                        if (intent.resolveActivity(context.packageManager) == null) {
-//                            // Handle the case where WhatsApp is not installed
-//                            Toast.makeText(context, "WhatsApp is not installed", Toast.LENGTH_SHORT).show()
-//                            return@IconButton
-//                        }
-//                        context.startActivity(intent)
-//                    }) {
-//                        Icon(
-//                            painter = painterResource(id = R.drawable.ic_whatsapp),
-//                            contentDescription = "Chat on WhatsApp",
-//                            tint = Color(0xFF25D366),
-//                            modifier = Modifier.size(24.dp)
-//                        )
-//                    }
-
-                    Text(
-                        text = "$${String.format("%.0f", board.pricePerDay)}/day",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
+                        board.ownerName,
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
         }
     }
+}
+
+@Composable
+private fun InfoColumn(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RentalBoardCardPreview() {
+    val sampleBoard = BoardForRent(
+        model = "Sample Surfboard",
+        type = SurfboardType.SHORTBOARD,
+        height = "6'0\"",
+        width = "18.5\"",
+        volume = "30L",
+        pricePerDay = 25.0,
+        surfboardPic = "https://example.com/surfboard.jpg",
+        ownerName = "John Doe",
+        surfboardId = "12345",
+        ownerPic = "https://example.com/owner.jpg",
+        ownerPhoneNumber = "123-456-7890",
+    )
+
+    RentalBoardCard(board = sampleBoard)
 }

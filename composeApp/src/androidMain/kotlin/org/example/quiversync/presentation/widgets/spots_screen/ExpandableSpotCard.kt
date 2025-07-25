@@ -151,38 +151,68 @@ fun ExpandableSpotCard(
                                     MatchBadge(score.toInt())
                                 }
                             }
-                        } else{
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Image(
-                                    painter = painterResource(id = R.drawable.hs_shortboard),
-                                    contentDescription = "No Board",
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_waves),
+                                    contentDescription = "Wave Height",
+                                    tint = OceanPalette.SkyBlue,
+                                    modifier = Modifier.size(20.dp)
                                 )
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "No Recommended Board is available",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = OceanPalette.DeepBlue
+                                    text = "${waveHeightDisplay} ${waveHeightUnit}",
+                                    color = OceanPalette.DeepBlue,
+                                    style = MaterialTheme.typography.bodyMedium
                                 )
                             }
-                        }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_waves),
-                                contentDescription = "Wave Height",
-                                tint = OceanPalette.SkyBlue,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            val df = DecimalFormat("#.##")
-                            Text(
-                                text = "${waveHeightDisplay} ${waveHeightUnit}",
-                                color = OceanPalette.DeepBlue,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                        } else{
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                //show wave height and wind speed and tide only
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_waves),
+                                        contentDescription = "Wave Height",
+                                        tint = OceanPalette.SkyBlue,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "${waveHeightDisplay} ${waveHeightUnit}",
+                                        color = OceanPalette.DeepBlue,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_air),
+                                        contentDescription = "Wind Speed",
+                                        tint = OceanPalette.SkyBlue,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "${df.format(forecast.windSpeed)} ${if (isImperial) "mph" else "m/s"}",
+                                        color = OceanPalette.DeepBlue,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_tide),
+                                        contentDescription = "Tide",
+                                        tint = OceanPalette.SkyBlue,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = forecast.date,
+                                        color = OceanPalette.DeepBlue,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))

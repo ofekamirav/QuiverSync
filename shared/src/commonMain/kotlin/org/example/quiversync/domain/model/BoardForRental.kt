@@ -7,7 +7,7 @@ data class BoardForRent(
     val ownerPhoneNumber: String,
     val surfboardPic: String,
     val model: String,
-    val type: String,
+    val type: SurfboardType,
     val height: String,
     val width: String,
     val volume: String,

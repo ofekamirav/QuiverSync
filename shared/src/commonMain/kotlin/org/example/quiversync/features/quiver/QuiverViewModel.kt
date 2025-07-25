@@ -83,39 +83,48 @@ class QuiverViewModel(
     }
 
     private fun publishSurfboardForRental(surfboardId: String, pricePerDay: Double) {
-        _isLoadingPublish.value = true
         scope.launch {
+            val currentState = _uiState.value
+            if (currentState !is QuiverState.Loaded) return@launch
+
+            val updatedBoards = currentState.boards.map { board ->
+                if (board.id == surfboardId) {
+                    board.copy(isRentalPublished = true, pricePerDay = pricePerDay)
+                } else {
+                    board
+                }
+            }
+            _uiState.value = QuiverState.Loaded(updatedBoards)
+            dismissPublishDialog()
+
             val result = quiverUseCases.publishSurfboardToRentalUseCase(surfboardId,
-                RentalPublishDetails(
-                    pricePerDay = pricePerDay,
-                    latitude = null,
-                    longitude = null
-                )
+                RentalPublishDetails(pricePerDay = pricePerDay, latitude = null, longitude = null)
             )
-            when(result) {
-                is Result.Success -> {
-                    delay(1500)
-                    _isLoadingPublish.value = false
-                    dismissPublishDialog()
-                }
-                is Result.Failure -> {
-                    _uiState.emit(QuiverState.Error(result.error?.message ?: "Failed to publish surfboard for rental."))
-                    _isLoadingPublish.value = false
-                    dismissPublishDialog()
-                }
+
+            if (result is Result.Failure) {
+                _uiState.value = currentState
             }
         }
     }
 
     private fun unpublishSurfboardFromRental(surfboardId: String) {
         scope.launch {
+            val currentState = _uiState.value
+            if (currentState !is QuiverState.Loaded) return@launch
+
+            val updatedBoards = currentState.boards.map { board ->
+                if (board.id == surfboardId) {
+                    board.copy(isRentalPublished = false, pricePerDay = null)
+                } else {
+                    board
+                }
+            }
+            _uiState.value = QuiverState.Loaded(updatedBoards)
+
             val result = quiverUseCases.unpublishForRentalUseCase(surfboardId)
-            when(result) {
-                is Result.Success -> {
-                }
-                is Result.Failure -> {
-                    _uiState.emit(QuiverState.Error(result.error.toString()))
-                }
+
+            if (result is Result.Failure) {
+                _uiState.value = currentState
             }
         }
     }

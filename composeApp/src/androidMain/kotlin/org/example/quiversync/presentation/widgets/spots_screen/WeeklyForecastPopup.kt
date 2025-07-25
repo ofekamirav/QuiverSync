@@ -3,6 +3,7 @@ package org.example.quiversync.presentation.widgets.spots_screen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -79,12 +81,13 @@ fun WeeklyForecastPopup(
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ){
+            val backgroundColor = if (isSystemInDarkTheme()) OceanPalette.DarkSurface.copy(alpha = 0.9f) else Color.White.copy(alpha = 0.9f)
             Surface(
                 modifier = modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.9f),
                 shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+                color = backgroundColor
             ) {
                 Column {
                     Row(
@@ -186,11 +189,12 @@ fun WeeklyForecastItem(
             ) {
                 AsyncImage(
                     model = data.imageUrl,
-                    placeholder = painterResource(id = R.drawable.hs_shortboard),
+                    placeholder = painterResource(id = R.drawable.logo_placeholder),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))

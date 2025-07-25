@@ -76,7 +76,7 @@
             return try {
                 firebase.collection("surfboards").document(surfboardId).update(
                     "isRentalPublished" to false,
-                    "isRentalAvailable" to false,
+                    "isRentalAvailable" to null,
                     "pricePerDay" to null,
                     "latitude" to null,
                     "longitude" to null

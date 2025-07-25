@@ -41,7 +41,7 @@ UPDATE SurfboardEntity SET isRentalPublished = 1, isRentalAvailable = 1, longitu
 WHERE id = ?;
 
 unpublishSurfboardForRental:
-UPDATE SurfboardEntity SET isRentalPublished = 0, isRentalAvailable = 0, longitude = NULL, latitude = NULL, pricePerDay = NULL
+UPDATE SurfboardEntity SET isRentalPublished = 0, isRentalAvailable = NULL, longitude = NULL, latitude = NULL, pricePerDay = NULL
 WHERE id = ?;
 
 setSurfboardAsUnavailableForRental:
