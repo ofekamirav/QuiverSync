@@ -85,11 +85,7 @@ public struct SpotCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(colorScheme == .dark ? AppColors.darkBorder : AppColors.borderGray, lineWidth: 1)
         )
-        .background(
-            Color.clear
-                .contentShape(Rectangle())
-                .allowsHitTesting(false) // prevent card's background from hijacking touches
-        )
+
 
 
     }

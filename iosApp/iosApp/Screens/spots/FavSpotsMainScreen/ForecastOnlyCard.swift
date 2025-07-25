@@ -10,7 +10,7 @@ struct ForecastOnlyCard: View {
     @State private var isExpanded = false
 
     private var forecast: DailyForecast? {
-        favSpotsData.weeklyForecastForSpecificSpot.first {
+        favSpotsData.currentForecastsForAllSpots.first {
             round($0.latitude * 10_000) == round(spot.spotLatitude * 10_000) &&
             round($0.longitude * 10_000) == round(spot.spotLongitude * 10_000)
         }

@@ -41,19 +41,23 @@ struct SwipeToDeleteCard<Content: View>: View {
             content()
                 .background(AppColors.sectionBackground(for: colorScheme))
                 .offset(x: offsetX + dragOffset)
-                .gesture(
+                .simultaneousGesture(
                     DragGesture()
                         .updating($dragOffset) { value, state, _ in
-                            if value.translation.width < 0 {
-                                state = value.translation.width
+                            if abs(value.translation.width) > abs(value.translation.height) {
+                                if value.translation.width < 0 {
+                                    state = value.translation.width
+                                }
                             }
                         }
                         .onEnded { value in
-                            withAnimation(.easeOut) {
-                                if value.translation.width < swipeThreshold {
-                                    offsetX = -100 // reveal delete
-                                } else {
-                                    offsetX = 0 // bounce back
+                            if abs(value.translation.width) > abs(value.translation.height) {
+                                withAnimation(.easeOut) {
+                                    if value.translation.width < swipeThreshold {
+                                        offsetX = -100
+                                    } else {
+                                        offsetX = 0
+                                    }
                                 }
                             }
                         }

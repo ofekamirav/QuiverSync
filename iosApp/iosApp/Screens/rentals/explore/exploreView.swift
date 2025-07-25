@@ -12,7 +12,7 @@ import Shared
 struct ExploreView: View {
     @Environment(\.colorScheme) var colorScheme
 
-    let exploreData: [RentalOffer]
+    let exploreData: [BoardForDisplay]
 
     // Adaptive grid layout
     private let columns = [

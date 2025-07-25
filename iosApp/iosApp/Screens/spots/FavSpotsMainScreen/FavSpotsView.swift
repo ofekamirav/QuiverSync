@@ -58,6 +58,10 @@ public struct FavSpotsView: View {
                                 .padding(.vertical, 2)
                                 .padding(.horizontal, 8)
                                 .background(AppColors.sectionBackground(for: colorScheme))
+                                .onAppear(){
+                                    print("FavSpotsView: No boards available for spot \(spot.name)")
+                                    print("FavSpotsView: Boards count: \(favSpots)")
+                                }
                             } else {
                                 SwipeToDeleteCard(
                                     content: {

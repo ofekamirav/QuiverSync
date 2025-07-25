@@ -22,7 +22,7 @@ public struct ExploreScreen: View {
                 LoadingAnimationView(animationName: "quiver_sync_loading_animation", size: 300)
             case .loaded(let data):
                 ExploreView(
-                    exploreData: data.explorePageData
+                    exploreData: data.communityBoards
                 )
             case .error(let error):
                 ErrorView(
@@ -31,7 +31,8 @@ public struct ExploreScreen: View {
                     systemImageName: "surfboard.fill",
                     buttonText: "Try Again",
                     onRetry: {
-                        viewModel.viewModel.refreshBoards()
+//                        viewModel.viewModel.refreshBoards()
+                        print("Retry tapped, but no refresh method available")
                     }
                 )
 
