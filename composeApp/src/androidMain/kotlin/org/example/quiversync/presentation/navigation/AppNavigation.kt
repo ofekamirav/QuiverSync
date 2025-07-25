@@ -43,6 +43,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
+import org.example.quiversync.features.main.MainViewModel
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.components.LottieSplashScreen
 import org.example.quiversync.presentation.components.SnackbarWithCountdown
@@ -68,7 +69,10 @@ import org.koin.compose.koinInject
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavigation(sessionManager: SessionManager = koinInject()) {
+fun AppNavigation(
+    sessionManager: SessionManager = koinInject(),
+    mainViewModel: MainViewModel = koinInject()
+) {
     val navController = rememberNavController()
     var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
     val coroutineScope = rememberCoroutineScope()

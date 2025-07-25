@@ -5,9 +5,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -102,11 +106,12 @@ fun ExploreTabSkeleton(modifier: Modifier = Modifier) {
     val brush = rememberShimmerBrush()
 
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 320.dp),
+        columns = GridCells.Adaptive(minSize = 340.dp),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        userScrollEnabled = false
     ) {
         items(6) {
             RentalBoardCardSkeleton(shimmerBrush = brush)
@@ -152,77 +157,97 @@ fun RentalRequestSkeletonCard(modifier: Modifier = Modifier) {
         }
     }
 }
-
 @Composable
 fun RentalBoardCardSkeleton(shimmerBrush: Brush) {
     val cardColor = if (isSystemInDarkTheme()) OceanPalette.DarkSurface else Color.White
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(cardColor)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
-        Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
+                    .width(120.dp)
+                    .fillMaxHeight()
                     .clip(RoundedCornerShape(12.dp))
                     .background(shimmerBrush)
-                    .placeholder(visible = true)
             )
 
             Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .height(20.dp)
-                        .fillMaxWidth(0.6f)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(shimmerBrush)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .height(16.dp)
-                        .fillMaxWidth(0.4f)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(shimmerBrush)
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(30.dp)
-                            .clip(CircleShape)
-                            .background(shimmerBrush)
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .height(16.dp)
-                            .fillMaxWidth(0.3f)
+                            .height(20.dp)
+                            .width(100.dp)
                             .clip(RoundedCornerShape(4.dp))
                             .background(shimmerBrush)
                     )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
                     Box(
                         modifier = Modifier
                             .height(20.dp)
                             .width(60.dp)
-                            .clip(RoundedCornerShape(6.dp))
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(shimmerBrush)
+                    )
+                }
+
+                HorizontalDivider()
+
+                repeat(2) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        repeat(2) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Box(
+                                    modifier = Modifier
+                                        .height(12.dp)
+                                        .width(40.dp)
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(shimmerBrush)
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .height(16.dp)
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(shimmerBrush)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .background(shimmerBrush)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .height(16.dp)
+                            .width(100.dp)
+                            .clip(RoundedCornerShape(4.dp))
                             .background(shimmerBrush)
                     )
                 }
@@ -231,3 +256,11 @@ fun RentalBoardCardSkeleton(shimmerBrush: Brush) {
     }
 }
 
+
+@Preview(showBackground = true)
+@Composable
+fun ExploreTabSkeletonPreview() {
+    QuiverSyncTheme {
+        ExploreTabSkeleton()
+    }
+}

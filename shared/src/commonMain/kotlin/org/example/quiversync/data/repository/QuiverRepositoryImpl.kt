@@ -46,10 +46,12 @@ class QuiverRepositoryImpl(
         if (quiverSyncJob?.isActive == true) return
 
         val userId = sessionManager.getUid() ?: return
+        platformLogger("QuiverRepo", ">>> startQuiverSync CALLED! Attempting to start sync job.")
         quiverSyncJob = applicationScope.launch {
             remoteDataSource.observeQuiver(userId)
                 .catch { e -> platformLogger("QuiverRepo", "Quiver sync error: ${e.message}") }
                 .collect { remoteBoards ->
+                    platformLogger("QuiverRepo", ">>> Data received from Firebase! Syncing ${remoteBoards.size} boards.")
                     syncRemoteToLocal(userId, remoteBoards)
                 }
         }.also { job ->
@@ -166,6 +168,7 @@ class QuiverRepositoryImpl(
             when (val remoteRes = remoteDataSource.unpublishForRentalRemote(surfboardId)) {
                 is Result.Success -> {
                     platformLogger("QuiverRepositoryImpl", "Unpublished for rental: $surfboardId")
+                    localDataSource.unpublishForRental(surfboardId)
                     Result.Success(true)
                 }
                 is Result.Failure -> {
