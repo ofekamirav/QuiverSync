@@ -149,6 +149,7 @@ fun WeeklyForecastPopup(
                                     forecast = data.weeklyForecastForSpecificSpot[index],
                                     isImperial = isImperial
                                 )
+                                Divider(color = OceanPalette.BorderGray, thickness = 0.5.dp)
                             }
                         }
                     }

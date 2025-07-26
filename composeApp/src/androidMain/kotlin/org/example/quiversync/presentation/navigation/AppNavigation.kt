@@ -8,6 +8,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -79,8 +82,21 @@ fun AppNavigation(
     val uid by mainViewModel.uidState.collectAsState()
     val isInitialCheckDone by mainViewModel.isInitialCheckDone.collectAsState()
     val isAppReady by mainViewModel.isAppReady.collectAsState()
+    val justRegistered by mainViewModel.justRegistered.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showLottieSplash by remember { mutableStateOf(true) }
+    val isDarkTheme = isSystemInDarkTheme()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val startDestination = remember(uid, isAppReady, justRegistered) {
+        when {
+            justRegistered -> Screen.CompleteRegister.route
+            uid != null && isAppReady -> Screen.Home.route
+            else -> Screen.Login.route
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         val minSplashTime = 3000L
@@ -101,27 +117,18 @@ fun AppNavigation(
     }
 
     if (showLottieSplash) {
+        val animationFileName = if (isDarkTheme) {
+            "splash_intro_animation_dark_mode.json"
+        } else {
+            "splash_intro_animation.json"
+        }
         LottieSplashScreen(
-            animationFileName = "splash_intro_animation.json",
+            animationFileName = animationFileName,
             iterations = 1,
             onAnimationFinished = {
             }
         )
         return
-    }
-
-    if (!isInitialCheckDone) {
-        Box(
-            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-        ) {
-            LoadingAnimation(
-                isLoading = true,
-                animationFileName = "quiver_sync_loading_animation.json",
-                animationSize = 240.dp
-
-            )
-            return
-        }
     }
 
     val items = listOf(
@@ -156,13 +163,6 @@ fun AppNavigation(
             "Profile"
         )
     )
-    val startDestination = when {
-        uid != null && isAppReady -> Screen.Home.route
-        uid != null && !isAppReady -> Screen.Login.route
-        else -> Screen.Login.route
-    }
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
     val hideTopBarRoutes = listOf(
         Screen.Login.route,
         Screen.Register.route,
@@ -330,27 +330,7 @@ fun AppNavigation(
                     .fillMaxSize()
             ) {
                 composable(Screen.Login.route) {
-                    val viewModel: LoginViewModel = koinViewModel()
-                    val loginState by viewModel.loginState.collectAsState()
-
-                    LaunchedEffect(loginState) {
-                        if (loginState is LoginState.NavigateToOnboarding) {
-                            navController.navigate(Screen.CompleteRegister.route) {
-                                popUpTo(0)
-                            }
-                        } else if (loginState is LoginState.Loaded) {
-                            // המתן לסיום הסנכרון לפני המעבר
-                            while (!isAppReady) {
-                                delay(100)
-                            }
-                            navController.navigate(Screen.Home.route) {
-                                popUpTo(0)
-                            }
-                        }
-                    }
-
                     LoginScreen(
-                        viewModel = viewModel,
                         onRegisterClick = {
                             navController.navigate(Screen.Register.route)
                         },
@@ -362,10 +342,13 @@ fun AppNavigation(
                 composable(Screen.Register.route) {
                     RegisterScreen(
                         onSignUpSuccess = {
-                            navController.navigate(Screen.CompleteRegister.route)
+                            mainViewModel.signalRegistrationComplete()
+                            navController.navigate(Screen.CompleteRegister.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
+                            }
                         },
                         onLoginClick = {
-                            navController.navigate(Screen.Login.route)
+                            navController.popBackStack()
                         }
                     )
                 }
@@ -421,8 +404,9 @@ fun AppNavigation(
                 composable(Screen.CompleteRegister.route) {
                     OnboardingScreen(
                         onCompleteClick = {
+                            mainViewModel.consumeRegistrationSignal()
                             navController.navigate(Screen.Home.createRoute(showWelcome = true)) {
-                                popUpTo(0)
+                                popUpTo(navController.graph.id) { inclusive = true }
                             }
                         }
                     )
@@ -480,6 +464,21 @@ fun AppNavigation(
                     AddSpotScreen(
                         modifier = Modifier.padding(innerPadding),
                         onSpotAdded = { navController.popBackStack() }
+                    )
+                }
+            }
+            if (!isInitialCheckDone) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent)
+                        .clickable(enabled = false, onClick = {}),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LoadingAnimation(
+                        isLoading = true,
+                        animationFileName = "quiver_sync_loading_animation.json",
+                        animationSize = 240.dp
                     )
                 }
             }

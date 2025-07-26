@@ -27,6 +27,17 @@ class MainViewModel(
     private val _isAppReady = MutableStateFlow(false)
     val isAppReady: StateFlow<Boolean> = _isAppReady.asStateFlow()
 
+    private val _justRegistered = MutableStateFlow(false)
+    val justRegistered: StateFlow<Boolean> = _justRegistered
+
+    fun signalRegistrationComplete() {
+        _justRegistered.value = true
+    }
+
+    fun consumeRegistrationSignal() {
+        _justRegistered.value = false
+    }
+
     private var currentSyncJob: Job? = null
 
     init {
@@ -42,17 +53,14 @@ class MainViewModel(
                     .collect { uid ->
                         platformLogger("MainViewModel", "🧲 observeUid triggered collect block — current uid: $uid")
 
-                        // עדכון מיידי של ה-UID state
                         _uidState.value = uid
 
-                        // ביטול job קודם
                         currentSyncJob?.cancel()
                         platformLogger("MainViewModel", "🔴 Cancelled previous sync job")
 
                         if (uid != null) {
                             platformLogger("MainViewModel", "✅ UID set: $uid — starting syncs")
 
-                            // הגדרת מצב loading
                             _isInitialCheckDone.value = false
                             _isAppReady.value = false
 
@@ -61,12 +69,10 @@ class MainViewModel(
                                     platformLogger("MainViewModel", "🚀 startSyncsUseCase launched")
                                     startSyncsUseCase()
 
-                                    // חכה קצת יותר כדי לוודא שהסנכרון הושלם
                                     delay(500)
 
                                     platformLogger("MainViewModel", "✅ Sync completed successfully")
 
-                                    // סמן שהסנכרון הושלם בהצלחה
                                     _isInitialCheckDone.value = true
                                     _isAppReady.value = true
 

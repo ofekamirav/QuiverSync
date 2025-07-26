@@ -1,8 +1,11 @@
 package org.example.quiversync.presentation.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,9 +27,9 @@ fun LottieSplashScreen(
     val windowInfo = LocalWindowInfo.current
 
     val actualAnimationSize = when (windowInfo.widthSize) {
-        WindowWidthSize.COMPACT -> 460.dp
-        WindowWidthSize.MEDIUM -> 600.dp
-        WindowWidthSize.EXPANDED -> 700.dp
+        WindowWidthSize.COMPACT -> 500.dp
+        WindowWidthSize.MEDIUM -> 540.dp
+        WindowWidthSize.EXPANDED -> 740.dp
     }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(animationFileName))
@@ -43,7 +46,10 @@ fun LottieSplashScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+        ,
         contentAlignment = Alignment.Center
     ) {
         LottieAnimation(
