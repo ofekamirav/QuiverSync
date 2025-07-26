@@ -52,13 +52,14 @@ fun HomeScreen(
     )
 
     LaunchedEffect(locationPermissionState.status) {
-        if (locationPermissionState.status.isGranted) {
-            viewModel.initialLoadWithLocation()
-        } else {
+        viewModel.onPermissionResult(locationPermissionState.status.isGranted)
+    }
+
+    LaunchedEffect(Unit) {
+        if (!locationPermissionState.status.isGranted) {
             locationPermissionState.launchPermissionRequest()
         }
     }
-
     LaunchedEffect(showWelcomeBottomSheetOnStart) {
         if (showWelcomeBottomSheetOnStart) {
             showBottomSheet = true
@@ -120,8 +121,8 @@ fun HomeScreen(
                     onButtonClick = {
                         if (message.contains("Location permission", ignoreCase = true)) {
                             locationPermissionState.launchPermissionRequest()
-                        } else {
-                            viewModel.refreshWithLocation()
+                        } else{
+                            viewModel.refresh()
                         }
                     }
                 )

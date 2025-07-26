@@ -69,6 +69,8 @@ fun WeeklyForecastPopup(
     modifier: Modifier = Modifier,
     isImperial: Boolean
 ) {
+    val hasBoards = data.boards.isNotEmpty()
+
     Dialog(
         onDismissRequest = onClose,
         properties = DialogProperties(
@@ -119,22 +121,35 @@ fun WeeklyForecastPopup(
                             .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(data.weeklyForecastForSpecificSpot.size) { item ->
-                            val surfboardId = data.weeklyPredictionsForSpecificSpot[item].surfboardID
-                            WeeklyForecastItem(
-                                data = WeeklyForecastData(
-                                    date = data.weeklyForecastForSpecificSpot[item].date,
-                                    model = data.boards.find { it.id == surfboardId }?.model ?: "Unknown Model",
-                                    company = data.boards.find { it.id == surfboardId }?.company ?: "Unknown Company",
-                                    imageUrl = data.boards.find { it.id == surfboardId }?.imageRes ?: R.drawable.hs_shortboard.toString(),
-                                    matchPercent = data.weeklyPredictionsForSpecificSpot[item].score,
-                                    waveHeight = data.weeklyForecastForSpecificSpot[item].waveHeight,
-                                    windSpeed = data.weeklyForecastForSpecificSpot[item].windSpeed,
-                                    swellPeriod = data.weeklyForecastForSpecificSpot[item].swellPeriod
-                                ),
-                                isImperial = isImperial
-                            )
-                            Divider(color = OceanPalette.BorderGray, thickness = 0.5.dp)
+                        if (hasBoards) {
+                            items(data.weeklyForecastForSpecificSpot.size) { item ->
+                                val surfboardId =
+                                    data.weeklyPredictionsForSpecificSpot[item].surfboardID
+                                WeeklyForecastItem(
+                                    data = WeeklyForecastData(
+                                        date = data.weeklyForecastForSpecificSpot[item].date,
+                                        model = data.boards.find { it.id == surfboardId }?.model
+                                            ?: "Unknown Model",
+                                        company = data.boards.find { it.id == surfboardId }?.company
+                                            ?: "Unknown Company",
+                                        imageUrl = data.boards.find { it.id == surfboardId }?.imageRes
+                                            ?: R.drawable.hs_shortboard.toString(),
+                                        matchPercent = data.weeklyPredictionsForSpecificSpot[item].score,
+                                        waveHeight = data.weeklyForecastForSpecificSpot[item].waveHeight,
+                                        windSpeed = data.weeklyForecastForSpecificSpot[item].windSpeed,
+                                        swellPeriod = data.weeklyForecastForSpecificSpot[item].swellPeriod
+                                    ),
+                                    isImperial = isImperial
+                                )
+                                Divider(color = OceanPalette.BorderGray, thickness = 0.5.dp)
+                            }
+                        } else{
+                            items(data.weeklyForecastForSpecificSpot.size) { index ->
+                                ForecastOnlyItem(
+                                    forecast = data.weeklyForecastForSpecificSpot[index],
+                                    isImperial = isImperial
+                                )
+                            }
                         }
                     }
                 }

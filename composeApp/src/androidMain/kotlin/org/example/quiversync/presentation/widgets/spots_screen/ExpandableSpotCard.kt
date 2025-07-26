@@ -75,6 +75,7 @@ fun ExpandableSpotCard(
     } else {
         df.format(forecast.waveHeight)
     }
+    val swellPeriodDisplay = df.format(forecast.swellPeriod)
     val waveHeightUnit = if (isImperial) "ft" else "m"
 
     Card(
@@ -95,7 +96,7 @@ fun ExpandableSpotCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column {
+                Column{
                     Text(
                         text = spotName,
                         style = MaterialTheme.typography.titleMedium,
@@ -165,53 +166,27 @@ fun ExpandableSpotCard(
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
-                        } else{
-                            Column(
+                        } else {
+                            Row(
                                 modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                //show wave height and wind speed and tide only
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_waves),
-                                        contentDescription = "Wave Height",
-                                        tint = OceanPalette.SkyBlue,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "${waveHeightDisplay} ${waveHeightUnit}",
-                                        color = OceanPalette.DeepBlue,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_air),
-                                        contentDescription = "Wind Speed",
-                                        tint = OceanPalette.SkyBlue,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "${df.format(forecast.windSpeed)} ${if (isImperial) "mph" else "m/s"}",
-                                        color = OceanPalette.DeepBlue,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_tide),
-                                        contentDescription = "Tide",
-                                        tint = OceanPalette.SkyBlue,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = forecast.date,
-                                        color = OceanPalette.DeepBlue,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
+                                InfoItem(
+                                    iconRes = R.drawable.ic_waves,
+                                    label = "${waveHeightDisplay} $waveHeightUnit",
+                                    modifier = Modifier.weight(1f)
+                                )
+                                InfoItem(
+                                    iconRes = R.drawable.ic_air,
+                                    label = "${df.format(forecast.windSpeed)} ${if (isImperial) "mph" else "m/s"}",
+                                    modifier = Modifier.weight(1f)
+                                )
+                                InfoItem(
+                                    iconRes = R.drawable.ic_tide,
+                                    label = "${swellPeriodDisplay} s",
+                                    modifier = Modifier.weight(1f)
+                                )
                             }
                         }
                     }
@@ -279,6 +254,28 @@ fun ExpandableSpotCardExpandedPreview() {
             surfboard = dummySurfboard,
             forecast = dummyForecast,
             onWeeklyForecastClick = {}
+        )
+    }
+}
+
+@Composable
+fun InfoItem(iconRes: Int, label: String, modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = null,
+            tint = OceanPalette.SkyBlue,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = label,
+            color = OceanPalette.DeepBlue,
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }

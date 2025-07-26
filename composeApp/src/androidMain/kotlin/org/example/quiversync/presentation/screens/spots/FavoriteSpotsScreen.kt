@@ -36,6 +36,7 @@ import org.example.quiversync.presentation.components.ErrorContent
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.screens.skeletons.FavoriteSpotsScreenSkeleton
 import org.example.quiversync.presentation.widgets.spots_screen.ExpandableSpotCard
+import org.example.quiversync.presentation.widgets.spots_screen.SegmentedButton
 import org.example.quiversync.presentation.widgets.spots_screen.WeeklyForecastPopup
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
@@ -52,25 +53,28 @@ fun FavoriteSpotsScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val isImperial = viewModel.isImperialUnits.collectAsState().value
+    var showSurfboardRecommendations by remember { mutableStateOf(true) }
 
     when (uiState) {
         is FavSpotsState.Error -> ErrorContent(uiState.message)
-        is FavSpotsState.Loading -> {
-            FavoriteSpotsScreenSkeleton(modifier)
+        is FavSpotsState.Loading -> FavoriteSpotsScreenSkeleton(modifier)
+        is FavSpotsState.Loaded -> {
+            val hasBoards = uiState.favSpotsData.boards.isNotEmpty()
+            FavoriteSpotsContent(
+                modifier = modifier.fillMaxSize(),
+                favSpotsData = uiState.favSpotsData,
+                onAddSpotClick = onAddSpotClick,
+                onUndoDeleteSpot = {
+                    viewModel.onEvent(FavSpotsEvent.UndoDeleteSpot)
+                },
+                snackbarHostState = snackbarHostState,
+                isImperial = isImperial,
+                onEvent = viewModel::onEvent,
+                showSurfboardRecommendations = showSurfboardRecommendations,
+                toggleRecommendationView = { showSurfboardRecommendations = it },
+                hasBoards = hasBoards
+            )
         }
-        is FavSpotsState.Loaded -> FavoriteSpotsContent(
-            modifier = modifier.fillMaxSize(),
-            favSpotsData = uiState.favSpotsData,
-            onAddSpotClick = onAddSpotClick,
-            onDeleteSpot = {
-            },
-            onUndoDeleteSpot = {
-                viewModel.onEvent(FavSpotsEvent.UndoDeleteSpot)
-            },
-            snackbarHostState = snackbarHostState,
-            isImperial = isImperial,
-            onEvent = viewModel::onEvent
-        )
     }
 }
 
@@ -80,12 +84,14 @@ fun FavoriteSpotsScreen(
 fun FavoriteSpotsContent(
     modifier: Modifier,
     favSpotsData: FavSpotsData,
-    onDeleteSpot: (FavoriteSpot) -> Unit,
     onUndoDeleteSpot: () -> Unit,
     onAddSpotClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
     isImperial: Boolean,
-    onEvent: (FavSpotsEvent) -> Unit = { }
+    onEvent: (FavSpotsEvent) -> Unit = { },
+    showSurfboardRecommendations: Boolean,
+    toggleRecommendationView: (Boolean) -> Unit,
+    hasBoards: Boolean = true
 ) {
     val spots = favSpotsData.spots
     val allPredictions = favSpotsData.allSpotsDailyPredictions
@@ -128,6 +134,22 @@ fun FavoriteSpotsContent(
                 .background(MaterialTheme.colorScheme.background)
                 .then(blurModifier)
         ) {
+            if (hasBoards) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    SegmentedButton(
+                        options = listOf("AI Match", "Forecast Only"),
+                        selectedIndex = if (showSurfboardRecommendations) 0 else 1,
+                        onOptionSelected = { index ->
+                            toggleRecommendationView(index == 0)
+                        }
+                    )
+                }
+            }
             if (spots.isEmpty()) {
                 Column(
                     modifier = Modifier
@@ -245,20 +267,30 @@ fun FavoriteSpotsContent(
                                         }
                                     },
                                     content = {
-                                        bestBoard?.let {
-                                            associatedForecast?.let { forecast ->
-                                                ExpandableSpotCard(
-                                                    spot = spot,
-                                                    score = score,
-                                                    surfboard = it,
-                                                    forecast = forecast,
-                                                    onWeeklyForecastClick = {
-                                                        selectedSpotForWeeklyForecast = spot
-                                                        isLoadingWeeklyForecast = true
-                                                    },
-                                                    isImperial = isImperial
-                                                )
-                                            }
+                                        if ((showSurfboardRecommendations && bestBoard != null|| !hasBoards) && associatedForecast != null) {
+                                            ExpandableSpotCard(
+                                                spot = spot,
+                                                score = score,
+                                                surfboard = bestBoard,
+                                                forecast = associatedForecast,
+                                                onWeeklyForecastClick = {
+                                                    selectedSpotForWeeklyForecast = spot
+                                                    isLoadingWeeklyForecast = true
+                                                },
+                                                isImperial = isImperial
+                                            )
+                                        } else if (!showSurfboardRecommendations && associatedForecast != null) {
+                                            ExpandableSpotCard(
+                                                spot = spot,
+                                                score = score,
+                                                surfboard = null,
+                                                forecast = associatedForecast,
+                                                onWeeklyForecastClick = {
+                                                    selectedSpotForWeeklyForecast = spot
+                                                    isLoadingWeeklyForecast = true
+                                                },
+                                                isImperial = isImperial
+                                            )
                                         }
                                     }
                                 )
@@ -360,19 +392,30 @@ fun FavoriteSpotsContent(
                                         }
                                     },
                                     content = {
-                                        bestBoard?.let {
-                                            associatedForecast?.let { forecast ->
-                                                ExpandableSpotCard(
-                                                    spot = spot,
-                                                    score = score,
-                                                    surfboard = it,
-                                                    forecast = forecast,
-                                                    onWeeklyForecastClick = {
-                                                        selectedSpotForWeeklyForecast = spot
-                                                        isLoadingWeeklyForecast = true
-                                                    }
-                                                )
-                                            }
+                                        if (showSurfboardRecommendations && bestBoard != null && associatedForecast != null) {
+                                            ExpandableSpotCard(
+                                                spot = spot,
+                                                score = score,
+                                                surfboard = bestBoard,
+                                                forecast = associatedForecast,
+                                                onWeeklyForecastClick = {
+                                                    selectedSpotForWeeklyForecast = spot
+                                                    isLoadingWeeklyForecast = true
+                                                },
+                                                isImperial = isImperial
+                                            )
+                                        } else if (!showSurfboardRecommendations && associatedForecast != null) {
+                                            ExpandableSpotCard(
+                                                spot = spot,
+                                                score = score,
+                                                surfboard = null,
+                                                forecast = associatedForecast,
+                                                onWeeklyForecastClick = {
+                                                    selectedSpotForWeeklyForecast = spot
+                                                    isLoadingWeeklyForecast = true
+                                                },
+                                                isImperial = isImperial
+                                            )
                                         }
                                     }
                                 )

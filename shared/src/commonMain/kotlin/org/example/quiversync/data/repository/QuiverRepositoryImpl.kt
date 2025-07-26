@@ -38,7 +38,7 @@ class QuiverRepositoryImpl(
                 Result.Success(boards)
             }
             .catch { e ->
-                emit(Result.Failure(SurfboardError("DB Error: ${e.message}")))
+                emit(Result.Failure(SurfboardError("DB read error: ${e.message}")))
             }
     }
 
@@ -109,11 +109,7 @@ class QuiverRepositoryImpl(
 
             when (val remoteRes = remoteDataSource.addSurfboardRemote(boardWithDate.toDto())) {
                 is Result.Success -> {
-                    val addedSurfboardFromRemote = remoteRes.data
                     platformLogger("QuiverRepositoryImpl", "Surfboard added remotely: ${boardWithDate.model}")
-                    if (addedSurfboardFromRemote != null) {
-                        localDataSource.addSurfboard(addedSurfboardFromRemote)
-                    }
                     Result.Success(true)
                 }
                 is Result.Failure -> {

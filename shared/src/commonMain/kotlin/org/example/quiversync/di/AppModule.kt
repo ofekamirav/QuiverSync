@@ -211,7 +211,7 @@ val commonModule= module {
    single { SetSurfboardAsAvailableForRental(get()) }
    single { SetSurfboardAsUnavailableUseCase(get()) }
    single { PublishSurfboardToRentalUseCase(get(), get()) }
-   single { DeleteSurfboardUseCase(get()) }
+   single { DeleteSurfboardUseCase(get(),get(),get()) }
    single { UnpublishSurfboardFromRentalUseCase(get()) }
    single { GetBoardsNumberUseCase(get()) }
 

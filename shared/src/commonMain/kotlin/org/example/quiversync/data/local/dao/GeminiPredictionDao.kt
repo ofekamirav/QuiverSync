@@ -106,5 +106,13 @@ class GeminiPredictionDao(private val queries: GeminiPredictionQueries) {
         description = this.description
     )
 
+    fun deleteMatchById(predictionID: Long) {
+       queries.DeletePredictionByID(predictionID)
+    }
+
+    fun deleteAllPredictionsBySurfboard(surfboardID: String, userId: String) {
+        queries.DeleteAllPredictionsBySurfboardIDAndUserID(surfboardID, userId)
+    }
+
 
 }

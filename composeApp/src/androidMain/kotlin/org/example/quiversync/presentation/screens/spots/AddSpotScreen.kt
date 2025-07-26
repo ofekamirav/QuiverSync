@@ -5,11 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,10 +21,9 @@ import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
-import com.google.android.libraries.places.api.net.PlacesClient
-import org.example.quiversync.R
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.delay
+import org.example.quiversync.R
 import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotEvent
 import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotState
 import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotViewModel
@@ -47,215 +41,178 @@ fun AddSpotScreen(
     onSpotAdded: () -> Unit
 ) {
     val context = LocalContext.current
-
-    val placesClient = remember { Places.createClient(context) }
-    val session    = remember { AutocompleteSessionToken.newInstance() }
-
     val formState by viewModel.addFavSpotState.collectAsState()
+
+    LaunchedEffect(formState) {
+        if (formState is AddFavSpotState.Loaded) {
+            Toast.makeText(context, "New spot added to favorites", Toast.LENGTH_SHORT).show()
+            delay(500)
+            onSpotAdded()
+        }
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+
+        when (val state = formState) {
+            is AddFavSpotState.Idle, is AddFavSpotState.Loading -> {
+                AddSpotScreenContent(
+                    viewModel = viewModel,
+                    formState = state
+                )
+            }
+            is AddFavSpotState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+            }
+            is AddFavSpotState.Loaded -> {  }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AddSpotScreenContent(
+    viewModel: AddFavSpotViewModel,
+    formState: AddFavSpotState
+) {
+    val context = LocalContext.current
+    val placesClient = remember { Places.createClient(context) }
+    val sessionToken = remember { AutocompleteSessionToken.newInstance() }
+
     var searchQuery by remember { mutableStateOf("") }
     var suggestions by remember { mutableStateOf<List<AutocompletePrediction>>(emptyList()) }
-    var expanded   by remember { mutableStateOf(false) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+    val contentModifier = if (formState is AddFavSpotState.Loading) {
+        Modifier.fillMaxSize().blur(8.dp)
+    } else {
+        Modifier.fillMaxSize()
+    }
 
     val defaultLocation = LatLng(34.0195, -118.4912)
     var markerPosition by remember { mutableStateOf(defaultLocation) }
     val cameraState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(defaultLocation, 10f)
     }
-    val contentModifier = if (formState is AddFavSpotState.Loading) {
-        modifier.blur(radius = 8.dp)
-    } else {
-        modifier
-    }
 
-    LaunchedEffect(formState) {
-        if (formState is AddFavSpotState.Loaded) {
-            Toast.makeText(context, "New spot added to favorites", Toast.LENGTH_SHORT).show()
-            delay(1500)
-            onSpotAdded()
-        }
-    }
+    Column(
+        modifier = contentModifier
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = isDropdownExpanded,
+            onExpandedChange = { /* מטופל ידנית */ },
+        ) {
+            val form = (formState as? AddFavSpotState.Idle)?.data
+            CustomTextField(
+                value = searchQuery,
+                onValueChange = { query ->
+                    searchQuery = query
+                    viewModel.onEvent(AddFavSpotEvent.NameChanged(query))
+                    if (query.length >= 2) {
+                        fetchPredictions(placesClient, query, sessionToken) { newSuggestions ->
+                            suggestions = newSuggestions
+                            isDropdownExpanded = newSuggestions.isNotEmpty()
+                        }
+                    } else {
+                        suggestions = emptyList()
+                        isDropdownExpanded = false
+                    }
+                },
+                label = "Enter a spot name",
+                isError = form?.nameError != null,
+                errorMessage = form?.nameError,
+                modifier = Modifier.menuAnchor().fillMaxWidth(),
+            )
 
-    Box(modifier = modifier.fillMaxSize()) {
-        when (formState) {
-            is AddFavSpotState.Loaded -> {
-                // This state is handled in LaunchedEffect
-            }
-            is AddFavSpotState.Error -> {
-                Text(
-                    text = (formState as AddFavSpotState.Error).message,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp)
-                )
-            }
-            is AddFavSpotState.Idle, is AddFavSpotState.Loading -> {
-                val form = (formState as? AddFavSpotState.Idle)?.data
-                Box(
-                    modifier = contentModifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.SpaceBetween
+            ExposedDropdownMenu(
+                expanded = isDropdownExpanded,
+                onDismissRequest = { isDropdownExpanded = false },
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            ) {
+                suggestions.forEach { prediction ->
+                    DropdownMenuItem(
+                        text = { Text(prediction.getFullText(null).toString()) },
+                        onClick = {
+                            val placeName = prediction.getFullText(null).toString()
+                            val placeId = prediction.placeId
+                            searchQuery = placeName
+                            suggestions = emptyList()
+                            isDropdownExpanded = false
 
-                    ) {
-                        ExposedDropdownMenuBox(
-                            expanded = searchQuery.length >= 2,
-                            onExpandedChange = {},
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            CustomTextField(
-                                value = searchQuery,
-                                onValueChange = { q ->
-                                    searchQuery = q
-                                    viewModel.onEvent(AddFavSpotEvent.NameChanged(q))
-                                    if (q.length >= 2) {
-                                        fetchPredictions(
-                                            placesClient,
-                                            q,
-                                            session
-                                        ) { suggestionsList ->
-                                            suggestions = suggestionsList
-                                            expanded = suggestionsList.isNotEmpty()
-                                        }
-                                    } else {
-                                        suggestions = emptyList()
-                                        expanded = false
-                                    }
-                                },
-                                label = "Enter a spot name",
-                                isError = form?.nameError != null,
-                                errorMessage = form?.nameError,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor(),
-                                readOnly = false
-                            )
-                            ExposedDropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .clip(RoundedCornerShape(12.dp))
-                            ) {
-                                suggestions.forEach { prediction ->
-                                    DropdownMenuItem(
-                                        text = { Text(prediction.getFullText(null).toString()) },
-                                        onClick = {
-                                            val placeName = prediction.getFullText(null).toString()
-                                            val fetchRequest = FetchPlaceRequest.builder(
-                                                prediction.placeId,
-                                                listOf(Place.Field.LAT_LNG)
-                                            ).build()
-                                            placesClient.fetchPlace(fetchRequest)
-                                                .addOnSuccessListener { place ->
-                                                    val latLng =
-                                                        place.place.location ?: defaultLocation
-                                                    searchQuery = placeName
-                                                    suggestions = emptyList()
-                                                    expanded = false
-                                                    markerPosition = latLng
-                                                    cameraState.position =
-                                                        CameraPosition.fromLatLngZoom(latLng, 12f)
+                            val placeFields = listOf(Place.Field.LAT_LNG)
+                            val request = FetchPlaceRequest.newInstance(placeId, placeFields)
 
-                                                    viewModel.onEvent(
-                                                        AddFavSpotEvent.NameChanged(
-                                                            placeName
-                                                        )
-                                                    )
-                                                    viewModel.onEvent(
-                                                        AddFavSpotEvent.LocationChanged(
-                                                            latitude = latLng.latitude,
-                                                            longitude = latLng.longitude
-                                                        )
-                                                    )
-                                                }
-                                        }
-                                    )
-                                }
+                            placesClient.fetchPlace(request).addOnSuccessListener { response ->
+                                val latLng = response.place.latLng ?: defaultLocation
+                                markerPosition = latLng
+                                cameraState.position = CameraPosition.fromLatLngZoom(latLng, 12f)
+                                viewModel.onEvent(AddFavSpotEvent.NameChanged(placeName))
+                                viewModel.onEvent(AddFavSpotEvent.LocationChanged(latLng.latitude, latLng.longitude))
                             }
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                                .clip(RoundedCornerShape(30.dp)),
-                            colors = CardDefaults.cardColors(containerColor = Color.White)
-                        ) {
-                            MapWithCustomSvgMarker(
-                                position = markerPosition,
-                                cameraPositionState = cameraState,
-                                onMapClick = { latLng ->
-                                    markerPosition = latLng
-                                    viewModel.onEvent(
-                                        AddFavSpotEvent.LocationChanged(
-                                            latitude = latLng.latitude,
-                                            longitude = latLng.longitude
-                                        )
-                                    )
-                                },
-                                markerSvgRes = R.drawable.ic_marker
-                            )
-                        }
-                        form?.locationError?.let {
-                            Text(
-                                text = it,
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        GradientButton(
-                            text = "Add Spot",
-                            onClick = { viewModel.onEvent(AddFavSpotEvent.SaveClicked) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 12.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            enabled = formState !is AddFavSpotState.Loading
-                        )
-                    }
+                    )
                 }
             }
         }
 
-        if (formState is AddFavSpotState.Loading) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .background(Color.Transparent),
-                contentAlignment = Alignment.Center
-            ) {
-                LoadingAnimation(
-                    isLoading          = true,
-                    animationFileName  = "quiver_sync_loading_animation.json",
-                    animationSize      = 240.dp
-                )
-            }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            shape = RoundedCornerShape(24.dp)
+        ) {
+            MapWithCustomSvgMarker(
+                modifier = Modifier.fillMaxSize(),
+                position = markerPosition,
+                cameraPositionState = cameraState,
+                onMapClick = { latLng ->
+                    markerPosition = latLng
+                    viewModel.onEvent(AddFavSpotEvent.LocationChanged(latLng.latitude, latLng.longitude))
+                },
+                markerSvgRes = R.drawable.ic_marker
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        GradientButton(
+            text = "Add Spot",
+            onClick = { viewModel.onEvent(AddFavSpotEvent.SaveClicked) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = formState !is AddFavSpotState.Loading,
+            shape = RoundedCornerShape(12.dp),
+        )
+    }
+
+    if (formState is AddFavSpotState.Loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingAnimation(
+                isLoading = true,
+                animationFileName = "quiver_sync_loading_animation.json",
+                animationSize = 240.dp
+            )
         }
     }
 }
 
 private fun fetchPredictions(
-    placesClient: PlacesClient,
+    placesClient: com.google.android.libraries.places.api.net.PlacesClient,
     query: String,
-    session: AutocompleteSessionToken,
+    sessionToken: AutocompleteSessionToken,
     onResult: (List<AutocompletePrediction>) -> Unit
 ) {
     val request = FindAutocompletePredictionsRequest.builder()
-        .setSessionToken(session)
+        .setSessionToken(sessionToken)
         .setQuery(query)
         .build()
     placesClient.findAutocompletePredictions(request)
-        .addOnSuccessListener { resp ->
-            onResult(resp.autocompletePredictions)
-        }
-        .addOnFailureListener {
-            onResult(emptyList())
-        }
+        .addOnSuccessListener { response -> onResult(response.autocompletePredictions) }
+        .addOnFailureListener { onResult(emptyList()) }
 }
