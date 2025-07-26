@@ -52,58 +52,55 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel(),
-    onRegisterClick: () -> Unit = {},
-    onSignInSuccess: () -> Unit = {},
-    onForgotPasswordClick: () -> Unit = {},
-    onNavigateToOnboarding: () -> Unit = {}
-    ) {
+    onRegisterClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit
+) {
     val uiState by viewModel.loginState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val contentModifier = if (uiState is LoginState.Loading) {
-        Modifier.blur(radius = 8.dp)
-    } else {
-        Modifier
+
+    LaunchedEffect(uiState) {
+        val currentState = uiState
+        if (currentState is LoginState.Error) {
+            Toast.makeText(context, currentState.message, Toast.LENGTH_LONG).show()
+            viewModel.resetState()
+        } else if (currentState is LoginState.Loaded) {
+            Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     when (val currentState = uiState) {
-        is LoginState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize()
-                    .background(Color.Transparent),
-                contentAlignment = Alignment.Center
-            ) {
-                LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
-            }
-        }
-        is LoginState.Error -> {
-            LaunchedEffect(currentState) {
-                Toast.makeText(context, currentState.message, Toast.LENGTH_LONG).show()
-                viewModel.resetState()
-            }
-        }
-        is LoginState.Loaded -> {
-            LaunchedEffect(Unit) {
-                onSignInSuccess()
-                Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
-                viewModel.resetState()
-            }
-        }
         is LoginState.Idle -> {
             LoginScreenContent(
-                onRegisterClick = onRegisterClick,
-                modifier = contentModifier,
-                onEvent = viewModel::onEvent,
                 currentState = currentState,
+                onRegisterClick = onRegisterClick,
                 onForgotPasswordClick = onForgotPasswordClick,
+                onEvent = viewModel::onEvent,
                 onGoogleSignInResult = viewModel::onGoogleSignInResult
             )
         }
-        is LoginState.NavigateToOnboarding -> {
-            LaunchedEffect(Unit) {
-                onNavigateToOnboarding()
+        else -> { // Loading, Loaded, Error, Onboarding
+            val isLoading = currentState is LoginState.Loading
+            val contentModifier = if (isLoading) Modifier.blur(8.dp) else Modifier
+
+            LoginScreenContent(
+                currentState = (currentState as? LoginState.Idle) ?: LoginState.Idle(LoginData()),
+                onRegisterClick = {},
+                onForgotPasswordClick = {},
+                onEvent = {},
+                isLoading = isLoading,
+                onGoogleSignInResult = {},
+                modifier = contentModifier
+            )
+
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LoadingAnimation(isLoading = true, animationFileName = "quiver_sync_loading_animation.json", animationSize = 240.dp)
+                }
             }
         }
-
     }
 }
 
@@ -130,7 +127,7 @@ fun LoginScreenContent(
 
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(context.getString(R.string.default_web_client_id)) // חשוב! לקחת מ-google-services.json
+            .requestIdToken(context.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
     }
@@ -272,24 +269,5 @@ fun LoginScreenContent(
                 textAlign = TextAlign.Center
             )
         }
-    }
-}
-
-@Preview(
-    showBackground = true,
-    //name = "Dark Mode",
-    //uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun LoginScreenDarkPreview() {
-    QuiverSyncTheme() {
-        LoginScreen()
-    }
-}
-@Preview(showBackground = true, widthDp = 900)
-@Composable
-fun LoginScreenPreviewTablet() {
-    QuiverSyncTheme() {
-        LoginScreen()
     }
 }

@@ -7,6 +7,7 @@ import org.example.quiversync.data.remote.dto.AuthResult
 
 interface AuthRepository {
     suspend fun register(name: String, email: String, password: String): Result<Unit,Error>
+    suspend fun getCurrentUserId(): String?
     suspend fun getCurrentUser(): User?
     suspend fun login(email: String, password: String): Result<Unit,Error>
     suspend fun logoutRemote()

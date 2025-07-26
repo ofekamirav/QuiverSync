@@ -47,7 +47,7 @@ fun BoardCardSkeleton(shimmerBrush: Brush) {
         ) {
             Box(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(120.dp)
                     .clip(shape = RoundedCornerShape(16.dp))
                     .background(shimmerBrush),
             )

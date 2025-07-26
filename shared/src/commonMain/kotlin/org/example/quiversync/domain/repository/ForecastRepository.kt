@@ -1,27 +1,28 @@
 package org.example.quiversync.domain.repository
 
-import org.example.quiversync.data.repository.TMDBError
+
 import org.example.quiversync.data.local.Result
+import org.example.quiversync.data.local.Error
 import org.example.quiversync.domain.model.forecast.DailyForecast
-import org.example.quiversync.domain.model.forecast.WeeklyForecast
+
 
 interface ForecastRepository {
     suspend fun getWeeklyForecast(
         latitude: Double,
         longitude: Double,
         isHomePage: Boolean
-    ): Result<List<DailyForecast>,TMDBError>
+    ): Result<List<DailyForecast>, Error>
 
     suspend fun getDailyForecastByDateAndSpot(
         latitude: Double,
         longitude: Double
-    ): Result<DailyForecast, TMDBError>
+    ): Result<DailyForecast, Error>
 
     suspend fun deleteOutDateForecast():
-        Result<Unit, TMDBError>
+        Result<Unit, Error>
 
     suspend fun deleteBySpot(
         latitude: Double,
         longitude: Double
-    ): Result<Unit, TMDBError>
+    ): Result<Unit, Error>
 }

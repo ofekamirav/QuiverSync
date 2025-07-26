@@ -98,7 +98,9 @@ fun AddSpotScreen(
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceBetween
+
                     ) {
                         ExposedDropdownMenuBox(
                             expanded = searchQuery.length >= 2,

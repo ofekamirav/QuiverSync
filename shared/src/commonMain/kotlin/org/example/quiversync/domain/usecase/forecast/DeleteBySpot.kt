@@ -1,7 +1,7 @@
 package org.example.quiversync.domain.usecase.forecast
 
 import org.example.quiversync.data.local.Result
-import org.example.quiversync.data.repository.TMDBError
+import org.example.quiversync.data.local.Error
 import org.example.quiversync.domain.repository.ForecastRepository
 
 class DeleteBySpot(
@@ -10,7 +10,7 @@ class DeleteBySpot(
     suspend operator fun invoke(
         latitude: Double,
         longitude: Double
-    ) : Result<Unit, TMDBError> {
+    ) : Result<Unit, Error> {
         return forecastRepository.deleteBySpot(latitude, longitude)
     }
 }

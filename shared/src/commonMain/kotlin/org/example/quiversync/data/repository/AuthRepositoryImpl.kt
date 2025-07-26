@@ -67,6 +67,16 @@ class AuthRepositoryImpl(
         }
     }
 
+    override suspend fun getCurrentUserId(): String? {
+        val firebaseUser = auth.currentUser
+        return if (firebaseUser != null) {
+            platformLogger("AuthRepositoryImpl", "Current user ID: ${firebaseUser.uid}")
+            firebaseUser.uid
+        } else {
+            platformLogger("AuthRepositoryImpl", "No user is currently signed in.")
+            null
+        }  }
+
     override suspend fun getCurrentUser(): User?  {
         val firebaseUser = auth.currentUser
         return if (firebaseUser != null) {
