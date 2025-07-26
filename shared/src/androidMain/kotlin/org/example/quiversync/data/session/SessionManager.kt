@@ -36,6 +36,12 @@ actual class SessionManager actual constructor(context: Any?) {
         return context.dataStore.data.first()[uidKey]
     }
 
+    actual fun observeUid(): Flow<String?> {
+        return context.dataStore.data.map { preferences ->
+            preferences[uidKey]
+        }
+    }
+
     actual suspend fun setUid(uid: String) {
         context.dataStore.edit { it[uidKey] = uid }
     }
