@@ -13,72 +13,94 @@ import Shared
 
 struct RentalBoardCardView: View {
     @Environment(\.colorScheme) var colorScheme
-
-    let rentalOffer: RentalOffer
+    let rentalOffer: BoardForDisplay
 
     var body: some View {
+        let surfboard = rentalOffer.board
+
         VStack(alignment: .leading, spacing: 10) {
-            // Surfboard Image
-            AsyncImage(url: URL(string: rentalOffer.surfboardImageUrl ?? "")) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 160)
-                        .clipped()
-                default:
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(height: 160)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .font(.largeTitle)
-                                .foregroundColor(.gray)
-                        )
-                }
-            }
-            .cornerRadius(10)
-
-            VStack(alignment: .leading, spacing: 6) {
-                // Surfboard Name
-                Text(rentalOffer.surfboardName)
-                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
-                    .font(.headline)
-                    .lineLimit(1)
-
-                // Owner Info
-                HStack(spacing: 8) {
-                    AsyncImage(url: URL(string: rentalOffer.ownerProfilePicture ?? "")) { phase in
+            HStack(alignment: .top, spacing: 12) {
+                // 🔹 Surfboard Image (matches height)
+                GeometryReader { geo in
+                    AsyncImage(url: URL(string: surfboard?.surfboardPic ?? "")) { phase in
                         switch phase {
                         case .success(let image):
                             image
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 44, height: 44)
-                                .clipShape(Circle())
+                                .frame(width: 110, height: geo.size.height)
+                                .clipped()
+                                .cornerRadius(16)
                         default:
-                            Circle()
-                                .fill(Color.gray.opacity(0.3))
-                                .frame(width: 24, height: 24)
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(width: 110, height: geo.size.height)
+                                .cornerRadius(16)
                         }
                     }
-
-                    Text(rentalOffer.ownerName)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-
-                    Spacer()
                 }
+                .frame(width: 110)
 
-                Divider()
+                // 🔸 Details Section
+                VStack(alignment: .leading, spacing: 6) {
+                    // Name + Price
+                    HStack(alignment: .top) {
+                        Text(surfboard?.model ?? "No Model")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundColor(AppColors.deepBlue)
 
-                // Price
-                Text("$\(String(format: "%.0f", rentalOffer.pricePerDay))/day")
-                    .font(.subheadline)
-                    .fontWeight(.bold)
-                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
+                        Spacer()
+
+                        Text("$\(String(format: "%.0f", surfboard?.pricePerDay ?? 0))/day")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .foregroundColor(AppColors.valueSand)
+                    }
+
+                    Divider()
+
+                    // Specs Grid
+                    Grid(horizontalSpacing: 16, verticalSpacing: 8) {
+                        GridRow {
+                            SpecItem(label: "Type", value: surfboard?.type.name ?? "")
+                            SpecItem(label: "Height", value: surfboard?.height ?? "")
+                        }
+                        GridRow {
+                            SpecItem(label: "Width", value: surfboard?.width ?? "")
+                            SpecItem(label: "Volume", value: surfboard?.volume ?? "")
+                        }
+                        GridRow{
+                            HStack(spacing: 8) {
+                                AsyncImage(url: URL(string: surfboard?.ownerPic ?? "")) { phase in
+                                    switch phase {
+                                    case .success(let image):
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 38, height: 38)
+                                            .clipShape(Circle())
+                                    default:
+                                        Circle()
+                                            .fill(Color.gray.opacity(0.3))
+                                            .frame(width: 38, height: 38)
+                                    }
+                                }
+
+                                Text(surfboard?.ownerName ?? "Unknown")
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+
+                                Spacer()
+                            }
+                            .padding(.top, 8)
+
+                        }
+                        .gridCellColumns(2)
+                        
+                    }
+                    .padding(.top, 4)
+                }
             }
         }
         .padding()
@@ -87,3 +109,45 @@ struct RentalBoardCardView: View {
         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
 }
+
+
+
+// MARK: - Reusable Spec Item View
+struct SpecItem: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Text(value)
+                .font(.subheadline)
+                .foregroundColor(.primary)
+        }
+        .frame(minWidth: 50)
+    }
+}
+
+
+//
+//#Preview {
+//    RentalBoardCardView(
+//        rentalOffer: BoardForDisplay(
+//            board: BoardForRent(
+//                surfboardId: "1",
+//                ownerName: "Gal Levi",
+//                ownerPic: "https://via.placeholder.com/150",
+//                ownerPhoneNumber: "123-456-7890",
+//                surfboardPic: "https://via.placeholder.com/300",
+//                model: "SharpEye Inferno",
+//                type: "Shortboard",
+//                height: "5'11\"",
+//                width: "18.5\"",
+//                volume: "25.5L",
+//                pricePerDay: 50.0
+//            ), id: "1"
+//        )
+//    )
+//}

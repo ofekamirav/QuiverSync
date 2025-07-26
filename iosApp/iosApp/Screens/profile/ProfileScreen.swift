@@ -21,6 +21,8 @@ public struct ProfileScreen: View {
             case .loaded(let loaded):
                 ProfileView(user: loaded.user,
                             boardsCount: Int(loaded.boards),
+                            spotsCount: Int(loaded.spots),
+                            rentalsCount: Int(loaded.rentals),
                             isLoggedIn: $isLoggedIn)
             case .error(let error):
                 ErrorView(

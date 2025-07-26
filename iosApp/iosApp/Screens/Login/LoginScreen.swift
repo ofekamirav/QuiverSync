@@ -36,17 +36,7 @@ struct LoginScreen: View {
             case .loaded:
                 Color.clear.onAppear {
                     print("User logged in successfully")
-                    Task {
-                            let sessionManager = SessionManager(context: nil)
-                            if let newUid = try? await sessionManager.getUid(), newUid != "" {
-                                print("User logged in successfully: \(newUid)")
-                                onLoginSuccess()
-                            } else {
-                                print("❌ Login attempted, but UID is still nil")
-                            }
-                        viewModel.viewModel.resetState()
-
-                        }
+                    onLoginSuccess()
                     isLoggedIn = true
                 }
 

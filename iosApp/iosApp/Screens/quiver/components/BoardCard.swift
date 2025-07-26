@@ -14,36 +14,29 @@ struct BoardCard: View {
 
     let board: Surfboard
     let onClick: () -> Void
-    let onPublishToggle: (Surfboard, Bool) -> Void
-
-    @State private var toggleValue: Bool
-
-    init(board: Surfboard, onClick: @escaping () -> Void, onPublishToggle: @escaping (Surfboard, Bool) -> Void) {
-        self.board = board
-        self.onClick = onClick
-        self.onPublishToggle = onPublishToggle
-        _toggleValue = State(initialValue: board.isRentalPublished?.boolValue ?? false)
-    }
+    @Binding var isPublished: Bool
 
     var body: some View {
         Button(action: onClick) {
             VStack(spacing: 12) {
-                AsyncImage(
-                    url: URL(string: board.imageRes ?? ""),
-                    content: { image in
+                
+                AsyncImage(url: URL(string: board.imageRes ?? "")) { phase in
+                    switch phase {
+                    case .success(let image):
                         image
                             .resizable()
-                            .scaledToFit()
-                    },
-                    placeholder: {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundColor(.gray.opacity(0.3))
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 110, height: 130)
+                            .clipped()
+                            .cornerRadius(16)
+                    default:
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width: 110, height: 100)
+                            .cornerRadius(16)
                     }
-                )
-                .frame(height: 100)
-                .cornerRadius(10)
+                }
+
 
                 Text(board.model)
                     .font(.headline)
@@ -57,21 +50,18 @@ struct BoardCard: View {
 
                     Spacer()
 
-                    Toggle("", isOn: $toggleValue)
+                    Toggle("", isOn: $isPublished)
                         .labelsHidden()
-                        .onChange(of: toggleValue) { newValue in
-                            onPublishToggle(board, newValue)
-                        }
                 }
             }
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 20)
                     .fill(AppColors.cardColor(for: colorScheme))
-                    .shadow(color: colorScheme == .dark ? .clear : .black.opacity(toggleValue ? 0.1 : 0.05), radius: toggleValue ? 6 : 3)
+                    .shadow(color: colorScheme == .dark ? .clear : .black.opacity(isPublished ? 0.1 : 0.05), radius: isPublished ? 6 : 3)
                     .overlay(
                         RoundedRectangle(cornerRadius: 20)
-                            .stroke(toggleValue ? AppColors.sandOrange : Color.clear, lineWidth: 2)
+                            .stroke(isPublished ? AppColors.sandOrange : Color.clear, lineWidth: 2)
                     )
             )
         }

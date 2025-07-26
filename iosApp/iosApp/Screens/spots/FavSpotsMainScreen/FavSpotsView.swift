@@ -18,6 +18,8 @@ public struct FavSpotsView: View {
     @State private var selectedSpot: FavoriteSpot? = nil
     @State private var showAddSpotScreen = false
     @State private var spotToDelete: FavoriteSpot? = nil
+    @State private var showAsForecastOnly = false
+
 
     public var body: some View {
         
@@ -40,10 +42,13 @@ public struct FavSpotsView: View {
             } else {
                 // 🔹 Main List
                 ScrollView {
+                    if !favSpots.boards.isEmpty {
+                        SmartMatchBtn(showForecastOnly: $showAsForecastOnly, colorScheme: colorScheme)
+                    }
                     LazyVStack(spacing: 0) {
                         ForEach(favSpots.spots, id: \.spotID) { spot in
 
-                            if favSpots.boards.isEmpty{
+                            if favSpots.boards.isEmpty || showAsForecastOnly {
                                 SwipeToDeleteCard(
                                     content: {
                                         ForecastOnlyCard(
@@ -55,6 +60,7 @@ public struct FavSpotsView: View {
                                         spotToDelete = spot
                                     }
                                 )
+                                .padding()
                                 .padding(.vertical, 2)
                                 .padding(.horizontal, 8)
                                 .background(AppColors.sectionBackground(for: colorScheme))
@@ -67,12 +73,12 @@ public struct FavSpotsView: View {
                                             favSpotsViewModel: favSpotsViewModel,
                                             selectedSpot: $selectedSpot
                                         )
-                                        .padding()
                                     },
                                     onDelete: {
                                         spotToDelete = spot
                                     }
                                 )
+                                .padding()
                                 .padding(.vertical, 2)
                                 .padding(.horizontal, 8)
                                 .background(AppColors.sectionBackground(for: colorScheme))
@@ -86,7 +92,7 @@ public struct FavSpotsView: View {
             }
 
             // ➕ Add Button
-            if selectedSpot == nil {
+            if selectedSpot == nil || !favSpots.spots.isEmpty {
                 Button(action: {
                     showAddSpotScreen = true
                 }) {
@@ -107,17 +113,22 @@ public struct FavSpotsView: View {
 
             // 📍 Weekly Forecast Popup
             if let spot = selectedSpot {
-                ZStack {
-                    WeeklyForecastPopup(
-                        selectedSpot: $selectedSpot,
-                        favSpotsData: favSpots,
-                        favSpotsViewModel: favSpotsViewModel
-                    )
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                if(favSpots.boards.isEmpty || showAsForecastOnly){
+                    
                 }
-                .zIndex(1)
-                .onAppear {
-                    favSpotsViewModel.onEvent(event: FavSpotsEventLoadWeekPredictions(favoriteSpot: spot))
+                else{
+                    ZStack {
+                        WeeklyForecastPopup(
+                            selectedSpot: $selectedSpot,
+                            favSpotsData: favSpots,
+                            favSpotsViewModel: favSpotsViewModel
+                        )
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    .zIndex(1)
+                    .onAppear {
+                        favSpotsViewModel.onEvent(event: FavSpotsEventLoadWeekPredictions(favoriteSpot: spot))
+                    }
                 }
             }
 

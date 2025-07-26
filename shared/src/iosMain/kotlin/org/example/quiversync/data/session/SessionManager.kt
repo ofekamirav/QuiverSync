@@ -15,25 +15,28 @@ actual class SessionManager actual constructor(context: Any?) {
         defaults.stringForKey("units") ?: "metric"
     )
 
-    actual suspend fun clearUserData(){
-        defaults.removeObjectForKey("uid")
-        defaults.removeObjectForKey("latitude")
-        defaults.removeObjectForKey("longitude")
-        defaults.removeObjectForKey("lastRefresh")
-    }
-
     private val _uidFlow = MutableStateFlow<String?>(defaults.stringForKey("uid"))
 
     actual fun observeUid(): Flow<String?> {
         return _uidFlow.asStateFlow()
     }
 
-    actual suspend fun getUid(): String? {
-        return defaults.stringForKey("uid")
-    }
-
     actual suspend fun setUid(uid: String) {
         defaults.setObject(uid, forKey = "uid")
+        _uidFlow.value = uid // ✅ FIX: Update the flow to notify observers
+    }
+
+    actual suspend fun clearUserData(){
+        defaults.removeObjectForKey("uid")
+        defaults.removeObjectForKey("latitude")
+        defaults.removeObjectForKey("longitude")
+        defaults.removeObjectForKey("lastRefresh")
+        _uidFlow.value = null // ✅ FIX: Notify observers of logout
+    }
+
+    actual suspend fun getUid(): String? {
+        // The value from the flow is the most current source of truth
+        return _uidFlow.value
     }
 
     actual suspend fun getLatitude(): Double? {

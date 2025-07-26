@@ -107,6 +107,21 @@ class FavSpotsViewModel(
         val forecasts = spots.mapNotNull { spot ->
             (favSpotsUseCases.getDailyForecast(spot) as? Result.Success)?.data
         }
+
+        if(quiver.isEmpty()){
+            _uiState.value = FavSpotsState.Loaded(
+                FavSpotsData(
+                    spots = spots,
+                    allSpotsDailyPredictions = emptyList(),
+                    boards = quiver,
+                    currentForecastsForAllSpots = forecasts,
+                    weeklyForecastForSpecificSpot = emptyList(),
+                    weeklyPredictionsForSpecificSpot = emptyList(),
+                    weeklyUiPredictions = emptyList()
+                )
+            )
+            return
+        }
 //        platformLogger("FavSpotsViewModel", "Forecasts loaded: ${forecasts.size}")
 
         val predictionsResult = favSpotsUseCases.generateAllTodayPredictionsUseCase(

@@ -40,7 +40,8 @@ public struct QuiverScreen: View {
                     systemImageName: "shippingbox.fill",
                     buttonText: "Retry",
                     onRetry: {
-                        ViewModel.ViewModel.refreshQuiver()
+//                        ViewModel.ViewModel.refreshQuiver()
+                        print("Retrying quiver fetch...")
                     }
                 )
 

@@ -2,14 +2,12 @@
 //  AddBoardStep2View.swift
 //  iosApp
 //
-//  Created by gal levi on 13/07/2025.
+//  Created by gal levi on 25/07/2025.
 //  Copyright © 2025 orgName. All rights reserved.
 //
 
-
 import SwiftUI
 import Shared
-import Foundation
 
 struct AddBoardStep2View: View {
     @Environment(\.colorScheme) var colorScheme

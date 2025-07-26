@@ -22,6 +22,8 @@ enum AppColors {
     static let textDark = Color(#colorLiteral(red: 0.149, green: 0.196, blue: 0.22, alpha: 1)) // #263238
     static let borderGray = Color(#colorLiteral(red: 0.878, green: 0.878, blue: 0.878, alpha: 1)) // #e0e0e0
     static let error = Color(#colorLiteral(red: 0.827, green: 0.361, blue: 0.361, alpha: 1)) // #d35c5c
+    static let valueSand = Color(#colorLiteral(red: 0.2451936305, green: 0.525488317, blue: 0.6831794977, alpha: 1)) // #47a051
+
     // MARK: - Gradients
     static let loginGradientLight = [skyBlue, surfBlue]
     static let loginGradientDark = [deepBlue, surfBlue]

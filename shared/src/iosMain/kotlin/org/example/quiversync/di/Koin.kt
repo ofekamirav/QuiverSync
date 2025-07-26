@@ -1,6 +1,8 @@
 package org.example.quiversync.di
 
-import org.example.quiversync.features.exploreRentals.ExploreViewModel
+import MainViewModel
+import org.example.quiversync.data.session.SessionManager
+import org.example.quiversync.domain.usecase.user.StartSyncsUseCase
 import org.example.quiversync.features.home.HomeViewModel
 import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.features.login.forgot_password.ForgotPasswordViewModel
@@ -8,6 +10,7 @@ import org.example.quiversync.features.quiver.QuiverViewModel
 import org.example.quiversync.features.quiver.add_board.AddBoardViewModel
 import org.example.quiversync.features.register.OnboardingViewModel
 import org.example.quiversync.features.register.RegisterViewModel
+import org.example.quiversync.features.rentals.explore.ExploreViewModel
 import org.example.quiversync.features.settings.SecurityAndPrivacyViewModel
 import org.example.quiversync.features.settings.SettingsViewModel
 import org.example.quiversync.features.spots.add_fav_spot.AddFavSpotViewModel
@@ -46,3 +49,10 @@ fun forgotPasswordViewModel() : ForgotPasswordViewModel = KoinPlatform.getKoin()
 fun onboardingViewModel() : OnboardingViewModel = KoinPlatform.getKoin().get()
 
 fun exploreViewModel() : ExploreViewModel = KoinPlatform.getKoin().get()
+
+fun mainViewModel() : MainViewModel = KoinPlatform.getKoin().get()
+
+fun startSyncsUseCase(): StartSyncsUseCase = KoinPlatform.getKoin().get()
+
+fun sessionManager() = KoinPlatform.getKoin().get<SessionManager>()
+
