@@ -8,6 +8,7 @@ expect class SessionManager(context: Any?) {
 
     suspend fun getUid(): String?
     suspend fun setUid(uid: String)
+    fun observeUid(): Flow<String?>
 
     suspend fun getLatitude(): Double?
     suspend fun setLatitude(latitude: Double)

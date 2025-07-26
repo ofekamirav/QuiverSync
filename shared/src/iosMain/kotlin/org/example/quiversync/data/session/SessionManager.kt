@@ -22,6 +22,12 @@ actual class SessionManager actual constructor(context: Any?) {
         defaults.removeObjectForKey("lastRefresh")
     }
 
+    private val _uidFlow = MutableStateFlow<String?>(defaults.stringForKey("uid"))
+
+    actual fun observeUid(): Flow<String?> {
+        return _uidFlow.asStateFlow()
+    }
+
     actual suspend fun getUid(): String? {
         return defaults.stringForKey("uid")
     }

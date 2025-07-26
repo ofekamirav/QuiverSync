@@ -1,5 +1,6 @@
 package org.example.quiversync.presentation.navigation
 
+import MainViewModel
 import android.R.attr.type
 import android.os.Build
 import android.util.Log
@@ -43,7 +44,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
-import org.example.quiversync.features.main.MainViewModel
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.components.LottieSplashScreen
 import org.example.quiversync.presentation.components.SnackbarWithCountdown

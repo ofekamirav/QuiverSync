@@ -1,5 +1,6 @@
 package org.example.quiversync.di
 
+import MainViewModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
@@ -112,7 +113,6 @@ import org.example.quiversync.domain.usecase.user.GetOwnerByIdUseCase
 import org.example.quiversync.domain.usecase.user.GetRentalsNumberUseCase
 import org.example.quiversync.domain.usecase.user.StartSyncsUseCase
 import org.example.quiversync.features.login.LoginUseCases
-import org.example.quiversync.features.main.MainViewModel
 import org.example.quiversync.features.rentals.RentalsUseCases
 import org.example.quiversync.features.rentals.explore.ExploreViewModel
 
