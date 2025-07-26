@@ -63,7 +63,7 @@ struct RentalBoardCardView: View {
                     // Specs Grid
                     Grid(horizontalSpacing: 16, verticalSpacing: 8) {
                         GridRow {
-                            SpecItem(label: "Type", value: surfboard?.type ?? "")
+                            SpecItem(label: "Type", value: surfboard?.type.name ?? "")
                             SpecItem(label: "Height", value: surfboard?.height ?? "")
                         }
                         GridRow {

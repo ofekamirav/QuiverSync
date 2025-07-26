@@ -24,6 +24,8 @@
 		694F85572E26E6F600C2322F /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694F85562E26E6EE00C2322F /* AppRoute.swift */; };
 		694F85592E26E7F300C2322F /* AppNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694F85582E26E7F100C2322F /* AppNavigationView.swift */; };
 		694F855B2E26EA6400C2322F /* TODOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694F855A2E26EA5E00C2322F /* TODOView.swift */; };
+		69537D422E34B52700562A5E /* SmartMatchBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69537D412E34B51B00562A5E /* SmartMatchBtn.swift */; };
+		69537D452E34C62B00562A5E /* MainViewModelWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69537D442E34C62400562A5E /* MainViewModelWrapper.swift */; };
 		6953D45A2E28EAF1005C54F5 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 6953D4592E28EAF1005C54F5 /* Lottie */; };
 		6953D45D2E2905E0005C54F5 /* SecurityAndPrivacyWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6953D45C2E2905D7005C54F5 /* SecurityAndPrivacyWrapper.swift */; };
 		6953D45F2E2905EB005C54F5 /* SecurityAndPrivacyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6953D45E2E2905E6005C54F5 /* SecurityAndPrivacyScreen.swift */; };
@@ -154,6 +156,8 @@
 		694F85562E26E6EE00C2322F /* AppRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoute.swift; sourceTree = "<group>"; };
 		694F85582E26E7F100C2322F /* AppNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationView.swift; sourceTree = "<group>"; };
 		694F855A2E26EA5E00C2322F /* TODOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TODOView.swift; sourceTree = "<group>"; };
+		69537D412E34B51B00562A5E /* SmartMatchBtn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartMatchBtn.swift; sourceTree = "<group>"; };
+		69537D442E34C62400562A5E /* MainViewModelWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModelWrapper.swift; sourceTree = "<group>"; };
 		6953D45C2E2905D7005C54F5 /* SecurityAndPrivacyWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAndPrivacyWrapper.swift; sourceTree = "<group>"; };
 		6953D45E2E2905E6005C54F5 /* SecurityAndPrivacyScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAndPrivacyScreen.swift; sourceTree = "<group>"; };
 		6953D4602E2905EF005C54F5 /* SecurityAndPrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAndPrivacyView.swift; sourceTree = "<group>"; };
@@ -323,6 +327,14 @@
 			path = HelperFunctions;
 			sourceTree = "<group>";
 		};
+		69537D432E34C61400562A5E /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				69537D442E34C62400562A5E /* MainViewModelWrapper.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
 		6953D45B2E2905C1005C54F5 /* SecurityAndPrivacy */ = {
 			isa = PBXGroup;
 			children = (
@@ -433,6 +445,7 @@
 		699AE8AD2E1D3D3B00717A8B /* FavSpotsMainScreen */ = {
 			isa = PBXGroup;
 			children = (
+				69537D412E34B51B00562A5E /* SmartMatchBtn.swift */,
 				69B24F7C2E2D36140098C5B7 /* ForecastOnlyCard.swift */,
 				699AE8AB2E1D3CFA00717A8B /* FavSpotWrapper.swift */,
 				69EAE8262E05CA13004E31CD /* FavSpotsView.swift */,
@@ -609,6 +622,7 @@
 		69E55AAD2E02DD6A00B530D3 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				69537D432E34C61400562A5E /* Main */,
 				69D02A002E27C2680074E2E9 /* Settings */,
 				69C1292E2E157D5E0054411E /* Login */,
 				69C86FF32E12ACA900850490 /* register */,
@@ -873,6 +887,7 @@
 			files = (
 				69E55AD92E02EE0700B530D3 /* CustomInputField.swift in Sources */,
 				69DB83E22E267E53005489FD /* ProfileWrapper.swift in Sources */,
+				69537D422E34B52700562A5E /* SmartMatchBtn.swift in Sources */,
 				69E55AAF2E02DD9400B530D3 /* RegisterScreen.swift in Sources */,
 				69A923852E23BA15001EB624 /* AddBoardStep1ViewOld.swift in Sources */,
 				697184202E2BF6C90083BA31 /* SuccessMessageView.swift in Sources */,
@@ -977,6 +992,7 @@
 				69B24F7D2E2D36150098C5B7 /* ForecastOnlyCard.swift in Sources */,
 				69DB83ED2E268150005489FD /* StatItem.swift in Sources */,
 				6995DF5E2E33B5C30098718B /* AddBoardInputField.swift in Sources */,
+				69537D452E34C62B00562A5E /* MainViewModelWrapper.swift in Sources */,
 				69DB83EB2E267F56005489FD /* UserDetailsSectionView.swift in Sources */,
 				697E7CAF2E05656E0030392F /* LoadingView.swift in Sources */,
 				69B24F7B2E2D31260098C5B7 /* SwipeToDeleteCard.swift in Sources */,

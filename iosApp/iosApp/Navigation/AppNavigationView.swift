@@ -10,6 +10,8 @@ import SwiftUI
 import Shared
 
 struct AppNavigationView: View {
+    @StateObject private var mainViewModel = MainViewModelWrapper()
+
     @Environment(\.colorScheme) var colorScheme
 
     @State private var isLoggedIn: Bool? = nil
@@ -19,8 +21,10 @@ struct AppNavigationView: View {
     @State private var uid: String? = nil
     @State private var isRegistered: Bool = false
     @State private var onBoardingCompleted: Bool? = false
-    var sessionManager = SessionManager(context: nil)
-
+    
+    var sessionManager: SessionManager {
+            mainViewModel.viewModel.sessionManager
+    }
     
     
 

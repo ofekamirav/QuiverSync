@@ -41,23 +41,30 @@ struct QuiverView: View {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 16)], spacing: 16) {
                         ForEach(boards, id: \.id) { board in
-                            BoardCard(
-                                board: board,
-                                onClick: { selectedBoard = board },
-                                onPublishToggle: { surfboard, isChecked in
-                                    if isChecked && !(surfboard.isRentalPublished?.boolValue ?? false) {
-                                        boardViewModel.onEvent(event: QuiverEventShowPublishDialog(surfboardId: surfboard.id))
-                                    } else if !isChecked && (surfboard.isRentalPublished?.boolValue ?? false) {
-                                        boardViewModel.onEvent(event: QuiverEventUnpublishSurfboard(surfboardId: surfboard.id))
+                            let toggleBinding = Binding<Bool>(
+                                get: { board.isRentalPublished?.boolValue ?? false },
+                                set: { isChecked in
+                                    if isChecked && !(board.isRentalPublished?.boolValue ?? false) {
+                                        boardViewModel.onEvent(event: QuiverEventShowPublishDialog(surfboardId: board.id))
+                                    } else if !isChecked && (board.isRentalPublished?.boolValue ?? false) {
+                                        boardViewModel.onEvent(event: QuiverEventUnpublishSurfboard(surfboardId: board.id))
                                     }
                                 }
                             )
+
+                            BoardCard(
+                                board: board,
+                                onClick: { selectedBoard = board },
+                                isPublished: toggleBinding
+                            )
+
                         }
                     }
                     .padding(16)
                 }
                 .onAppear(){
                     showAddBtn = true
+                    print("QuiverView appeared with boards count: \(boards)")
                 }
             }
 
@@ -120,9 +127,6 @@ struct QuiverView: View {
                         boardViewModel.onEvent(event: QuiverEventDismissPublishDialog())
                     }
                 )
-                .onAppear(){
-                    print("Publish dialog appeared for surfboard: \(toPublish.model)")
-                }
             }
         }
         .background(AppColors.sectionBackground(for: colorScheme))

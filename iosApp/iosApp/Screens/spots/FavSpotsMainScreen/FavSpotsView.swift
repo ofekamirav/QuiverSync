@@ -43,16 +43,7 @@ public struct FavSpotsView: View {
                 // 🔹 Main List
                 ScrollView {
                     if !favSpots.boards.isEmpty {
-                            Toggle(isOn: $showAsForecastOnly) {
-                                Text(showAsForecastOnly ? "Showing Forecast Only" : "Showing Smart Match View")
-                                    .font(.subheadline)
-                                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
-                            }
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-                            .onAppear(){
-                                print("FavSpotsView: Boards available for spots: \(favSpots.boards)")
-                            }
+                        SmartMatchBtn(showForecastOnly: $showAsForecastOnly, colorScheme: colorScheme)
                     }
                     LazyVStack(spacing: 0) {
                         ForEach(favSpots.spots, id: \.spotID) { spot in
@@ -69,13 +60,10 @@ public struct FavSpotsView: View {
                                         spotToDelete = spot
                                     }
                                 )
+                                .padding()
                                 .padding(.vertical, 2)
                                 .padding(.horizontal, 8)
                                 .background(AppColors.sectionBackground(for: colorScheme))
-                                .onAppear(){
-                                    print("FavSpotsView: No boards available for spot \(spot.name)")
-                                    print("FavSpotsView: Boards count: \(favSpots)")
-                                }
                             } else {
                                 SwipeToDeleteCard(
                                     content: {
@@ -85,12 +73,12 @@ public struct FavSpotsView: View {
                                             favSpotsViewModel: favSpotsViewModel,
                                             selectedSpot: $selectedSpot
                                         )
-                                        .padding()
                                     },
                                     onDelete: {
                                         spotToDelete = spot
                                     }
                                 )
+                                .padding()
                                 .padding(.vertical, 2)
                                 .padding(.horizontal, 8)
                                 .background(AppColors.sectionBackground(for: colorScheme))
@@ -104,7 +92,7 @@ public struct FavSpotsView: View {
             }
 
             // ➕ Add Button
-            if selectedSpot == nil {
+            if selectedSpot == nil || !favSpots.spots.isEmpty {
                 Button(action: {
                     showAddSpotScreen = true
                 }) {

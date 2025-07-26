@@ -18,68 +18,73 @@ struct ForecastOnlyCard: View {
 
     var body: some View {
         if let forecast = forecast {
-            VStack(spacing: 12) {
-                // Header
-                HStack(alignment: .top, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(spot.name)
-                            .font(.system(.headline, design: .rounded))
-                            .foregroundColor(AppColors.textPrimary(for: colorScheme))
-
-                        Label(
-                            title: {
-                                Text("\(forecast.waveHeight, specifier: "%.1f") m wave")
-                            },
-                            icon: {
-                                Image(systemName: "waveform.path.ecg")
-                            }
-                        )
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
+            ZStack(alignment: .topTrailing) {
+                
+                VStack(spacing: 12) {
+                    // Header
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(spot.name)
+                                .font(.system(.headline, design: .rounded))
+                                .foregroundColor(AppColors.textPrimary(for: colorScheme))
+                            
+                            Label(
+                                title: {
+                                    Text("\(forecast.waveHeight, specifier: "%.1f") m wave")
+                                },
+                                icon: {
+                                    Image(systemName: "waveform.path.ecg")
+                                }
+                            )
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .foregroundColor(.gray)
                     }
-
-                    Spacer()
-
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .foregroundColor(.gray)
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    withAnimation(.easeInOut) {
-                        isExpanded.toggle()
+                    .padding(.top, 12)
+                    .padding(.horizontal)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        withAnimation(.easeInOut) {
+                            isExpanded.toggle()
+                        }
                     }
-                }
-
-                // Expanded details
-                if isExpanded {
-                    Divider()
-                        .transition(.opacity)
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        DetailRow(
-                            icon: "wind",
-                            label: "Wind",
-                            value: String(format: "%.1f km/h", forecast.windSpeed)
-                        )
-                        DetailRow(
-                            icon: "clock",
-                            label: "Swell Period",
-                            value: String(format: "%.1f s", forecast.swellPeriod)
-                        )
-                        DetailRow(
-                            icon: "location.north.line",
-                            label: "Wind Dir",
-                            value: String(format: "%.0f°", forecast.windDirection)
-                        )
-                        DetailRow(
-                            icon: "arrow.triangle.merge",
-                            label: "Swell Dir",
-                            value: String(format: "%.0f°", forecast.swellDirection)
-                        )
+                    
+                    // Expanded details
+                    if isExpanded {
+                        Divider()
+                            .transition(.opacity)
+                        
+                        VStack(alignment: .leading, spacing: 10) {
+                            DetailRow(
+                                icon: "wind",
+                                label: "Wind",
+                                value: String(format: "%.1f km/h", forecast.windSpeed)
+                            )
+                            DetailRow(
+                                icon: "clock",
+                                label: "Swell Period",
+                                value: String(format: "%.1f s", forecast.swellPeriod)
+                            )
+                            DetailRow(
+                                icon: "location.north.line",
+                                label: "Wind Dir",
+                                value: String(format: "%.0f°", forecast.windDirection)
+                            )
+                            DetailRow(
+                                icon: "arrow.triangle.merge",
+                                label: "Swell Dir",
+                                value: String(format: "%.0f°", forecast.swellDirection)
+                            )
+                        }
+                        .font(.caption)
+                        .foregroundColor(AppColors.textPrimary(for: colorScheme))
+                        .transition(.opacity.combined(with: .move(edge: .top)))
                     }
-                    .font(.caption)
-                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
-                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
             .padding()
@@ -89,10 +94,6 @@ struct ForecastOnlyCard: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(colorScheme == .dark ? AppColors.darkBorder : AppColors.borderGray, lineWidth: 1)
             )
-            .onAppear(){
-                // Ensure the forecast is loaded when the view appears
-                print("forecastOnlyCard: \(spot) and the forecast is \(forecast)")
-            }
         } else {
             EmptyView()
         }
