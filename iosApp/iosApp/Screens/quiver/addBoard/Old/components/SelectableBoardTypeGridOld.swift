@@ -10,7 +10,7 @@
 import SwiftUI
 import Shared
 
-struct SelectableBoardTypeGrid: View {
+struct SelectableBoardTypeGridOld: View {
     let selectedType: SurfboardType
     let onTypeSelected: (SurfboardType) -> Void
 

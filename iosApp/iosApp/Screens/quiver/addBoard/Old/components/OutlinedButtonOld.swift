@@ -9,7 +9,7 @@
 
 import SwiftUI
 
-struct OutlinedButton: View {
+struct OutlinedButtonOld: View {
     let text: String
     let icon: String?        // Optional system icon name (e.g., "arrow.right")
     let isEnabled: Bool

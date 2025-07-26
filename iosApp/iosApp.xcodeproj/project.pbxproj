@@ -55,6 +55,14 @@
 		697E7CAD2E0561C00030392F /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CAC2E0561B60030392F /* ProfileScreen.swift */; };
 		697E7CAF2E05656E0030392F /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CAE2E05656B0030392F /* LoadingView.swift */; };
 		697E7CB12E0565D80030392F /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697E7CB02E0565D50030392F /* ErrorView.swift */; };
+		6995DF4E2E33ACD80098718B /* AddBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6995DF4D2E33ACD10098718B /* AddBoardView.swift */; };
+		6995DF532E33AF3A0098718B /* AddBoardStep1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6995DF522E33AF380098718B /* AddBoardStep1View.swift */; };
+		6995DF552E33AF6D0098718B /* FinsSetupPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6995DF542E33AF6B0098718B /* FinsSetupPicker.swift */; };
+		6995DF582E33B13A0098718B /* SurfboardTypeGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6995DF572E33B12D0098718B /* SurfboardTypeGrid.swift */; };
+		6995DF5A2E33B14F0098718B /* SurfboardTypeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6995DF592E33B14D0098718B /* SurfboardTypeCard.swift */; };
+		6995DF5C2E33B2BA0098718B /* AddBoardStep2View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6995DF5B2E33B2B60098718B /* AddBoardStep2View.swift */; };
+		6995DF5E2E33B5C30098718B /* AddBoardInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6995DF5D2E33B5C20098718B /* AddBoardInputField.swift */; };
+		6995DF602E33B6A60098718B /* WizardNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6995DF5F2E33B6A50098718B /* WizardNavigationBar.swift */; };
 		699AE8AC2E1D3D0100717A8B /* FavSpotWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699AE8AB2E1D3CFA00717A8B /* FavSpotWrapper.swift */; };
 		69A923712E23A4F7001EB624 /* QuiverViewModelWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923702E23A4F6001EB624 /* QuiverViewModelWrapper.swift */; };
 		69A923742E23A961001EB624 /* BoardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923732E23A960001EB624 /* BoardCard.swift */; };
@@ -63,18 +71,18 @@
 		69A9237A2E23A9C0001EB624 /* CustomDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923792E23A9BF001EB624 /* CustomDialog.swift */; };
 		69A9237D2E23B7E0001EB624 /* AddBoardWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9237C2E23B7D4001EB624 /* AddBoardWrapper.swift */; };
 		69A9237F2E23B7E7001EB624 /* AddBoardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9237E2E23B7E3001EB624 /* AddBoardScreen.swift */; };
-		69A923822E23B7FB001EB624 /* AddBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923812E23B7F7001EB624 /* AddBoardView.swift */; };
-		69A923852E23BA15001EB624 /* AddBoardStep1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923842E23BA14001EB624 /* AddBoardStep1View.swift */; };
-		69A923872E23BA1D001EB624 /* AddBoardStep2View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923862E23BA1C001EB624 /* AddBoardStep2View.swift */; };
-		69A923892E23BA23001EB624 /* WizardNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923882E23BA22001EB624 /* WizardNavigationBar.swift */; };
-		69A9238B2E23BA2D001EB624 /* BoardImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9238A2E23BA2C001EB624 /* BoardImagePicker.swift */; };
-		69A9238D2E23BA34001EB624 /* SelectableBoardTypeGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9238C2E23BA33001EB624 /* SelectableBoardTypeGrid.swift */; };
-		69A9238F2E23BA3B001EB624 /* FinsSetupDropdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9238E2E23BA3A001EB624 /* FinsSetupDropdown.swift */; };
+		69A923822E23B7FB001EB624 /* AddBoardViewOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923812E23B7F7001EB624 /* AddBoardViewOld.swift */; };
+		69A923852E23BA15001EB624 /* AddBoardStep1ViewOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923842E23BA14001EB624 /* AddBoardStep1ViewOld.swift */; };
+		69A923872E23BA1D001EB624 /* AddBoardStep2ViewOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923862E23BA1C001EB624 /* AddBoardStep2ViewOld.swift */; };
+		69A923892E23BA23001EB624 /* WizardNavigationBarOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923882E23BA22001EB624 /* WizardNavigationBarOld.swift */; };
+		69A9238B2E23BA2D001EB624 /* BoardImagePickerOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9238A2E23BA2C001EB624 /* BoardImagePickerOld.swift */; };
+		69A9238D2E23BA34001EB624 /* SelectableBoardTypeGridOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9238C2E23BA33001EB624 /* SelectableBoardTypeGridOld.swift */; };
+		69A9238F2E23BA3B001EB624 /* FinsSetupDropdownOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9238E2E23BA3A001EB624 /* FinsSetupDropdownOld.swift */; };
 		69A923922E23C518001EB624 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923912E23C516001EB624 /* CustomTextField.swift */; };
 		69A923942E23C573001EB624 /* ImageSourceSelectorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923932E23C572001EB624 /* ImageSourceSelectorSheet.swift */; };
 		69A923962E23D06F001EB624 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923952E23D06E001EB624 /* ImagePicker.swift */; };
 		69A923992E23D17D001EB624 /* KotlinInteropExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A923982E23D17C001EB624 /* KotlinInteropExtensions.swift */; };
-		69A9239B2E23D262001EB624 /* OutlinedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9239A2E23D260001EB624 /* OutlinedButton.swift */; };
+		69A9239B2E23D262001EB624 /* OutlinedButtonOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A9239A2E23D260001EB624 /* OutlinedButtonOld.swift */; };
 		69B24F7B2E2D31260098C5B7 /* SwipeToDeleteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B24F7A2E2D31210098C5B7 /* SwipeToDeleteCard.swift */; };
 		69B24F7D2E2D36150098C5B7 /* ForecastOnlyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B24F7C2E2D36140098C5B7 /* ForecastOnlyCard.swift */; };
 		69C86FF52E12ACBF00850490 /* RegisterWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C86FF42E12ACB600850490 /* RegisterWrapper.swift */; };
@@ -171,6 +179,14 @@
 		697E7CAC2E0561B60030392F /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		697E7CAE2E05656B0030392F /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		697E7CB02E0565D50030392F /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		6995DF4D2E33ACD10098718B /* AddBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardView.swift; sourceTree = "<group>"; };
+		6995DF522E33AF380098718B /* AddBoardStep1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardStep1View.swift; sourceTree = "<group>"; };
+		6995DF542E33AF6B0098718B /* FinsSetupPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinsSetupPicker.swift; sourceTree = "<group>"; };
+		6995DF572E33B12D0098718B /* SurfboardTypeGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfboardTypeGrid.swift; sourceTree = "<group>"; };
+		6995DF592E33B14D0098718B /* SurfboardTypeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfboardTypeCard.swift; sourceTree = "<group>"; };
+		6995DF5B2E33B2B60098718B /* AddBoardStep2View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardStep2View.swift; sourceTree = "<group>"; };
+		6995DF5D2E33B5C20098718B /* AddBoardInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardInputField.swift; sourceTree = "<group>"; };
+		6995DF5F2E33B6A50098718B /* WizardNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WizardNavigationBar.swift; sourceTree = "<group>"; };
 		699AE8AB2E1D3CFA00717A8B /* FavSpotWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavSpotWrapper.swift; sourceTree = "<group>"; };
 		69A923702E23A4F6001EB624 /* QuiverViewModelWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuiverViewModelWrapper.swift; sourceTree = "<group>"; };
 		69A923732E23A960001EB624 /* BoardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardCard.swift; sourceTree = "<group>"; };
@@ -179,18 +195,18 @@
 		69A923792E23A9BF001EB624 /* CustomDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDialog.swift; sourceTree = "<group>"; };
 		69A9237C2E23B7D4001EB624 /* AddBoardWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardWrapper.swift; sourceTree = "<group>"; };
 		69A9237E2E23B7E3001EB624 /* AddBoardScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardScreen.swift; sourceTree = "<group>"; };
-		69A923812E23B7F7001EB624 /* AddBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardView.swift; sourceTree = "<group>"; };
-		69A923842E23BA14001EB624 /* AddBoardStep1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardStep1View.swift; sourceTree = "<group>"; };
-		69A923862E23BA1C001EB624 /* AddBoardStep2View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardStep2View.swift; sourceTree = "<group>"; };
-		69A923882E23BA22001EB624 /* WizardNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WizardNavigationBar.swift; sourceTree = "<group>"; };
-		69A9238A2E23BA2C001EB624 /* BoardImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardImagePicker.swift; sourceTree = "<group>"; };
-		69A9238C2E23BA33001EB624 /* SelectableBoardTypeGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableBoardTypeGrid.swift; sourceTree = "<group>"; };
-		69A9238E2E23BA3A001EB624 /* FinsSetupDropdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinsSetupDropdown.swift; sourceTree = "<group>"; };
+		69A923812E23B7F7001EB624 /* AddBoardViewOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardViewOld.swift; sourceTree = "<group>"; };
+		69A923842E23BA14001EB624 /* AddBoardStep1ViewOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardStep1ViewOld.swift; sourceTree = "<group>"; };
+		69A923862E23BA1C001EB624 /* AddBoardStep2ViewOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardStep2ViewOld.swift; sourceTree = "<group>"; };
+		69A923882E23BA22001EB624 /* WizardNavigationBarOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WizardNavigationBarOld.swift; sourceTree = "<group>"; };
+		69A9238A2E23BA2C001EB624 /* BoardImagePickerOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardImagePickerOld.swift; sourceTree = "<group>"; };
+		69A9238C2E23BA33001EB624 /* SelectableBoardTypeGridOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableBoardTypeGridOld.swift; sourceTree = "<group>"; };
+		69A9238E2E23BA3A001EB624 /* FinsSetupDropdownOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinsSetupDropdownOld.swift; sourceTree = "<group>"; };
 		69A923912E23C516001EB624 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 		69A923932E23C572001EB624 /* ImageSourceSelectorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSourceSelectorSheet.swift; sourceTree = "<group>"; };
 		69A923952E23D06E001EB624 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		69A923982E23D17C001EB624 /* KotlinInteropExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinInteropExtensions.swift; sourceTree = "<group>"; };
-		69A9239A2E23D260001EB624 /* OutlinedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlinedButton.swift; sourceTree = "<group>"; };
+		69A9239A2E23D260001EB624 /* OutlinedButtonOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlinedButtonOld.swift; sourceTree = "<group>"; };
 		69B24F7A2E2D31210098C5B7 /* SwipeToDeleteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToDeleteCard.swift; sourceTree = "<group>"; };
 		69B24F7C2E2D36140098C5B7 /* ForecastOnlyCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastOnlyCard.swift; sourceTree = "<group>"; };
 		69C86FF42E12ACB600850490 /* RegisterWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterWrapper.swift; sourceTree = "<group>"; };
@@ -383,6 +399,37 @@
 			path = profile;
 			sourceTree = "<group>";
 		};
+		6995DF4C2E33ACBE0098718B /* Old */ = {
+			isa = PBXGroup;
+			children = (
+				69A923832E23BA03001EB624 /* stepsAndWizard */,
+				69A923812E23B7F7001EB624 /* AddBoardViewOld.swift */,
+				69A923802E23B7EA001EB624 /* components */,
+			);
+			path = Old;
+			sourceTree = "<group>";
+		};
+		6995DF512E33AF2A0098718B /* WizardSteps */ = {
+			isa = PBXGroup;
+			children = (
+				6995DF5F2E33B6A50098718B /* WizardNavigationBar.swift */,
+				6995DF5B2E33B2B60098718B /* AddBoardStep2View.swift */,
+				6995DF522E33AF380098718B /* AddBoardStep1View.swift */,
+			);
+			path = WizardSteps;
+			sourceTree = "<group>";
+		};
+		6995DF562E33AF7D0098718B /* components */ = {
+			isa = PBXGroup;
+			children = (
+				6995DF5D2E33B5C20098718B /* AddBoardInputField.swift */,
+				6995DF592E33B14D0098718B /* SurfboardTypeCard.swift */,
+				6995DF572E33B12D0098718B /* SurfboardTypeGrid.swift */,
+				6995DF542E33AF6B0098718B /* FinsSetupPicker.swift */,
+			);
+			path = components;
+			sourceTree = "<group>";
+		};
 		699AE8AD2E1D3D3B00717A8B /* FavSpotsMainScreen */ = {
 			isa = PBXGroup;
 			children = (
@@ -408,11 +455,12 @@
 		69A9237B2E23B7CB001EB624 /* addBoard */ = {
 			isa = PBXGroup;
 			children = (
-				69A923832E23BA03001EB624 /* stepsAndWizard */,
-				69A923802E23B7EA001EB624 /* components */,
+				6995DF562E33AF7D0098718B /* components */,
+				6995DF512E33AF2A0098718B /* WizardSteps */,
+				6995DF4D2E33ACD10098718B /* AddBoardView.swift */,
 				69A9237E2E23B7E3001EB624 /* AddBoardScreen.swift */,
 				69A9237C2E23B7D4001EB624 /* AddBoardWrapper.swift */,
-				69A923812E23B7F7001EB624 /* AddBoardView.swift */,
+				6995DF4C2E33ACBE0098718B /* Old */,
 			);
 			path = addBoard;
 			sourceTree = "<group>";
@@ -420,10 +468,10 @@
 		69A923802E23B7EA001EB624 /* components */ = {
 			isa = PBXGroup;
 			children = (
-				69A9239A2E23D260001EB624 /* OutlinedButton.swift */,
-				69A9238E2E23BA3A001EB624 /* FinsSetupDropdown.swift */,
-				69A9238C2E23BA33001EB624 /* SelectableBoardTypeGrid.swift */,
-				69A9238A2E23BA2C001EB624 /* BoardImagePicker.swift */,
+				69A9239A2E23D260001EB624 /* OutlinedButtonOld.swift */,
+				69A9238E2E23BA3A001EB624 /* FinsSetupDropdownOld.swift */,
+				69A9238C2E23BA33001EB624 /* SelectableBoardTypeGridOld.swift */,
+				69A9238A2E23BA2C001EB624 /* BoardImagePickerOld.swift */,
 			);
 			path = components;
 			sourceTree = "<group>";
@@ -431,9 +479,9 @@
 		69A923832E23BA03001EB624 /* stepsAndWizard */ = {
 			isa = PBXGroup;
 			children = (
-				69A923882E23BA22001EB624 /* WizardNavigationBar.swift */,
-				69A923862E23BA1C001EB624 /* AddBoardStep2View.swift */,
-				69A923842E23BA14001EB624 /* AddBoardStep1View.swift */,
+				69A923882E23BA22001EB624 /* WizardNavigationBarOld.swift */,
+				69A923842E23BA14001EB624 /* AddBoardStep1ViewOld.swift */,
+				69A923862E23BA1C001EB624 /* AddBoardStep2ViewOld.swift */,
 			);
 			path = stepsAndWizard;
 			sourceTree = "<group>";
@@ -826,13 +874,13 @@
 				69E55AD92E02EE0700B530D3 /* CustomInputField.swift in Sources */,
 				69DB83E22E267E53005489FD /* ProfileWrapper.swift in Sources */,
 				69E55AAF2E02DD9400B530D3 /* RegisterScreen.swift in Sources */,
-				69A923852E23BA15001EB624 /* AddBoardStep1View.swift in Sources */,
+				69A923852E23BA15001EB624 /* AddBoardStep1ViewOld.swift in Sources */,
 				697184202E2BF6C90083BA31 /* SuccessMessageView.swift in Sources */,
 				69A923762E23A986001EB624 /* SurfboardDetailDialog.swift in Sources */,
 				69D02A202E27D7A40074E2E9 /* EditProfileScreen.swift in Sources */,
 				694F855B2E26EA6400C2322F /* TODOView.swift in Sources */,
 				6953D4612E2905F4005C54F5 /* SecurityAndPrivacyView.swift in Sources */,
-				69A9239B2E23D262001EB624 /* OutlinedButton.swift in Sources */,
+				69A9239B2E23D262001EB624 /* OutlinedButtonOld.swift in Sources */,
 				69DB83E72E267F24005489FD /* ProfileView.swift in Sources */,
 				694813FE2E1E870B00F9F297 /* Functions.swift in Sources */,
 				6904CA6F2E0BF0E10039C9D9 /* ExtendCard.swift in Sources */,
@@ -846,6 +894,7 @@
 				69E55ACB2E02DEAE00B530D3 /* RentalsScreen.swift in Sources */,
 				6918273D2E1EBCC700B26BD2 /* AddSpotScreen.swift in Sources */,
 				69C86FF72E12B4E500850490 /* RegisterView.swift in Sources */,
+				6995DF602E33B6A60098718B /* WizardNavigationBar.swift in Sources */,
 				691827412E1EC4FB00B26BD2 /* LocationManager.swift in Sources */,
 				697E7CB12E0565D80030392F /* ErrorView.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
@@ -860,15 +909,16 @@
 				69E55ADC2E02EE6A00B530D3 /* GradientButton.swift in Sources */,
 				6904CA752E0C027C0039C9D9 /* ForecastRow.swift in Sources */,
 				696392462E2E5D2B00C05C6A /* exploreScreen.swift in Sources */,
-				69A9238F2E23BA3B001EB624 /* FinsSetupDropdown.swift in Sources */,
+				69A9238F2E23BA3B001EB624 /* FinsSetupDropdownOld.swift in Sources */,
+				6995DF5A2E33B14F0098718B /* SurfboardTypeCard.swift in Sources */,
 				699AE8AC2E1D3D0100717A8B /* FavSpotWrapper.swift in Sources */,
 				69A923712E23A4F7001EB624 /* QuiverViewModelWrapper.swift in Sources */,
-				69A923892E23BA23001EB624 /* WizardNavigationBar.swift in Sources */,
+				69A923892E23BA23001EB624 /* WizardNavigationBarOld.swift in Sources */,
 				6953D46D2E2928E5005C54F5 /* OnBoardingWrapper.swift in Sources */,
 				69E55AF12E033BB200B530D3 /* BoardRecommendationCardView.swift in Sources */,
 				69E55ABB2E02DE3600B530D3 /* AddSpotView.swift in Sources */,
 				69E55AE22E02EF7A00B530D3 /* ProfileImageUpload.swift in Sources */,
-				69A9238B2E23BA2D001EB624 /* BoardImagePicker.swift in Sources */,
+				69A9238B2E23BA2D001EB624 /* BoardImagePickerOld.swift in Sources */,
 				69A9237D2E23B7E0001EB624 /* AddBoardWrapper.swift in Sources */,
 				6918273F2E1EBCD900B26BD2 /* AddSpotWrapper.swift in Sources */,
 				69A923942E23C573001EB624 /* ImageSourceSelectorSheet.swift in Sources */,
@@ -877,7 +927,7 @@
 				69DB83F32E268248005489FD /* DividerView.swift in Sources */,
 				69DB83F12E26823B005489FD /* UserDetailItem.swift in Sources */,
 				694F85592E26E7F300C2322F /* AppNavigationView.swift in Sources */,
-				69A923872E23BA1D001EB624 /* AddBoardStep2View.swift in Sources */,
+				69A923872E23BA1D001EB624 /* AddBoardStep2ViewOld.swift in Sources */,
 				69D02A222E27EFC90074E2E9 /* EditProfileFormView.swift in Sources */,
 				6904CA712E0BFB180039C9D9 /* WeeklyForecastPopup.swift in Sources */,
 				69EAE8272E05CA1E004E31CD /* FavSpotsView.swift in Sources */,
@@ -912,22 +962,28 @@
 				69D02A042E27C2890074E2E9 /* SettingsWrapper.swift in Sources */,
 				69A923922E23C518001EB624 /* CustomTextField.swift in Sources */,
 				69D02A1E2E27D7970074E2E9 /* EditProfileWrapper.swift in Sources */,
+				6995DF4E2E33ACD80098718B /* AddBoardView.swift in Sources */,
 				69E55AA92E02D20600B530D3 /* LoginView.swift in Sources */,
 				696392442E2E5D2300C05C6A /* exploreWrapper.swift in Sources */,
 				692B517D2E16D9B40036FCD8 /* LoginScreen.swift in Sources */,
+				6995DF552E33AF6D0098718B /* FinsSetupPicker.swift in Sources */,
+				6995DF532E33AF3A0098718B /* AddBoardStep1View.swift in Sources */,
 				69DB83E92E267F44005489FD /* ProfileHeaderView.swift in Sources */,
 				69DB83E02E265076005489FD /* ImageUploader.swift in Sources */,
 				6953D4682E2915FA005C54F5 /* ForgotPasswordView.swift in Sources */,
 				69E55AF52E033C0300B530D3 /* ForecastItemView.swift in Sources */,
+				6995DF582E33B13A0098718B /* SurfboardTypeGrid.swift in Sources */,
 				69C86FF52E12ACBF00850490 /* RegisterWrapper.swift in Sources */,
 				69B24F7D2E2D36150098C5B7 /* ForecastOnlyCard.swift in Sources */,
 				69DB83ED2E268150005489FD /* StatItem.swift in Sources */,
+				6995DF5E2E33B5C30098718B /* AddBoardInputField.swift in Sources */,
 				69DB83EB2E267F56005489FD /* UserDetailsSectionView.swift in Sources */,
 				697E7CAF2E05656E0030392F /* LoadingView.swift in Sources */,
 				69B24F7B2E2D31260098C5B7 /* SwipeToDeleteCard.swift in Sources */,
-				69A9238D2E23BA34001EB624 /* SelectableBoardTypeGrid.swift in Sources */,
-				69A923822E23B7FB001EB624 /* AddBoardView.swift in Sources */,
+				69A9238D2E23BA34001EB624 /* SelectableBoardTypeGridOld.swift in Sources */,
+				69A923822E23B7FB001EB624 /* AddBoardViewOld.swift in Sources */,
 				6953D45D2E2905E0005C54F5 /* SecurityAndPrivacyWrapper.swift in Sources */,
+				6995DF5C2E33B2BA0098718B /* AddBoardStep2View.swift in Sources */,
 				6953D46A2E2917A7005C54F5 /* ForgotPasswordSuccessView.swift in Sources */,
 				69A923782E23A9AD001EB624 /* PublishSurfboardDialog.swift in Sources */,
 			);

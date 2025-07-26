@@ -15,6 +15,8 @@ struct ProfileView: View {
 
     let user: User
     let boardsCount: Int
+    let spotsCount: Int
+    let rentalsCount: Int
     @Binding var isLoggedIn: Bool
 
     var body: some View {
@@ -23,7 +25,8 @@ struct ProfileView: View {
                 // COMPACT WIDTH (Mobile)
                 ScrollView {
                     VStack(spacing: 16) {
-                        ProfileHeaderView(user: user, boardsCount: boardsCount)
+                        ProfileHeaderView(user: user, boardsCount: boardsCount , spotsCount: spotsCount, rentalsCount: rentalsCount)
+                            
                         UserDetailsSectionView(user: user)
                             .frame( maxHeight: .infinity)
                     }
@@ -35,7 +38,7 @@ struct ProfileView: View {
                 // EXPANDED WIDTH (Tablet/Desktop)
                 HStack(alignment: .top, spacing: 16) {
                     VStack(spacing: 16) {
-                        ProfileHeaderView(user: user, boardsCount: boardsCount)
+                        ProfileHeaderView(user: user, boardsCount: boardsCount, spotsCount: spotsCount, rentalsCount: rentalsCount)
                     }
                     .frame(maxWidth: .infinity, alignment: .topLeading)
 

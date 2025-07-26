@@ -18,6 +18,8 @@ public struct FavSpotsView: View {
     @State private var selectedSpot: FavoriteSpot? = nil
     @State private var showAddSpotScreen = false
     @State private var spotToDelete: FavoriteSpot? = nil
+    @State private var showAsForecastOnly = false
+
 
     public var body: some View {
         
@@ -40,10 +42,22 @@ public struct FavSpotsView: View {
             } else {
                 // 🔹 Main List
                 ScrollView {
+                    if !favSpots.boards.isEmpty {
+                            Toggle(isOn: $showAsForecastOnly) {
+                                Text(showAsForecastOnly ? "Showing Forecast Only" : "Showing Smart Match View")
+                                    .font(.subheadline)
+                                    .foregroundColor(AppColors.textPrimary(for: colorScheme))
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                            .onAppear(){
+                                print("FavSpotsView: Boards available for spots: \(favSpots.boards)")
+                            }
+                    }
                     LazyVStack(spacing: 0) {
                         ForEach(favSpots.spots, id: \.spotID) { spot in
 
-                            if favSpots.boards.isEmpty{
+                            if favSpots.boards.isEmpty || showAsForecastOnly {
                                 SwipeToDeleteCard(
                                     content: {
                                         ForecastOnlyCard(

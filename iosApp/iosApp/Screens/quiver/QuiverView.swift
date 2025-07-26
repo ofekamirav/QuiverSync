@@ -127,12 +127,17 @@ struct QuiverView: View {
         }
         .background(AppColors.sectionBackground(for: colorScheme))
         .sheet(isPresented: $showAddBoardScreen) {
-            AddBoardScreen(
-                onBackRequested: {
-                    showAddBoardScreen = false
-                }
-            )
+            ZStack {
+                AddBoardScreen(
+                    onBackRequested: {
+                        showAddBoardScreen = false
+                    }
+                )
+            }
+            .background(AppColors.sectionBackground(for: colorScheme))
         }
+
+        
 
     }
 }

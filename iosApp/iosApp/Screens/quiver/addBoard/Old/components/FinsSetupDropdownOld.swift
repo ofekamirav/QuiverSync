@@ -9,7 +9,7 @@
 import SwiftUI
 import Shared
 
-struct FinsSetupDropdown: View {
+struct FinsSetupDropdownOld: View {
     let selected: FinsSetup
     let onSelected: (FinsSetup) -> Void
 

@@ -20,7 +20,7 @@ struct ForecastOnlyCard: View {
         if let forecast = forecast {
             VStack(spacing: 12) {
                 // Header
-                HStack {
+                HStack(alignment: .top, spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(spot.name)
                             .font(.system(.headline, design: .rounded))

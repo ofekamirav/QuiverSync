@@ -51,6 +51,7 @@ struct HomeView: View {
                             .foregroundColor(.gray)
                     }
                 }
+                .contentShape(Rectangle()) // Make entire area tappable
                 .padding(.vertical, 8)
                 .padding(.horizontal)
 

@@ -14,6 +14,8 @@ struct ProfileHeaderView: View {
 
     let user: User
     let boardsCount: Int
+    let spotsCount: Int
+    let rentalsCount: Int
 
     var body: some View {
         VStack(spacing: 12) {
@@ -34,18 +36,18 @@ struct ProfileHeaderView: View {
             }
 
             // Name
-            Text(user.name ?? "")
+            Text(user.name)
                 .font(.system(size: 24, weight: .semibold))
                 .foregroundColor(AppColors.textPrimary(for: colorScheme))
 
 
             // Stats Row
             HStack {
-                StatItem(label: "Rentals", value: "5")
+                StatItem(label: "Rentals", value: "\(rentalsCount)")
                 VerticalDivider()
                 StatItem(label: "Boards", value: "\(boardsCount)")
                 VerticalDivider()
-                StatItem(label: "Spots", value: "10")
+                StatItem(label: "Spots", value: "\(spotsCount)")
             }
             .padding(.vertical, 16)
             .background(AppColors.cardColor(for: colorScheme))
