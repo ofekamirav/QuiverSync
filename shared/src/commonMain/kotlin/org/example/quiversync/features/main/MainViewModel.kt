@@ -1,3 +1,5 @@
+// MainViewModel.kt
+
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -6,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.example.quiversync.data.session.SessionManager
+import org.example.quiversync.domain.usecase.user.LogoutUseCase
 import org.example.quiversync.domain.usecase.user.StartSyncsUseCase
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.utils.extensions.platformLogger

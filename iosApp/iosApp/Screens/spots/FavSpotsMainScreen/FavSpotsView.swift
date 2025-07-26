@@ -113,17 +113,22 @@ public struct FavSpotsView: View {
 
             // 📍 Weekly Forecast Popup
             if let spot = selectedSpot {
-                ZStack {
-                    WeeklyForecastPopup(
-                        selectedSpot: $selectedSpot,
-                        favSpotsData: favSpots,
-                        favSpotsViewModel: favSpotsViewModel
-                    )
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                if(favSpots.boards.isEmpty || showAsForecastOnly){
+                    
                 }
-                .zIndex(1)
-                .onAppear {
-                    favSpotsViewModel.onEvent(event: FavSpotsEventLoadWeekPredictions(favoriteSpot: spot))
+                else{
+                    ZStack {
+                        WeeklyForecastPopup(
+                            selectedSpot: $selectedSpot,
+                            favSpotsData: favSpots,
+                            favSpotsViewModel: favSpotsViewModel
+                        )
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    .zIndex(1)
+                    .onAppear {
+                        favSpotsViewModel.onEvent(event: FavSpotsEventLoadWeekPredictions(favoriteSpot: spot))
+                    }
                 }
             }
 

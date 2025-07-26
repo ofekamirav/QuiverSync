@@ -11,12 +11,12 @@ import Shared
 import Foundation
 
 class MainViewModelWrapper: ObservableObject {
-    let viewModel: MainViewModel
+    let viewModel: MainViewModel = KoinKt.mainViewModel()
 
-    init() {
-        viewModel = MainViewModel(
-            sessionManager: SessionManager(context: nil),
-            startSyncsUseCase: KoinKt.startSyncsUseCase()
-        )
-    }
+//    init() {
+//        viewModel = MainViewModel(
+//            sessionManager: SessionManager(context: nil),
+//            startSyncsUseCase: KoinKt.startSyncsUseCase()
+//        )
+//    }
 }

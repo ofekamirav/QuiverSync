@@ -19,22 +19,24 @@ struct BoardCard: View {
     var body: some View {
         Button(action: onClick) {
             VStack(spacing: 12) {
-                AsyncImage(
-                    url: URL(string: board.imageRes ?? ""),
-                    content: { image in
+                
+                AsyncImage(url: URL(string: board.imageRes ?? "")) { phase in
+                    switch phase {
+                    case .success(let image):
                         image
                             .resizable()
-                            .scaledToFit()
-                    },
-                    placeholder: {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundColor(.gray.opacity(0.3))
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 110, height: 130)
+                            .clipped()
+                            .cornerRadius(16)
+                    default:
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width: 110, height: 100)
+                            .cornerRadius(16)
                     }
-                )
-                .frame(height: 100)
-                .cornerRadius(10)
+                }
+
 
                 Text(board.model)
                     .font(.headline)

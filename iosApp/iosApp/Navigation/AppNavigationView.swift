@@ -22,10 +22,9 @@ struct AppNavigationView: View {
     @State private var isRegistered: Bool = false
     @State private var onBoardingCompleted: Bool? = false
     
-    var sessionManager: SessionManager {
-            mainViewModel.viewModel.sessionManager
-    }
     
+    private let sessionManager: SessionManager = KoinKt.sessionManager()
+
     
 
 
@@ -94,9 +93,12 @@ struct AppNavigationView: View {
                             ),
                             onLoginSuccess: {
                                 Task {
-                                    uid = try? await sessionManager.getUid()
-                                    print("🔁 onLoginSuccess triggered — this is the uid after login: \(String(describing: uid) )")
-                                    
+                                    let newUid = try? await sessionManager.getUid()
+                                    DispatchQueue.main.async {
+                                        uid = newUid
+                                        isLoggedIn = newUid != nil
+                                        print(("🔁 onLoginSuccess triggered — this is the uid after login: \(String(describing: uid) )"))
+                                    }
                                 }
                             },
                         )

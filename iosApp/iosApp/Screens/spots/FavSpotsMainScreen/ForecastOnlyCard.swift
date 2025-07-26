@@ -33,7 +33,7 @@ struct ForecastOnlyCard: View {
                                     Text("\(forecast.waveHeight, specifier: "%.1f") m wave")
                                 },
                                 icon: {
-                                    Image(systemName: "waveform.path.ecg")
+                                    Image(systemName: "water.waves")
                                 }
                             )
                             .font(.subheadline)
@@ -66,7 +66,7 @@ struct ForecastOnlyCard: View {
                                 value: String(format: "%.1f km/h", forecast.windSpeed)
                             )
                             DetailRow(
-                                icon: "clock",
+                                icon: "water.waves.and.arrow.trianglehead.up",
                                 label: "Swell Period",
                                 value: String(format: "%.1f s", forecast.swellPeriod)
                             )
