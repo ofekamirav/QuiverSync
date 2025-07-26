@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,11 +50,6 @@ fun BoardCard(
     val isPublished = board.isRentalPublished ?: false
     val isDark = isSystemInDarkTheme()
     val baseBackgroundColor = if (isDark) OceanPalette.DarkSurface else Color.White
-//    val placeholderId = if (isDark) {
-//        R.drawable.ic_board_placeholder_dark
-//    } else {
-//        R.drawable.ic_board_placeholder_light
-//    }
     val animatedBackgroundColor by animateColorAsState(
         targetValue = baseBackgroundColor,
         animationSpec = tween(300)
@@ -90,9 +86,9 @@ fun BoardCard(
                 placeholder = painterResource(id = R.drawable.logo_placeholder),
                 contentDescription = "Surfboard Image",
                 modifier = Modifier
-                    .size(80.dp)
-                    .padding(bottom = 12.dp)
-                    .clip(RoundedCornerShape(20.dp))
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(20.dp)),
+                contentScale = ContentScale.Fit
             )
             Text(
                 board.model,

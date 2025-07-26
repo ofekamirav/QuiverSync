@@ -1,5 +1,9 @@
 package org.example.quiversync.data.repository
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.toLocalDateTime
 import org.example.quiversync.QuiverSyncDatabase
 import org.example.quiversync.data.remote.api.StormGlassApi
@@ -18,10 +22,8 @@ class ForecastRepositoryImpl(
     private val database: QuiverSyncDatabase,
     private val sessionManager: SessionManager,
     private val geminiPredictionDao: GeminiPredictionDao,
-
 ): ForecastRepository {
     private val queries = database.dailyForecastQueries
-
     override suspend fun getWeeklyForecast(
         latitude: Double,
         longitude: Double,
@@ -57,7 +59,6 @@ class ForecastRepositoryImpl(
         else{
             howManyDaily = queries.howManyBySpot(latitude, longitude).executeAsOne().toInt()
             println("📦 Found $howManyDaily daily forecasts in local DB for ($latitude, $longitude)")
-
         }
 
         val userID = sessionManager.getUid()
@@ -236,6 +237,8 @@ class ForecastRepositoryImpl(
             return Result.Failure(TMDBError("Error deleting forecast: ${e.message ?: "Unknown error"}"))
         }
     }
+
+
 
 
 }

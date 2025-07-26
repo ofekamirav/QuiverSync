@@ -39,3 +39,8 @@ data class SpotsError(
 data class RentalError(
     override val message: String
 ): Error
+
+@Serializable
+data class ForecastError(
+    override val message: String
+): Error

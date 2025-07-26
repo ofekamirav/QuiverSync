@@ -44,6 +44,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.quiversync.R
 import org.example.quiversync.data.session.SessionManager
+import org.example.quiversync.features.login.LoginState
+import org.example.quiversync.features.login.LoginViewModel
 import org.example.quiversync.presentation.components.LoadingAnimation
 import org.example.quiversync.presentation.components.LottieSplashScreen
 import org.example.quiversync.presentation.components.SnackbarWithCountdown
@@ -64,33 +66,38 @@ import org.example.quiversync.presentation.screens.spots.FavoriteSpotsScreen
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.utils.LocalWindowInfo
 import org.example.quiversync.utils.WindowWidthSize
+import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation(
-    sessionManager: SessionManager = koinInject(),
     mainViewModel: MainViewModel = koinInject()
 ) {
     val navController = rememberNavController()
-    var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
-    val coroutineScope = rememberCoroutineScope()
+    val uid by mainViewModel.uidState.collectAsState()
+    val isInitialCheckDone by mainViewModel.isInitialCheckDone.collectAsState()
+    val isAppReady by mainViewModel.isAppReady.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showLottieSplash by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         val minSplashTime = 3000L
         val startTime = System.currentTimeMillis()
-        val uid = sessionManager.getUid()
-        Log.d("AppNavigation", "User ID from SessionManager: $uid")
-        isLoggedIn = uid != null
+        Log.d("AppNavigation", "Starting app initialization")
+
+        while (!isInitialCheckDone) {
+            delay(100)
+        }
+
         val endTime = System.currentTimeMillis()
         val elapsed = endTime - startTime
         if (elapsed < minSplashTime) {
             delay(minSplashTime - elapsed)
         }
         showLottieSplash = false
+        Log.d("AppNavigation", "App initialization completed. UID: $uid")
     }
 
     if (showLottieSplash) {
@@ -103,13 +110,15 @@ fun AppNavigation(
         return
     }
 
-    if (isLoggedIn == null) {
+    if (!isInitialCheckDone) {
         Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ) {
             LoadingAnimation(
                 isLoading = true,
-                animationFileName = "quiver_sync_loading_animation.json"
+                animationFileName = "quiver_sync_loading_animation.json",
+                animationSize = 240.dp
+
             )
             return
         }
@@ -147,7 +156,11 @@ fun AppNavigation(
             "Profile"
         )
     )
-    val startDestination = if (isLoggedIn == true) Screen.Home.route else Screen.Login.route
+    val startDestination = when {
+        uid != null && isAppReady -> Screen.Home.route
+        uid != null && !isAppReady -> Screen.Login.route
+        else -> Screen.Login.route
+    }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val hideTopBarRoutes = listOf(
@@ -317,26 +330,32 @@ fun AppNavigation(
                     .fillMaxSize()
             ) {
                 composable(Screen.Login.route) {
-                    LoginScreen(
-                        onSignInSuccess = {
-                            coroutineScope.launch {
-                                val uid = sessionManager.getUid()
-                                isLoggedIn = uid != null
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo(0)
-                                }
+                    val viewModel: LoginViewModel = koinViewModel()
+                    val loginState by viewModel.loginState.collectAsState()
+
+                    LaunchedEffect(loginState) {
+                        if (loginState is LoginState.NavigateToOnboarding) {
+                            navController.navigate(Screen.CompleteRegister.route) {
+                                popUpTo(0)
                             }
-                        },
+                        } else if (loginState is LoginState.Loaded) {
+                            // המתן לסיום הסנכרון לפני המעבר
+                            while (!isAppReady) {
+                                delay(100)
+                            }
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(0)
+                            }
+                        }
+                    }
+
+                    LoginScreen(
+                        viewModel = viewModel,
                         onRegisterClick = {
                             navController.navigate(Screen.Register.route)
                         },
                         onForgotPasswordClick = {
                             navController.navigate(Screen.ForgotPassword.route)
-                        },
-                        onNavigateToOnboarding = {
-                            navController.navigate(Screen.CompleteRegister.route) {
-                                popUpTo(0)
-                            }
                         }
                     )
                 }
@@ -422,7 +441,6 @@ fun AppNavigation(
                         },
                         onHelpSupport = {},
                         onLogout = {
-                            isLoggedIn = false
                             navController.navigate(Screen.Login.route) {
                                 popUpTo(0)
                             }

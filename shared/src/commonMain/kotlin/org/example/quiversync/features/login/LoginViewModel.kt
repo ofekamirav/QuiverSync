@@ -7,13 +7,14 @@ import kotlinx.coroutines.launch
 import org.example.quiversync.domain.usecase.loginUseCases.LoginUserUseCase
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.data.local.Result
+import org.example.quiversync.data.session.SessionManager
 import org.example.quiversync.domain.usecase.loginUseCases.SignInWithGoogleUseCase
 import org.example.quiversync.domain.usecase.user.StartSyncsUseCase
 import org.example.quiversync.utils.extensions.platformLogger
 
 
 class LoginViewModel (
-    private val loginUseCases : LoginUseCases,
+    private val loginUseCases : LoginUseCases
 ): BaseViewModel() {
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle(LoginData()))
@@ -62,13 +63,15 @@ class LoginViewModel (
                 email = currentState.data.email,
                 password = currentState.data.password
             )
-            when(result){
+            when (result) {
                 is Result.Success -> {
                     _loginState.emit(LoginState.Loaded)
+                    platformLogger("LoginViewModel", "Existing user logged in, loading main screen.")
                 }
                 is Result.Failure -> {
                     val errorMessage = result.error?.message ?: "An unknown error occurred during login."
-                    _loginState.emit(LoginState.Error(errorMessage))                }
+                    _loginState.emit(LoginState.Error(errorMessage))
+                }
             }
         }
 

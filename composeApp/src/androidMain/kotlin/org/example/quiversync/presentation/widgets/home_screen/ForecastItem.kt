@@ -26,11 +26,14 @@ import androidx.compose.ui.unit.dp
 import org.example.quiversync.R
 import org.example.quiversync.presentation.theme.OceanPalette
 import org.example.quiversync.utils.extentions.UnitConverter
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ForecastItem(day: String, date: String, waveHeight: String, wind: String) {
     val isDark = isSystemInDarkTheme()
+    val formattedDate = formatToDayFirst(date)
     val cardColor = if (isDark) MaterialTheme.colorScheme.surface else Color.White
     Card(
         colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -45,7 +48,7 @@ fun ForecastItem(day: String, date: String, waveHeight: String, wind: String) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(UnitConverter.getDayOfWeekName(day), fontWeight = FontWeight.Bold, color = OceanPalette.DeepBlue)
-                Text(date, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                Text(formattedDate, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -67,5 +70,18 @@ fun ForecastItem(day: String, date: String, waveHeight: String, wind: String) {
                 Text(wind, color = OceanPalette.DeepBlue)
             }
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun formatToDayFirst(dateString: String): String {
+    val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val outputDayFirst = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    return try {
+        val date = LocalDate.parse(dateString, inputFormatter)
+        date.format(outputDayFirst)
+    } catch (e: Exception) {
+        dateString
     }
 }

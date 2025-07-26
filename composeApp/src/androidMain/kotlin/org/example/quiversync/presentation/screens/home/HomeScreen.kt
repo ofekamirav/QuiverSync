@@ -51,15 +51,11 @@ fun HomeScreen(
         android.Manifest.permission.ACCESS_FINE_LOCATION
     )
 
-    LaunchedEffect(Unit) {
-        if (!locationPermissionState.status.isGranted) {
-            locationPermissionState.launchPermissionRequest()
-        }
-    }
-
-    LaunchedEffect(locationPermissionState.status.isGranted) {
+    LaunchedEffect(locationPermissionState.status) {
         if (locationPermissionState.status.isGranted) {
-            viewModel.refreshWithLocation()
+            viewModel.initialLoadWithLocation()
+        } else {
+            locationPermissionState.launchPermissionRequest()
         }
     }
 
@@ -68,6 +64,7 @@ fun HomeScreen(
             showBottomSheet = true
         }
     }
+
     if (showBottomSheet) {
         WelcomeBottomSheet(
             show = showBottomSheet,
@@ -111,7 +108,23 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Error: $message", color = MaterialTheme.colorScheme.error)
+                ErrorScreen(
+                    message = message,
+                    modifier = Modifier.padding(16.dp),
+                    icon = Icons.Default.LocationOn,
+                    buttonText = if (message.contains("Location permission", ignoreCase = true)) {
+                        "Grant Permission"
+                    } else {
+                        "Retry"
+                    },
+                    onButtonClick = {
+                        if (message.contains("Location permission", ignoreCase = true)) {
+                            locationPermissionState.launchPermissionRequest()
+                        } else {
+                            viewModel.refreshWithLocation()
+                        }
+                    }
+                )
             }
         }
     }
