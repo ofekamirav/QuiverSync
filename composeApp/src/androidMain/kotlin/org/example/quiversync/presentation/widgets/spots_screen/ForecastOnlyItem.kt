@@ -1,9 +1,13 @@
 package org.example.quiversync.presentation.widgets.spots_screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,6 +20,7 @@ import org.example.quiversync.utils.extentions.UnitConverter
 import java.text.DecimalFormat
 import org.example.quiversync.R
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ForecastOnlyItem(
     forecast: DailyForecast,
@@ -27,6 +32,7 @@ fun ForecastOnlyItem(
     val waveUnit = if (isImperial) "ft" else "m"
     val windUnit = if (isImperial) "knots" else "m/s"
     val swell = df.format(forecast.swellPeriod)
+    val dayName = UnitConverter.getDayOfWeekName(forecast.date)
 
     Column(
         modifier = Modifier
@@ -35,10 +41,16 @@ fun ForecastOnlyItem(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
+            text = dayName,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
             text = forecast.date,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onSurface
         )
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             InfoItem(R.drawable.ic_waves, "$waveValue $waveUnit")

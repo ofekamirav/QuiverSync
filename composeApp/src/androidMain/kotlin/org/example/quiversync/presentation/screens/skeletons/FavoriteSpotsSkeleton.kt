@@ -86,36 +86,52 @@ fun ExpandableSpotCardSkeleton(brush: Brush) {
 
 @Composable
 fun FavoriteSpotsScreenSkeleton(modifier: Modifier = Modifier) {
-    val isDark = isSystemInDarkTheme()
     val brush = rememberShimmerBrush()
     val windowInfo = LocalWindowInfo.current
 
-    when (windowInfo.widthSize) {
-        WindowWidthSize.COMPACT -> {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(6) {
-                    ExpandableSpotCardSkeleton(brush = brush)
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
+                .height(40.dp)
+                .width(240.dp)
+                .clip(RoundedCornerShape(50.dp))
+                .background(brush)
+        )
+
+        when (windowInfo.widthSize) {
+            WindowWidthSize.COMPACT -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(6) {
+                        ExpandableSpotCardSkeleton(brush = brush)
+                    }
                 }
             }
-        }
-        else -> { // MEDIUM or EXPANDED
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 300.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(8) {
-                    ExpandableSpotCardSkeleton(brush = brush)
+
+            else -> { // MEDIUM or EXPANDED
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 300.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(8) {
+                        ExpandableSpotCardSkeleton(brush = brush)
+                    }
                 }
             }
         }

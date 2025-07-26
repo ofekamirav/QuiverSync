@@ -122,7 +122,9 @@ fun HomeScreen(
                         if (message.contains("Location permission", ignoreCase = true)) {
                             locationPermissionState.launchPermissionRequest()
                         } else{
-                            viewModel.refresh()
+                            if (!locationPermissionState.status.isGranted) {
+                                locationPermissionState.launchPermissionRequest()
+                            }
                         }
                     }
                 )
