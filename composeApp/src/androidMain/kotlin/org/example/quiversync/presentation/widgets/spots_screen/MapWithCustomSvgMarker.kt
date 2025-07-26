@@ -26,6 +26,7 @@ import com.google.maps.android.compose.CameraPositionState
 
 @Composable
 fun MapWithCustomSvgMarker(
+    modifier: Modifier = Modifier,
     position: LatLng,
     cameraPositionState: CameraPositionState,
     onMapClick: (LatLng) -> Unit,
@@ -48,7 +49,7 @@ fun MapWithCustomSvgMarker(
     }
 
     GoogleMap(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         cameraPositionState = cameraPositionState,
         onMapClick = { latLng ->
             onMapClick(latLng)

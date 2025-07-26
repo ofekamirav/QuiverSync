@@ -29,6 +29,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -49,11 +50,6 @@ fun SurfboardDetailDialog(
     onDelete: (Surfboard) -> Unit = {}
 ) {
     val isDark = isSystemInDarkTheme()
-    val placeholderId = if (isDark) {
-        R.drawable.ic_board_placeholder_dark
-    } else {
-        R.drawable.ic_board_placeholder_light
-    }
     AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Dialog(onDismissRequest = onDismiss) {
@@ -80,11 +76,12 @@ fun SurfboardDetailDialog(
 
                             AsyncImage(
                                 model = board.imageRes,
-                                placeholder = painterResource(id = placeholderId),
+                                placeholder = painterResource(id = R.drawable.logo_placeholder),
                                 contentDescription = "Surfboard Image",
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
+                                    .clip(RoundedCornerShape(12.dp))
                                     .padding(vertical = 8.dp)
                             )
 

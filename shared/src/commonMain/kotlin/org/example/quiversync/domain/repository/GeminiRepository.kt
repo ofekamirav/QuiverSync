@@ -29,4 +29,6 @@ interface GeminiRepository {
         surfboards: List<Surfboard>,
         dailyForecasts: List<DailyForecast>
     ): Result<List<GeminiPrediction>, Error>
+
+    fun deletePredictionsBySurfboardId(surfboardId: String, userId: String): Result<Unit, Error>
 }

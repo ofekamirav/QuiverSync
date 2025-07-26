@@ -42,11 +42,17 @@ class GeminiRepositoryImpl(
                 user.uid
             )
             if (existingPrediction != null) {
-                println("GeminiRepositoryImpl : generateSingleDayMatch() - Found existing prediction with score ${existingPrediction.score} ")
-                return Result.Success(existingPrediction)
-            }else{
-                platformLogger("GeminiRepositoryImpl", "generateSingleDayMatch() - No existing prediction found, generating new match")
+                val isPredictionValid = surfboards.any { it.id == existingPrediction.surfboardID }
+
+                if (isPredictionValid) {
+                    platformLogger("GeminiRepositoryImpl", "Found VALID existing prediction for board ID ${existingPrediction.surfboardID}")
+                    return Result.Success(existingPrediction)
+                } else {
+                    platformLogger("GeminiRepositoryImpl", "Found STALE prediction for deleted board ID ${existingPrediction.surfboardID}. Deleting it.")
+                    dao.deleteMatchById(existingPrediction.predictionID)
+                }
             }
+            platformLogger("GeminiRepositoryImpl", "No valid prediction found, generating new match from API.")
             when (val result = api.predictionForOneDay(surfboards, dailyForecast, user)) {
                 is Result.Failure -> Result.Failure(result.error)
                 is Result.Success -> {
@@ -67,9 +73,6 @@ class GeminiRepositoryImpl(
             Result.Failure(GeminiError(e.message ?: "Unknown error"))
         }
     }
-
-
-
 
 
 
@@ -160,17 +163,11 @@ class GeminiRepositoryImpl(
         dailyForecasts: List<DailyForecast>
     ): Result<List<GeminiPrediction>, Error> {
         return try {
-//            println("🌀 Starting prediction generation for all spots (User: ${user.uid})")
-//            println("📆 Received ${dailyForecasts.size} forecasts for today:\n" +
-//                    dailyForecasts.joinToString("\n") {
-//                        "• Date: ${it.date}, Location: (${it.latitude}, ${it.longitude}), WaveHeight: ${it.waveHeight}m"
-//                    }
-//            )
-
             val predictions = mutableListOf<GeminiPrediction>()
             val forecastsForProcess = mutableListOf<DailyForecast>()
             val userUid = sessionManager.getUid()
                 ?: return Result.Failure(GeminiError("User UID is null, cannot generate predictions"))
+            val validBoardIds = surfboards.map { it.id }.toSet()
 
             dailyForecasts.forEach { forecast ->
                 val existingPrediction = dao.getMatch(
@@ -181,20 +178,22 @@ class GeminiRepositoryImpl(
                 )
 
                 if (existingPrediction != null) {
-//                    println("✅ Existing prediction found for ${forecast.date} at (${forecast.latitude}, ${forecast.longitude}) → Skipping")
-                    predictions.add(existingPrediction)
+                    if (existingPrediction.surfboardID in validBoardIds) {
+                        predictions.add(existingPrediction)
+                    } else {
+                        platformLogger("GeminiRepo", "generateAllSpots: Found and deleted STALE prediction for board ${existingPrediction.surfboardID}")
+                        dao.deleteMatchById(existingPrediction.predictionID)
+                        forecastsForProcess.add(forecast)
+                    }
                 } else {
-//                    println("🆕 No prediction for ${forecast.date} at (${forecast.latitude}, ${forecast.longitude}) → Will generate")
                     forecastsForProcess.add(forecast)
                 }
             }
 
             if (forecastsForProcess.isEmpty()) {
-//                println("🎉 All predictions already exist — returning ${predictions.size} predictions")
                 return Result.Success(predictions)
             }
 
-//            println("🚀 Sending ${forecastsForProcess.size} forecasts to Gemini API for prediction:")
             forecastsForProcess.forEachIndexed { i, f ->
                 println("   🔹 [$i] ${f.date} @ (${f.latitude}, ${f.longitude}) - Wave: ${f.waveHeight}m, Wind: ${f.windSpeed}m/s")
             }
@@ -221,6 +220,18 @@ class GeminiRepositoryImpl(
 
         } catch (e: Exception) {
             println("🔥 Exception during prediction generation: ${e.message}")
+            Result.Failure(GeminiError(e.message ?: "Unknown error"))
+        }
+    }
+
+    override fun deletePredictionsBySurfboardId(
+        surfboardId: String,
+        userId: String,
+    ): Result<Unit, Error> {
+        return try {
+            dao.deleteAllPredictionsBySurfboard(surfboardId, userId)
+            Result.Success(Unit)
+        } catch (e: Exception) {
             Result.Failure(GeminiError(e.message ?: "Unknown error"))
         }
     }

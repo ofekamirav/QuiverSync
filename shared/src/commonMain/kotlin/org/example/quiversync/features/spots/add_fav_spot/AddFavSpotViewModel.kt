@@ -8,6 +8,7 @@ import org.example.quiversync.data.local.Result
 import org.example.quiversync.domain.model.FavoriteSpot
 import org.example.quiversync.features.BaseViewModel
 import org.example.quiversync.features.spots.FavSpotsUseCases
+import org.example.quiversync.utils.extensions.platformLogger
 
 class AddFavSpotViewModel(
     private val favSpotUseCases: FavSpotsUseCases
@@ -70,11 +71,13 @@ class AddFavSpotViewModel(
                 is Result.Success -> {
                    val forecast = forecastResult.data
                     if (forecast == null) {
+                        platformLogger("AddFavSpotViewModel", ">>> [DEBUG] 🛑 FAILURE: No forecast data available for this spot.")
                         _addFavSpotState.emit(AddFavSpotState.Error("No forecast data available for this spot"))
                         return@launch
                     }
                     forecast.let { dailyForecasts ->
                         if(dailyForecasts.first().waveHeight <= 0.0) {
+                            platformLogger("AddFavSpotViewModel", ">>> [DEBUG] 🛑 FAILURE: Invalid spot, no waves detected.")
                             _addFavSpotState.emit(AddFavSpotState.Error("Please enter a valid spot near the ocean yew!"))
                             return@launch
                         }
@@ -82,6 +85,7 @@ class AddFavSpotViewModel(
 
                 }
                 is Result.Failure -> {
+                    platformLogger("AddFavSpotViewModel", ">>> [DEBUG] 🛑 FAILURE: Failed to fetch forecast: ${forecastResult.error?.message}")
                     _addFavSpotState.emit(AddFavSpotState.Error("Failed to fetch forecast: ${forecastResult.error?.message}"))
                     return@launch
                 }
@@ -89,6 +93,7 @@ class AddFavSpotViewModel(
 
             val result = favSpotUseCases.addFavSpotUseCase(spot)
             if( result is Result.Success ) {
+                platformLogger("AddFavSpotViewModel", ">>> [DEBUG] 🛑 SUCCESS: Favorite spot added successfully.")
                 _addFavSpotState.emit(AddFavSpotState.Loaded)
             } else {
                 _addFavSpotState.emit(AddFavSpotState.Error("Failed to add favorite spot"))

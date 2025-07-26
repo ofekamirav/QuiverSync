@@ -59,8 +59,6 @@ INSERT INTO GeminiPredictionEntity(
     userID, surfboardID, forecastDate, forecastLatitude, forecastLongitude, score , description
 ) VALUES (?, ?, ?, ?, ?, ?, ?);
 
-
-
 deleteAllPredictions:
 DELETE FROM GeminiPredictionEntity;
 
@@ -69,3 +67,12 @@ SELECT * FROM GeminiPredictionEntity
 WHERE userID = ?
   AND forecastLatitude = ?
   AND forecastLongitude = ?;
+
+DeletePredictionByID:
+DELETE FROM GeminiPredictionEntity
+WHERE predictionID = ?;
+
+DeleteAllPredictionsBySurfboardIDAndUserID:
+DELETE FROM GeminiPredictionEntity
+WHERE userID = ?
+  AND surfboardID = ?;
